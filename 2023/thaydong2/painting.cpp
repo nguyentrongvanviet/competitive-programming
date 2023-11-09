@@ -58,73 +58,93 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 50+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n; 
-int a[N][N] ; 
+int TYPE , n , k   ;
 vi g[N] ; 
+int a[N][N] ;
 void doc()
-{
-   	cin>> n; 
-   	FOR(i,1,n)FOR(j,1,n)cin>>a[i][j]; 
-	FOR(i,1,n)FOR(j,1,n)
-	{
-		if(a[i][j]==1)
-		{
-			g[i].pb(j) ; 
-		}
-	}
+{		
+    cin>> n >> k; 
+    FOR(i,1,k)
+    {
+    	int u ,v ; cin>>u >>v; 
+    	g[u].pb(v)  ; 
+    	a[u][v] = 1; 
+    }
 }
 
 namespace sub1
 {
-	int dd[N] ; 
-	int pa[N] ; 
+	int pa[N] ,dd[N] ; 
 	bool dfs(int u)
 	{
 		if(dd[u])return 0 ;
-		dd[u] = 1; 
-		for(auto v: g[u])
+		dd[u] =1 ; 
+		for(auto v:g[u])if(pa[v]==0||dfs(pa[v]))
 		{
-			if(pa[v]==0||dfs(pa[v]))
-			{
-				pa[v] = u ; 
-				return 1; 
-			}
+			pa[v] = u; 
+			return 1; 
 		}
-		return 0 ; 
+		return 0 ;
 	}
-	int ne[N] ; 
     void xuly()
     {
-    	FOR(i,1,n)
-    	{
-    		FOR(j,1,n)dd[j] = 0; 
-    		dfs(i) ; 
-    	}
-    	int tmp= 0 ;
-    	FOR(i,1,n)
-    	{
-    		tmp+=(pa[i]!=0) ;
-    		ne[pa[i]] = i;
-    	}
-    	if(tmp!=n)return void(cout<<-1<<el) ;
-    	ve<pii>res;
-    	FOR(i,1,n)
-    	{ 
-    		int u = pa[i] ; 
-    		if(u==i)continue ;
-    		res.pb({u,i}) ;   
-    		int xv= ne[i] ; 
-    		pa[v] = u ; 
-    		ne[u] = v ;
-    	}
-    	cout<<SZ(res)<<el;
-    	for(auto x : res)cout<<1<<" "<<x.fi<<" "<<x.se<<el;
+        FOR(i,1,n)
+        {
+        	FOR(j,1,n)dd[j] = 0 ;
+        	dfs(i) ; 
+        }
+        int res = 0;
+        FOR(i,1,n)
+        {
+        	res+=(pa[i]>0)  ;
+        }
+        cout<<res;
     }
 }
-
+namespace sub2
+{
+	int s[N][N] ; 
+	int get(int x, int y ,int u ,int v)
+	{
+		return s[u][v] - s[u][y-1]-s[x-1][v]+s[x-1][y-1] ; 
+	}
+	int f[N][N][N][N] ; 
+	int tinh(int x, int y ,int u ,int v)
+	{
+		if(x>u||y>v)return 0 ; 
+		if(x==u&&y==v)
+		{
+			return a[x][y] == 1; 
+		}
+		int &val = f[x][y][u][v] ;
+		if(val!=-1)return val; 
+		val = max(u-x+1,v-y+1) ; 
+		FOR(j,y,v)
+		{
+			if(get(x,j,u,j)==0) 
+			{
+				mini(val,tinh(x,y,u,j-1)+tinh(x,j+1,u,v)) ; 
+			}
+		}
+		FOR(i,x,u)
+		{
+			if(tinh(i,y,i,v)==0)
+			{
+				mini(val,tinh(x,y,i-1,v)+tinh(i+1,y,u,v)); 
+			}
+		}
+		return val; 
+	}
+	void xuly()
+	{	
+		FOR(i,1,n)FOR(j,1,n)s[i][j]=s[i-1][j]+s[i][j-1]-s[i-1][j-1]+a[i][j] ; 
+		FOR(x,1,n)FOR(y,1,n)FOR(u,1,n)FOR(v,1,n)f[x][y][u][v] =-1 ; 
+		cout<<tinh(1,1,n,n)<<el;
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -138,8 +158,10 @@ signed main()
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
+        cin>>TYPE ;
         doc() ; 
-        sub1::xuly() ; 
+        if(TYPE==1)sub1::xuly() ; 
+        else sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

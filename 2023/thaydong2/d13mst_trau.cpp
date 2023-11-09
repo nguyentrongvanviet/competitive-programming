@@ -5,9 +5,9 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "d13mst"
 #define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
+#define OUTPUT TASK".ANS"
 
 bool mtt = 0 ;
 int test = 1 ;  
@@ -58,70 +58,126 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n; 
-int a[N][N] ; 
-vi g[N] ; 
+int n , q; 
+
 void doc()
 {
-   	cin>> n; 
-   	FOR(i,1,n)FOR(j,1,n)cin>>a[i][j]; 
-	FOR(i,1,n)FOR(j,1,n)
-	{
-		if(a[i][j]==1)
-		{
-			g[i].pb(j) ; 
-		}
-	}
+	cin>> n >>q ;    
 }
-
-namespace sub1
+namespace sub11
 {
-	int dd[N] ; 
-	int pa[N] ; 
-	bool dfs(int u)
+	const int N = 2e3+5 ;
+	ll C[N][N] ; 
+	struct Edge
 	{
-		if(dd[u])return 0 ;
-		dd[u] = 1; 
-		for(auto v: g[u])
+		int u ,v ; 
+		ll w ;
+		bool operator<(const Edge&a)const
 		{
-			if(pa[v]==0||dfs(pa[v]))
+			return w<a.w;
+		}
+	} ;
+	Edge E[N*N] ;
+	int pa[N] ; 
+	int goc(int u)
+	{
+		return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
+	}
+	bool hop(int u ,int v)
+	{
+		int chau = goc(u) ; 
+		int chav = goc(v) ; 
+		if(chau==chav)return 0 ;
+		pa[chau] = chav; 
+		return 1; 
+	}  
+	void xuly()
+	{
+		FOR(i,1,q)
+		{
+			int x, y,  u , v,w ;
+			cin>>x>>y>>u>>v>>w ; 
+			FOR(i,x,y)FOR(j,u,v)
 			{
-				pa[v] = u ; 
-				return 1; 
+				C[i][j]+=w ;
 			}
 		}
-		return 0 ; 
+		int m =0 ; 
+		FOR(i,1,n)FOR(j,1,n)if(i<j)
+		{
+			//  cout<<i<<" "<<j<<" "<<C[i][j]<<el;
+			E[++m] ={i,j,C[i][j]} ;  
+		}
+		sort(E+1,E+m+1) ; 
+		FOR(i,1,n)pa[i] = i; 
+		ll res =0 ;
+    	FOR(i,1,m)
+    	{
+    		if(hop(E[i].u,E[i].v))res+=E[i].w ; 
+    	} 
+    	cout<<res;
 	}
-	int ne[N] ; 
-    void xuly()
+}
+namespace sub1
+{
+	const int N =2e3+5;
+	ll C[N][N] ; 
+	struct Edge
+	{
+		int u ,v ; 
+		ll w ;
+		bool operator<(const Edge&a)const
+		{
+			return w<a.w;
+		}
+	} ;
+	Edge E[N*N] ;  
+	int pa[N] ; 
+	int goc(int u)
+	{
+		return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
+	}
+	bool hop(int u ,int v)
+	{
+		int chau = goc(u) ; 
+		int chav = goc(v) ; 
+		if(chau==chav)return 0 ;
+		pa[chau] = chav; 
+		return 1; 
+	}
+    void xuly() 
     {
-    	FOR(i,1,n)
+    	FOR(i,1,q)
     	{
-    		FOR(j,1,n)dd[j] = 0; 
-    		dfs(i) ; 
+    		int x , y, u , v ; 
+    		ll w; 
+    		cin>> x >>y >>u >> v >>w; 
+    		C[x][u]+=w;
+    		C[y+1][u]-=w ; 
+    		C[x][v+1]-=w;
+    		C[y+1][v+1]+=w;
     	}
-    	int tmp= 0 ;
-    	FOR(i,1,n)
+    	int m = 0;
+    	FOR(i,1,n)FOR(j,1,n)
     	{
-    		tmp+=(pa[i]!=0) ;
-    		ne[pa[i]] = i;
+    		C[i][j]+=C[i-1][j]+C[i][j-1]-C[i-1][j-1] ; 
+    		if(i<j)
+    		{
+    			// cout<<i<<" "<<j<<" "<<C[i][j]<<el;
+    			E[++m] ={i,j,C[i][j]} ;
+    		}
     	}
-    	if(tmp!=n)return void(cout<<-1<<el) ;
-    	ve<pii>res;
-    	FOR(i,1,n)
-    	{ 
-    		int u = pa[i] ; 
-    		if(u==i)continue ;
-    		res.pb({u,i}) ;   
-    		int xv= ne[i] ; 
-    		pa[v] = u ; 
-    		ne[u] = v ;
-    	}
-    	cout<<SZ(res)<<el;
-    	for(auto x : res)cout<<1<<" "<<x.fi<<" "<<x.se<<el;
+    	sort(E+1,E+m+1) ;
+    	FOR(i,1,n)pa[i] = i ;
+    	ll res =0 ;
+    	FOR(i,1,m)
+    	{
+    		if(hop(E[i].u,E[i].v))res+=E[i].w ; 
+    	} 
+    	cout<<res;
     }
 }
 
@@ -139,7 +195,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        // sub11::xuly() ;
+        if(n<=2e3)sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

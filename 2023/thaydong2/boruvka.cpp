@@ -58,70 +58,84 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n; 
-int a[N][N] ; 
-vi g[N] ; 
+int n, m; 
+struct Edge
+{
+	int u ,v ,w ; 
+}E[N] ;
+int pa[N] ; 
+int goc(int u)
+{
+	return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
+}
 void doc()
 {
-   	cin>> n; 
-   	FOR(i,1,n)FOR(j,1,n)cin>>a[i][j]; 
-	FOR(i,1,n)FOR(j,1,n)
+	cin>> n >>m ; 
+	FOR(i,1,m)
 	{
-		if(a[i][j]==1)
-		{
-			g[i].pb(j) ; 
-		}
+		int u ,v ,w ; cin>> u >>v >> w; 
+		E[i] = {u,v,w}; 
 	}
 }
 
 namespace sub1
 {
-	int dd[N] ; 
-	int pa[N] ; 
-	bool dfs(int u)
+	int pa[N] ;
+	int goc(int u )
 	{
-		if(dd[u])return 0 ;
-		dd[u] = 1; 
-		for(auto v: g[u])
-		{
-			if(pa[v]==0||dfs(pa[v]))
-			{
-				pa[v] = u ; 
-				return 1; 
-			}
-		}
-		return 0 ; 
+		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
 	}
-	int ne[N] ; 
+	void hop(int u ,int v)
+	{
+		int chau = goc(u) ; 
+		int chav = goc(v) ; 
+		if(chau==chav)return ; 
+		pa[chau]=chav ; 
+	}
+	int tot[N] ;
     void xuly()
     {
-    	FOR(i,1,n)
-    	{
-    		FOR(j,1,n)dd[j] = 0; 
-    		dfs(i) ; 
-    	}
-    	int tmp= 0 ;
-    	FOR(i,1,n)
-    	{
-    		tmp+=(pa[i]!=0) ;
-    		ne[pa[i]] = i;
-    	}
-    	if(tmp!=n)return void(cout<<-1<<el) ;
-    	ve<pii>res;
-    	FOR(i,1,n)
-    	{ 
-    		int u = pa[i] ; 
-    		if(u==i)continue ;
-    		res.pb({u,i}) ;   
-    		int xv= ne[i] ; 
-    		pa[v] = u ; 
-    		ne[u] = v ;
-    	}
-    	cout<<SZ(res)<<el;
-    	for(auto x : res)cout<<1<<" "<<x.fi<<" "<<x.se<<el;
+        FOR(i,1,n)pa[i] = i ;
+        E[0] = {0,0,oo} ;
+        int com = n; 
+        ll res= 0 ;
+        while(com>1)
+        {
+        	FOR(i,1,n)
+        	{
+        		tot[i] = 0 ; 
+        	}
+        	FOR(i,1,m)
+        	{
+        		int u =goc(E[i].u) ; 
+        		int v =goc(E[i].v) ;
+        		if(u==v)continue;
+        		int w = E[i].w ;
+        		if(E[tot[u]].w>w)
+        		{
+        			tot[u] = i ; 
+        		}
+        		if(E[tot[v]].w>w)
+        		{
+        			tot[v] = i;
+        		}
+        	}
+        	FOR(i,1,n)if(tot[i])
+        	{	x
+        		int u = goc(E[tot[i]].u) ;
+        		int v = goc(E[tot[i]].v) ;
+        		if(u!=v)
+        		{
+        			pa[u] = v; 
+        			res+=E[tot[i]].w ;
+        			com--;
+        		}
+        	}
+        }
+	    cout<<res;
     }
 }
 
