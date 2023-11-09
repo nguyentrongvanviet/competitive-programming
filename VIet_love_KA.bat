@@ -1,4 +1,3 @@
-cd 
 git init
 git remote add origin https://github.com/nguyentrongvanviet/competitive-programming.git
 git add .
