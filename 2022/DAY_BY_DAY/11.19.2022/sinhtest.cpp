@@ -1,0 +1,101 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define TASK "D"
+
+const int T = 100;
+
+#define fast ios_base::sync_with_stdio(0) ; cin.tie(0) ; cout.tie(0) ;
+#define ll long long 
+#define pb push_back 
+#define pk pop_back 
+#define FOR(i,a,b) for(int i=a;i<=b;i++)
+#define FORD(i,a,b) for(int i =a;i>=b;i--)
+
+ll rd(ll l , ll r )
+{
+    return l +1LL*rand()%(r-l+1);
+}
+void create()
+{
+    ofstream cout(TASK".INP");
+
+    int n= 6 , m=3  ; 
+    cout<<n<<" "<<m<<"\n";
+    FOR(i,1,n)
+    {
+    	int  x= rd(1,4) ; 
+		if(x==1)
+		{
+			cout<<"E"; 
+		}
+		else if(x==2)
+		{
+			cout<<"W";
+		}
+		else if(x==3)
+		{
+			cout<<"N"; 
+		}
+		else 
+		{
+			cout<<"S";
+		}
+    } cout<<"\n";
+    FOR(i,1,m)
+    {
+    	int t = rd(1,2) ; 
+    	cout<<t<<" "; 
+    	if(t==1)
+    	{
+    		cout<<rd(1,n)<<" " ; 
+    		int  x= rd(1,4) ; 
+    		if(x==1)
+    		{
+    			cout<<"E"; 
+    		}
+    		else if(x==2)
+    		{
+    			cout<<"W";
+    		}
+    		else if(x==3)
+    		{
+    			cout<<"N"; 
+    		}
+    		else 
+    		{
+    			cout<<"S";
+    		}cout<<"\n";
+    	}
+    	else 
+    	{
+    		int l = rd(1,n) ; 
+    		cout<<l<<" "<<rd(l,n)<<" "<<rd(1,100)<<"\n";
+    	}
+    }
+    cout.close();
+}
+
+int main()
+{
+    fast
+    srand(time(0));
+    FOR(i,1,T)
+    {
+        create(); 
+
+        system(TASK"_trau.exe");
+        system(TASK".exe");
+
+        if(system("fc " TASK ".ANS " TASK ".OUT")!=0)
+        {   
+            cout<<"Test "<<i<<" WA"<<"\n";
+            return  0 ; 
+        }
+        else 
+        {
+            cout<<"Test "<<i<<" AC"<<"\n";
+        }
+    }
+    return 0;
+}
