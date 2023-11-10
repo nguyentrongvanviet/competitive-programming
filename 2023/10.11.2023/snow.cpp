@@ -272,6 +272,7 @@ namespace sub3
 		cout<<res;
 	}
 }
+// dorameon 
 namespace sub5
 {
 	int pa[N] ;
