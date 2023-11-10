@@ -209,7 +209,7 @@ pii INV(int d)
 int spec[N*N];
 void solve()
 {
-	int T = 0 ;
+			int T = 0 ;
 	int match = MF.maxflow(0,n*m+1) ; 
 	for(auto e : E)
 	{

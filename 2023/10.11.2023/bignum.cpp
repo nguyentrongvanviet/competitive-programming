@@ -7,7 +7,7 @@ str cong(str a , str b )
 	for(int i= b.size()-1;i>=0;i--)
 	{
 		int tmp = nho+ a[i]-'0'+b[i]-'0' ; 
-		int c= tmp%10 ; 
+		int c= tmp%10 ; V
 		nho = tmp/10 ; 
 		ans=(char)(c+'0')+ans; 
 	}
