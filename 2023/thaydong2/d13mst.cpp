@@ -105,8 +105,7 @@ namespace sub1
 	} ; 
 	struct Node
 	{
-		BG A ; 
-		BG B ;
+		BG A , B ;
 	} ; 
 	Node st[8*N] ; 
 	ll lazy[8*N] ;
@@ -194,7 +193,6 @@ namespace sub1
     void xuly()
     {
     	int comp = n ;
-    	
     	FOR(i,1,n)pa[i] = i ;
     	while(comp>1)
     	{
