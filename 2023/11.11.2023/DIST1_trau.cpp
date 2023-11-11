@@ -7,14 +7,14 @@
 ****************************************************************/
 #define TASK "text"
 #define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
+#define OUTPUT TASK".ANS"
 
 bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
 using namespace std; 
-#define int long long 
+
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -58,101 +58,91 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 250000+5 , oo = 2e9 , LO = 21 , CH = 26 ; 
+const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q ; 
-vi g[N] ; 
-
+int n; 
+struct DL
+{
+	ll x, v ;
+	bool operator<(const DL&a)const
+	{
+		return v<a.v||(v==a.v&&x<a.x) ;  
+	}
+} ; 
+vll V ; 
+DL a[N] ; 
 void doc()
 {
-	cin>> n >>q ;
-	FOR(i,1,n-1)
-	{
-		int u ,v ; 
-		cin>> u >> v ; 
-		g[u].pb(v) ; 
-		g[v].pb(u) ; 
-	}    
+    cin>> n ; 
+    FOR(i,1,n)cin>>a[i].x ; 
+    FOR(i,1,n)cin>>a[i].v;
+    FOR(i,1,n)
+    {
+    	V.pb(a[i].x) ; 
+    }
+    uni(V) ; 
+    sort(a+1,a+n+1) ;  
 }
 
 namespace sub1
 {
-	int sz[N] ; 
-	int P[N][LO+1] ; 
-	ll f[N][LO+1] ; 	
-	ll lost[N][LO+1] ; 
-	int h[N] ; 
-	void dfs(int u ,int p)
+	struct treebit
 	{
-		sz[u] =1 ;
-		f[u][0] = 1; 
-		for(auto v : g[u])if(v!=p)
+		vll bit; 
+		treebit(int _n)
 		{
-			h[v] = h[u]+1; 
-			P[v][0] = u ;
-			dfs(v,u) ;
-			f[u][0]+=1ll*sz[v]*sz[u] ; 
-			sz[u]+=sz[v] ; 
+			n=_n ; 
+			bit=vll(n+5,0) ; 
 		}
-		for(auto v : g[u])if(v!=p)
+		void up(int id ,ll val)
 		{
-			lost[v][0] = sz[v]*(sz[u]-sz[v]) ; 
+			for(int i =id;i<=n;i+=i&-i)bit[i]+=val; 
 		}
-	}
-	void solve(int u ,int v)
-	{
-		if(u==v){
-			return void(cout<<f[u][0]+sz[u]*(n-sz[u])<<el) ; 
-		} 
-		if(h[u]<h[v])swap(u,v) ;
-		int pre= u ; 
-		ll res = 0 ;
-		FORD(i,LO,0)if(h[u]-(1<<i)>=h[v])
+		ll get(int id)
 		{
-			res+=f[u][i]-lost[u][i] ; 
-			u =P[u][i]  ;
+			ll ans =0 ;
+			for(int i =id;i;i-=i&-i)ans+=bit[i] ; 
+			return ans; 
 		}
-		if(u==v)
+		ll get(ll l , ll r)
 		{
-			FORD(i,LO,0)if(h[pre]-(1<<i)>h[v])pre=P[pre][i] ; 
-			res= res+f[u][0]+sz[u]*(n-sz[u])-sz[pre]*(n-sz[u]) ;  
-			cout<<res<<el;
+			return get(r)-get(l-1) ;
 		}
-		else
-		{
-			FORD(i,LO,0)
-			{
-				int nu =P[u][i] ; 
-				int nv = P[v][i] ; 
-				if(nu==nv)continue ; 
-				res+=f[u][i]-lost[u][i] + f[v][i] - lost[v][i] ; 
-				u=nu ; 
-				v=nv ;
-			}
-			res+=f[u][0]+f[v][0] ; 
-			int c=  P[u][0] ;
-			res= res+sz[c]*(n-sz[c])+f[c][0]-sz[u]*(n-sz[u])-sz[v]*(n-sz[v])+sz[u]*sz[v] ; 
-			cout<<res<<el;
-		}
-	}
+	};
     void xuly()
     {
-        dfs(1,0); 
-        FOR(j,1,LO)FOR(i,1,n)
-        {
-        	P[i][j] = P[P[i][j-1]][j-1] ; 
-        	f[i][j] = f[i][j-1]+f[P[i][j-1]][j-1] ;
-        	lost[i][j] = lost[i][j-1]+lost[P[i][j-1]][j-1] ;  
-        } 
-        while(q--)
-        {
-        	int u ,v ; cin>> u>>v ;
-        	solve(u,v) ; 
-        }
+    	treebit Sum(SZ(V)) ; 
+    	treebit Cnt(SZ(V)) ;
+    	ll res = 0;  
+    	FOR(i,1,n)
+    	{
+    		ll x = a[i].x ; 
+    		int pos = UB(all(V),x)-V.begin() ; 
+    		ll sum = Sum.get(pos) ; 
+    		ll cnt = Cnt.get(pos) ; 
+    		res+=cnt*x-sum;  
+    		Sum.up(pos,a[i].x); 
+    		Cnt.up(pos,1) ; 
+    	}
+    	cout<<res<<el;  
     }
 }
-
+namespace sub2
+{
+	void xuly()
+	{
+		ll res = 0; 
+		FOR(i,1,n)FOR(j,i+1,n)
+		{
+			if((a[i].x<a[j].x&&a[i].v<=a[j].v)||(a[i].x>a[j].x&&a[i].v>=a[j].v))
+			{
+				res+=abs(a[i].x-a[j].x) ; 
+			}
+		}
+		cout<<res<<el;
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -167,7 +157,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        // sub1::xuly() ;
+        sub2::xuly() ;  
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
