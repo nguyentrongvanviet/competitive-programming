@@ -149,7 +149,7 @@ namespace sub1
     void xuly()
     {
     	FORN(i,0,m)dfs(node[i],0,dis[i]);  
-    	ll res = tknp() ;
+    	ll res = tknp() ;			
     	cout<<res<<el; 
     }
 }

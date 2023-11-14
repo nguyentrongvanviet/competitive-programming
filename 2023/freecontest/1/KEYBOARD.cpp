@@ -58,165 +58,31 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q; 
-struct edge
-{
-	int u ,v ; 
-} ; 
-struct polygon
-{
-	ve<edge>cheo; 
-	vi node ; 
-	vi dis[2] ;
-	int S , T; 
-	int get(int id ,int u)
-	{
-		int pos = LB(all(node),u)-node.begin() ; 
-		return dis[id][pos] ;
-	}
-} ; 
-vi g[N] ; 
-polygon st[(int)2e6] ;
+int n , m; 
+
 void doc()
 {
-    cin>> n; 
-    FOR(i,1,n)st[1].node.pb(i) ;
-    FOR(i,1,n)
+    cin>> n >> m ; 
+    int cnt =0 ;
+    FOR(i,1,n)FOR(j,1,m)
     {
-    	int pre=i-1 ; 
-    	if(pre==0)pre=n ;
-    	int ne= i+1 ;
-    	if(ne==n+1)ne=1; 
-    	g[i].pb(pre) ;
-    	g[i].pb(ne) ;
-    } 
-    FOR(i,1,n-3)
-    { 
-    	int u ,v ; cin>> u >>v;  
-    	if(u>v)swap(u,v) ;
-    	st[1].cheo.pb({u,v}) ; 
+    	char x; cin>>x ;
+    	if(x=='u'||x=='e'||x=='o'||x=='a'||x=='i'||x=='y')
+    	{
+    		cnt++ ;
+    	}
     }
+    assert(cnt<=20) ;
 }
+
 namespace sub1
 {
-	int f[N] ;
-	void bfs(int st , int id , vi &node , vi&dis )
-	{
-		queue<int>q; 
-		for(auto u :node)f[u] = oo ; 
-
-		q.push(st) ; 
-		f[st]= 0; 
-		
-		while(!q.empty())
-		{
-			int u= q.front() ;
-			q.pop() ; 
-			for(auto v :g[u])if(f[v]==oo)
-			{
-				f[v] =f[u]+1; 
-				q.push(v) ;
-			}
-		}
-		for(auto u : node)dis.pb(f[u]) ; 
-	}	
-	void build(int id)
-	{ 
-		if(SZ(st[id].node)==3)return ; 
-
-		int tot = oo ;
-
-		int best_u = 0 , best_v = 0;  
-		for(auto [u,v]:st[id].cheo)
-		{ 
-			int l = UB(all(st[id].node),u)-st[id].node.begin() ;
-			int r = UB(all(st[id].node),v)-st[id].node.begin() ;
-			if(mini(tot,abs(r-l+1-(SZ(st[id].node)-(r-l+1)+2))))
-			{	
-				best_u = u ; 
-				best_v = v; 
-			}
-		}
-
-		for(auto u : st[id].node)
-		{
-			if(best_u<=u&&u<=best_v)st[id*2].node.pb(u) ; 
-			if(u<=best_u||best_v<=u)st[id*2+1].node.pb(u) ; 
-		}
-
-		st[id].S=best_u ; 
-		st[id].T=best_v ; 
-		g[best_u].pb(best_v) ; 
-		g[best_v].pb(best_u) ; 
-		for(auto [u,v]: st[id].cheo)
-		{
-			if(u==best_u&&v==best_v)continue ;
-			if(best_u <= u && v <= best_v)
-			{
-				st[id*2].cheo.pb({u,v}); 
-			}
-			else 
-			{
-				st[id*2+1].cheo.pb({u,v}); 
-			}
-		} 
-		for(auto [u,v]:st[id].cheo)
-		{
-			g[u].pb(v) ;
-			g[v].pb(u) ;
-		}
-		bfs(best_u,0,st[id].node,st[id].dis[0]) ; 
-		bfs(best_v,1,st[id].node,st[id].dis[1]) ; 
-		
-		for(auto [u,v]:st[id].cheo)
-		{
-			g[u].pk() ; 
-			g[v].pk() ; 
-		}
-
-		build(id*2) ; 
-
-		build(id*2+1) ;
-	}
-	bool giao(int l ,int r, int i)
-	{
-		return l<=i&&i<=r ; 
-	}
-	int get(int id , int u ,int v)
-	{
-
-		int S = st[id].S ;
-		int T = st[id].T ; 	
-		
-		if(u==v)return 0 ;
-
-		if(SZ(st[id].node)==3)return 1 ; 
-		if(u==S&&v==T)return 1 ; 
-		if(u==T||v==T||u==S||v==S||(giao(S,T,u)^giao(S,T,v)))
-		{
-			return min(st[id].get(0,u)+st[id].get(0,v),st[id].get(1,u)+st[id].get(1,v)) ; 
-		}
-		if(giao(S,T,u)&&giao(S,T,v))
-		{
-			return get(id*2,u,v) ; 
-		}
-
-		return get(id*2+1,u,v) ;
-
-	}
     void xuly()
     {
-    	build(1) ; 
-    	cin>>q ;
-    	while(q--)
-    	{
-    		int u,v ; cin>> u >>v; 
-    		if(u>v)swap(u,v) ; 
-    		cout<<get(1,u,v)<<el ; 
-    	}
+        
     }
 }
 

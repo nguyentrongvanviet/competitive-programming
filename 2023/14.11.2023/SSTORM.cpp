@@ -15,6 +15,7 @@ int test = 1 ;
 #include<bits/stdc++.h>
 using namespace std; 
 
+#define int long long 
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -55,171 +56,106 @@ tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 
 int xx[] = {0,-1,0,1} ; 
 int yy[] = {-1,0,1,0} ;
-
+	 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 4e3+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q; 
-struct edge
-{
-	int u ,v ; 
-} ; 
-struct polygon
-{
-	ve<edge>cheo; 
-	vi node ; 
-	vi dis[2] ;
-	int S , T; 
-	int get(int id ,int u)
-	{
-		int pos = LB(all(node),u)-node.begin() ; 
-		return dis[id][pos] ;
-	}
-} ; 
-vi g[N] ; 
-polygon st[(int)2e6] ;
+int n , m , q , k; 
+ll a[N][N] ; 
 void doc()
 {
-    cin>> n; 
-    FOR(i,1,n)st[1].node.pb(i) ;
-    FOR(i,1,n)
-    {
-    	int pre=i-1 ; 
-    	if(pre==0)pre=n ;
-    	int ne= i+1 ;
-    	if(ne==n+1)ne=1; 
-    	g[i].pb(pre) ;
-    	g[i].pb(ne) ;
-    } 
-    FOR(i,1,n-3)
-    { 
-    	int u ,v ; cin>> u >>v;  
-    	if(u>v)swap(u,v) ;
-    	st[1].cheo.pb({u,v}) ; 
-    }
+   	cin>> n >> m >> q >> k  ; 
+   	FOR(i,1,n)FOR(j,1,m)
+   	{
+   		cin>>a[i][j] ; 
+   	}	
 }
+
 namespace sub1
 {
-	int f[N] ;
-	void bfs(int st , int id , vi &node , vi&dis )
+	ll S[N][N] ; 
+	void inc(int x ,int y , int len ,int val)
 	{
-		queue<int>q; 
-		for(auto u :node)f[u] = oo ; 
-
-		q.push(st) ; 
-		f[st]= 0; 
-		
-		while(!q.empty())
-		{
-			int u= q.front() ;
-			q.pop() ; 
-			for(auto v :g[u])if(f[v]==oo)
-			{
-				f[v] =f[u]+1; 
-				q.push(v) ;
-			}
-		}
-		for(auto u : node)dis.pb(f[u]) ; 
-	}	
-	void build(int id)
-	{ 
-		if(SZ(st[id].node)==3)return ; 
-
-		int tot = oo ;
-
-		int best_u = 0 , best_v = 0;  
-		for(auto [u,v]:st[id].cheo)
-		{ 
-			int l = UB(all(st[id].node),u)-st[id].node.begin() ;
-			int r = UB(all(st[id].node),v)-st[id].node.begin() ;
-			if(mini(tot,abs(r-l+1-(SZ(st[id].node)-(r-l+1)+2))))
-			{	
-				best_u = u ; 
-				best_v = v; 
-			}
-		}
-
-		for(auto u : st[id].node)
-		{
-			if(best_u<=u&&u<=best_v)st[id*2].node.pb(u) ; 
-			if(u<=best_u||best_v<=u)st[id*2+1].node.pb(u) ; 
-		}
-
-		st[id].S=best_u ; 
-		st[id].T=best_v ; 
-		g[best_u].pb(best_v) ; 
-		g[best_v].pb(best_u) ; 
-		for(auto [u,v]: st[id].cheo)
-		{
-			if(u==best_u&&v==best_v)continue ;
-			if(best_u <= u && v <= best_v)
-			{
-				st[id*2].cheo.pb({u,v}); 
-			}
-			else 
-			{
-				st[id*2+1].cheo.pb({u,v}); 
-			}
-		} 
-		for(auto [u,v]:st[id].cheo)
-		{
-			g[u].pb(v) ;
-			g[v].pb(u) ;
-		}
-		bfs(best_u,0,st[id].node,st[id].dis[0]) ; 
-		bfs(best_v,1,st[id].node,st[id].dis[1]) ; 
-		
-		for(auto [u,v]:st[id].cheo)
-		{
-			g[u].pk() ; 
-			g[v].pk() ; 
-		}
-
-		build(id*2) ; 
-
-		build(id*2+1) ;
+		++len;  
+		int X = x-len+1;
+		int Y = y-len+1; 
+		int U = x+len-1;  
+		int V = y+len-1; 
+		S[X][Y]+=val; 
+		S[X][V+1]-=val;
+		S[U+1][Y]-=val; 
+		S[U+1][V+1]+=val; 
 	}
-	bool giao(int l ,int r, int i)
+	void up(int len , int x, int y , int val)
 	{
-		return l<=i&&i<=r ; 
+		if(len<0)return ;
+		int u = x-y+2000 ; 
+		int v = x+y+2000 ; 
+		inc(u,v,len,val) ; 
 	}
-	int get(int id , int u ,int v)
+	ll cost(int x ,int y)
 	{
-
-		int S = st[id].S ;
-		int T = st[id].T ; 	
-		
-		if(u==v)return 0 ;
-
-		if(SZ(st[id].node)==3)return 1 ; 
-		if(u==S&&v==T)return 1 ; 
-		if(u==T||v==T||u==S||v==S||(giao(S,T,u)^giao(S,T,v)))
-		{
-			return min(st[id].get(0,u)+st[id].get(0,v),st[id].get(1,u)+st[id].get(1,v)) ; 
-		}
-		if(giao(S,T,u)&&giao(S,T,v))
-		{
-			return get(id*2,u,v) ; 
-		}
-
-		return get(id*2+1,u,v) ;
-
+		int u = x-y+2000 ; 
+		int v = x+y+2000 ; 
+		return S[u][v] ; 
 	}
     void xuly()
     {
-    	build(1) ; 
-    	cin>>q ;
-    	while(q--)
+    	FOR(i,1,q)
     	{
-    		int u,v ; cin>> u >>v; 
-    		if(u>v)swap(u,v) ; 
-    		cout<<get(1,u,v)<<el ; 
+    		int x , y ; cin>>x>>y ;
     	}
+    	FOR(i,1,k)
+    	{
+    		int w , R , L , x, y; 
+    		cin>>w>>R>>L>>x>>y ;
+    		up(R,x,y,w) ; 
+    		up(L-1,x,y,-w) ; 
+    	}
+    	FOR(i,1,4000)FOR(j,1,4000)S[i][j]+=S[i-1][j]+S[i][j-1]-S[i-1][j-1];
+    	ll res = 0 ; 
+    	FOR(i,1,n)
+    	{
+    		FOR(j,1,m)
+	    	{
+	    		ll val = cost(i,j) ;
+	    		res+=min(val,a[i][j]) ; 
+	    	}
+	    }
+    	cout<<res;
     }
 }
-
+namespace sub2
+{
+	int dis(int  x ,int y ,int u ,int v)
+	{
+		return abs(x-u)+abs(y-v) ;
+	}
+	void xuly()
+	{
+		FOR(i,1,q)
+    	{
+    		int x , y ; cin>>x>>y ;
+    	}
+    	ll res = 0; 
+    	while(k--)
+    	{
+    		int w , R , L , x, y; 
+    		cin>>w>>R>>L>>x>>y ;
+    		FOR(i,1,n)FOR(j,1,m)
+    		{
+    			if(L<=dis(i,j,x,y)&&dis(i,j,x,y)<=R)
+    			{
+    				res+=min(w,a[i][j]) ;
+    				a[i][j] = max(0ll,a[i][j]-w) ;
+    			}
+    		}
+    	}
+    	cout<<res;
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -234,6 +170,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
+        // sub2::xuly() ;
         sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
