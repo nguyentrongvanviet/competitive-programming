@@ -61,61 +61,45 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n;
-
-struct treebit
+int n ; 
+vi res[25] ; 
+void solve(vi V , int k)
 {
-	int n  ; 
-	vi bit ; 
-	treebit(int _n)
-	{
-		n=_n ; 
-		bit = vi(n+1,0) ; 
-	}
-	treebit(){} 
-	void up(int id ,int val)
-	{
-		for(int i= id;i<=n;i+=i&-i)bit[i]+=val; 
-	}
-	int get(int id )
-	{
-		int ans = 0;
-		for(int i=id;i;i-=i&-i)ans+=bit[i] ;
-		return ans;  
-	}
-	int get(int l ,int r )
-	{
-		return get(r) - get(l-1) ; 
-	}
-} ;
-int a[(1<<20)]  ;
-treebit bit  ;
-ll res = 0 ;
-void solve(int l ,int r)
-{
-	if(l==r)return ; 
-	int mid=(l+r)/2 ;
-	FOR(i,l,mid)
-	{
-		bit.up(a[i],1) ; 
-	}
-	ll INV  = 0 ;
-	FOR(i,mid+1,r)
-	{
-		INV += bit.get(a[i]) ; 
-	}
-	res+=min(INV,1ll*(r-mid)*(mid-l+1)-INV) ; 
-	FOR(i,l,mid)bit.up(a[i],-1) ;
-	solve(l,mid) ; 
-	solve(mid+1,r) ; 
+	if(SZ(V)==1)return ; 
+	vi L  , R; 
+	FORN(i,0,SZ(V)/2)L.pb(V[i]) ; 
+	FORN(i,SZ(V)/2,SZ(V))R.pb(V[i]);
+	reverse(all(L)) ; 
+	solve(L,k+1) ;
+	solve(R,k+1) ;  
+	for(auto x :L)res[k].pb(x) ; 
 }
 void doc()
 {
-	cin>>n ; 
-    FOR(i,1,1<<n)cin>>a[i] ;
-    bit=treebit(1<<n) ;   
-    solve(1,1<<n) ;
-    cout<<res; 
+	cin>> n ; 
+	FOR(i,1,n)
+	{
+		int u; cin>> u ;
+	}
+	vi V ; 
+	FOR(i,1,n)
+	{
+		int val ; 
+		cin>>val; 
+		V.pb(val) ; 
+	}
+	solve(V,0) ;
+	int cnt = 0;
+	FORD(i,24,0)if(SZ(res[i]))
+	{
+		cnt++;
+	}
+	cout<<cnt<<el ;
+	FORD(i,24,0)if(SZ(res[i]))	
+	{
+		cout<<SZ(res[i])<<" ";
+		prv(res[i]) ;
+	}  
 }
 
 namespace sub1

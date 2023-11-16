@@ -58,74 +58,103 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 1e9 , LO = 17 , CH = 26 ; 
 
 
-int n;
+int n; 
+int a[N]  ; 
+vi g[N] ;
 
-struct treebit
-{
-	int n  ; 
-	vi bit ; 
-	treebit(int _n)
-	{
-		n=_n ; 
-		bit = vi(n+1,0) ; 
-	}
-	treebit(){} 
-	void up(int id ,int val)
-	{
-		for(int i= id;i<=n;i+=i&-i)bit[i]+=val; 
-	}
-	int get(int id )
-	{
-		int ans = 0;
-		for(int i=id;i;i-=i&-i)ans+=bit[i] ;
-		return ans;  
-	}
-	int get(int l ,int r )
-	{
-		return get(r) - get(l-1) ; 
-	}
-} ;
-int a[(1<<20)]  ;
-treebit bit  ;
-ll res = 0 ;
-void solve(int l ,int r)
-{
-	if(l==r)return ; 
-	int mid=(l+r)/2 ;
-	FOR(i,l,mid)
-	{
-		bit.up(a[i],1) ; 
-	}
-	ll INV  = 0 ;
-	FOR(i,mid+1,r)
-	{
-		INV += bit.get(a[i]) ; 
-	}
-	res+=min(INV,1ll*(r-mid)*(mid-l+1)-INV) ; 
-	FOR(i,l,mid)bit.up(a[i],-1) ;
-	solve(l,mid) ; 
-	solve(mid+1,r) ; 
-}
 void doc()
 {
-	cin>>n ; 
-    FOR(i,1,1<<n)cin>>a[i] ;
-    bit=treebit(1<<n) ;   
-    solve(1,1<<n) ;
-    cout<<res; 
-}
-
-namespace sub1
-{
-    void xuly()
+    cin>> n; 
+    FOR(i,1,n)cin>>a[i] ; 
+    FOR(i,1,n-1)
     {
-        
+    	int u ,v;  cin>> u >> v;
+    	g[u].pb(v) ; 
+    	g[v].pb(u) ; 
     }
 }
-
+int nt[N] ;
+int cnt[N]; 
+void sang()
+{
+	FOR(i,2,2e5)if(nt[i]==0)
+	{
+		nt[i] = i ;
+		FOR(j,i,2e5/i)nt[i*j] = i; 
+	}
+	FOR(i,2,2e5)
+	{
+		int tmp = i ; 
+		while(tmp!=1)
+		{
+			int u =nt[tmp] ;
+			cnt[i]++ ;  
+			while(tmp%u==0)
+			{
+				tmp/=u ; 
+			}
+		}
+	}
+}
+namespace sub1
+{
+	const int N = 205;  
+	int C[N][N] ; 
+    void xuly()
+    {
+    	FOR(i,1,n)
+    	{
+    		FOR(j,1,n)C[i][j] = oo ; 
+    		C[i][i] = 0 ; 
+    	}
+    	FOR(u,1,n)for(auto v : g[u]){
+    		C[u][v]  =1 ; 
+    	}
+    	FOR(k,1,n)FOR(i,1,n)FOR(j,1,n)mini(C[i][j],C[i][k]+C[k][j]) ;
+    	ll res = 0 ;
+    	FOR(i,1,n)FOR(j,i+1,n)FOR(k,j+1,n)
+    	{
+    		int val = gcd(gcd(a[i],a[j]),a[k]); 
+    		int dis = (C[i][j]+C[j][k]+C[i][k])/2; 
+    		res+=1ll*dis*cnt[val] ; 
+    	}
+    	cout<<res;
+    }
+}
+namespace sub2
+{
+	int sz[N][3] ; 
+	ll f[N][3] ; 
+	ll res = 0 ;
+	void dfs(int u ,int p)
+	{
+		for(auto v : g[u])if(v!=p)
+		{
+			dfs(v,u) ;
+			res+=f[u][1]*sz[v][2]+f[u][2]*sz[v][1]; 
+			f[u][2]+=f[u][1]*sz[v][1]+f[v][1]*sz[u][1] ; 
+			f[u][2]+=f[v][2]+sz[v][2] ; 
+			f[u][1]+=f[u][1]+sz[v][1] ;
+			sz[u][2]+=sz[u][1]*sz[v][1] ;
+			sz[u][1]+=sz[v][1] ; 
+			sz[u][2]+=sz[v][2] ;
+		}
+		if(a[u]==2)
+		{
+			sz[u][1]++ ; 
+			sz[u][2]+=sz[u][1] ; 
+			res+=f[u][2] ;
+		}
+	}
+	void xuly()
+	{
+		dfs(1,0) ; 
+		cout<<res ; 
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -140,7 +169,12 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        sang() ; 
+        // if(n<=200)sub1::xuly() ; 
+    	// else if(*max_element(a+1,a+n+1)==2)
+    	// {
+    		sub2::xuly() ;
+    	// }	
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

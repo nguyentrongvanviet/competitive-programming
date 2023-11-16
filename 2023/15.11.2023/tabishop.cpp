@@ -116,7 +116,7 @@ namespace sub1
 	    {
 	    	res+=(dd[i][j]==1) ;  
 	    }
-	    cout<<res;
+	    cout<<res ;
     }
 }
 namespace sub2
@@ -127,7 +127,7 @@ namespace sub2
 		int x ,y ; 
 		int X , Y ; 
 		pt(){}  	 	
-		pt(int _TYPE , int _x, int _y)
+		pt( int _TYPE , int _x , int _y)
 		{
 			TYPE = _TYPE ;
 			x = _x ;
@@ -135,13 +135,13 @@ namespace sub2
 			X = x-y ; 
 			Y = x+y ; 
 		}
-		pt(int _x ,int _y)
+		pt( int _x , int _y)
 		{
 			x=_x ;
 			y=_y ;
 		}
-		pt operator +( const pt &a)const
-		{
+		pt operator + ( const pt &a)const
+		{		
 			return pt(TYPE,x+a.x,y+a.y) ;
 		}
 	}; 
@@ -301,13 +301,13 @@ namespace sub2
 			int TYPE = t.TYPE;
 			if(TYPE==0)
 			{
-				int l = UB(all(V),t.y)-V.begin(); 
-				int r = UB(all(V),t.v)-V.begin();
-				res-=bit.get(l,r) ; 
+				int l = UB(all(V),t.y) - V.begin(); 
+				int r = UB(all(V),t.v) - V.begin();
+				res -= bit.get(l,r) ; 
 			}
 			else
 			{
-				int pos = UB(all(V),t.y)-V.begin();
+				int pos = UB(all(V),t.y) - V.begin();
 				bit.up(pos,TYPE) ; 
 			}
 		}
@@ -316,15 +316,15 @@ namespace sub2
 	{
 		FOR(i,1,m)
 		{
-			int x ,y ; cin>>x>>y ; 
-			++n;
-			a[n]=pt(1,x,y) ;  
+			int x , y ; cin >> x >> y ; 
+			++n ;
+			a[n] = pt(1,x,y) ;  
 		}
 		FOR(i,1,k)
 		{
-			int x, y; cin>>x >>y; 
-			++n; 
-			a[n]=pt(0,x,y) ; 
+			int x , y ; cin>> x >> y; 
+			++n ; 
+			a[n] = pt(0,x,y) ; 
 		}
 		a[n+1].X = (int)-3e9; 
 		a[n+1].Y= (int)-3e9 ;

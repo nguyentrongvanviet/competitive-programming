@@ -61,61 +61,15 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n;
+int n ; 
+int a[N] ,b[N] ;
 
-struct treebit
-{
-	int n  ; 
-	vi bit ; 
-	treebit(int _n)
-	{
-		n=_n ; 
-		bit = vi(n+1,0) ; 
-	}
-	treebit(){} 
-	void up(int id ,int val)
-	{
-		for(int i= id;i<=n;i+=i&-i)bit[i]+=val; 
-	}
-	int get(int id )
-	{
-		int ans = 0;
-		for(int i=id;i;i-=i&-i)ans+=bit[i] ;
-		return ans;  
-	}
-	int get(int l ,int r )
-	{
-		return get(r) - get(l-1) ; 
-	}
-} ;
-int a[(1<<20)]  ;
-treebit bit  ;
-ll res = 0 ;
-void solve(int l ,int r)
-{
-	if(l==r)return ; 
-	int mid=(l+r)/2 ;
-	FOR(i,l,mid)
-	{
-		bit.up(a[i],1) ; 
-	}
-	ll INV  = 0 ;
-	FOR(i,mid+1,r)
-	{
-		INV += bit.get(a[i]) ; 
-	}
-	res+=min(INV,1ll*(r-mid)*(mid-l+1)-INV) ; 
-	FOR(i,l,mid)bit.up(a[i],-1) ;
-	solve(l,mid) ; 
-	solve(mid+1,r) ; 
-}
+
 void doc()
 {
-	cin>>n ; 
-    FOR(i,1,1<<n)cin>>a[i] ;
-    bit=treebit(1<<n) ;   
-    solve(1,1<<n) ;
-    cout<<res; 
+	cin>> n; 
+	FOR(i,1,n)cin>>a[i] ; 
+	FOR(i,1,n)cin>>b[i] ;    
 }
 
 namespace sub1
