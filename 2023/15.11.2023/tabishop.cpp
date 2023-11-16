@@ -65,11 +65,6 @@ int L ;
 void doc()
 {
     cin>> L >> m >> k; 
-    // FOR(i,1,L)
-    // {
-    // 	FOR(j,1,L)cout<<(i+j)%2;
-    // 	cout<<el;
-    // }
 }
 
 namespace sub1
@@ -210,12 +205,6 @@ namespace sub2
 		}) ; 
 		FOR(i,1,n)
 		{
-			// cout<<a[i].x<<" "<<a[i].y<<" X "<<a[i].X<<el;
-		}
-		 
-		// cout<<"G"<<el;
-		FOR(i,1,n)
-		{
 			if(a[i].TYPE)
 			{
 				if(a[i].X!=a[i-1].X)
@@ -244,7 +233,6 @@ namespace sub2
 				res+=tmp ;	
 				add(1,a[i-1]+pt(1,1),a[i]+pt(-1,-1)) ; 
 			}
-			// cout<<i<<" "<<res<<el;
 		}	
 	} 
 	void solve2()
