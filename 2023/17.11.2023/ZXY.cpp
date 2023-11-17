@@ -62,6 +62,7 @@ const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ;
 
 int n , k; 
 int a[N] ;
+// huy da o day
 // hiensumi da o day
 // viet o chung vs hien 
 // phi cung da o day
