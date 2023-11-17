@@ -1,4 +1,4 @@
-#define TASK  "d13mst"
+#define TASK  "text"
 #include<bits/stdc++.h>
 const int T  = 100 ; 
 using namespace std; 
@@ -16,18 +16,14 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-
-    int n= rd(2,100) ;
-    int q =rd(1,50) ; 
-    cout<<n<<" "<<q<<el; 
-    FOR(i,1,q)
-    {
-    	int l =rd(1,n-1) ; 
-    	int r =rd(l,n-1) ; 
-    	int u = rd(r+1,n) ;
-    	int v= rd(u,n) ;
-    	cout<<l<<" "<<r<<" "<<u<<" "<<v<<" "<<rd(-5,5)<<el;
-    }
+    cout<<rd(1,1)<<el; 
+    int n =1 ; 
+   	int m =1 ; 
+   	cout<<n<<el; 
+   	FOR(i,1,n)cout<<rd(-5,5)<<" ";
+   	cout<<el;
+   	cout<<m<<el;
+   	FOR(i,1,m)cout<<rd(-5,5)<<" ";
     cout.close();
 }
 
@@ -37,8 +33,8 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system(TASK"_trau.exe");
-        system(TASK".exe"); 
+        system("MEGARR""_trau.exe");
+        system("MEGARR"".exe"); 
         if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
         {   
             cout<<"Test "<<i<<" WA"<<"\n";
