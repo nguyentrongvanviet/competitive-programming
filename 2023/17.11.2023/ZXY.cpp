@@ -66,6 +66,7 @@ int a[N] ;
 // hiensumi da o day
 // viet o chung vs hien 
 // phi cung da o day
+// now
 void doc()
 {
     cin>> n >> k; 
