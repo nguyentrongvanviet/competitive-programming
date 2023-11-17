@@ -176,8 +176,8 @@ namespace full
 		}
 		if(u==v)return u; 
 		FORD(i,LO,0)
-		{
-			int nu = P[u][i]  ; 
+			{
+				int nu = P[u][i]  ; 
 			int nv = P[v][i] ; 
 			if(nu!=nv)
 			{
@@ -204,13 +204,14 @@ namespace full
 	ll res = 0 ;
 	int VAL ; 
 	void dfs(int u ,int p)
-	{
+	{ 
 		sz[u][1]=  sz[u][2] = f[u][1]= f[u][2] = 0 ; 
 		for(auto [v,w] : adj[u])if(v!=p)
 		{
 			dfs(v,u) ;
 			(res+=f[u][1]*sz[v][2]%sm+(f[v][2]+sz[v][2]*w)*sz[u][1]%sm)%=sm;
 			(res+=f[u][2]*sz[v][1]%sm+(f[v][1]+sz[v][1]*w)*sz[u][2]%sm)%=sm; 
+			
 			(f[u][2]+=f[u][1]*sz[v][1]%sm+(f[v][1]+sz[v][1]*w)*sz[u][1]%sm)%=sm ; 
 			(f[u][2]+=f[v][2]+sz[v][2]*w)%=sm ; 
 			(f[u][1]+=f[v][1]+sz[v][1]*w)%=sm ;
@@ -255,10 +256,12 @@ namespace full
 			{
 				Q[i].pb(lca(Q[i][j], Q[i][j - 1])) ;
 			}
+			
 			stack<int>st ;
+			
 			uni(Q[i]) ;
 			sort(all(Q[i]), [&](int u , int v) {return in[u] < in[v];});
-				
+
 			for (auto u : Q[i])
 			{
 				while (!st.empty() && out[st.top()] < in[u])st.pop() ;
