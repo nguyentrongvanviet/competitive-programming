@@ -62,7 +62,7 @@ const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ;
 
 int n , k; 
 int a[N] ;
-
+// hiensumi da o day
 void doc()
 {
     cin>> n >> k; 
