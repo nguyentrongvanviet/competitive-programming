@@ -5,4 +5,4 @@ git add .
 set /p comment=What do you want to comment ? 
 git commit -m comment
 git push -f origin main
-exit
+echo on
