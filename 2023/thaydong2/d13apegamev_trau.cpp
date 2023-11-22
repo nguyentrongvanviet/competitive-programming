@@ -7,7 +7,7 @@
 ****************************************************************/
 #define TASK "text"
 #define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
+#define OUTPUT TASK".ANS"
 
 bool mtt = 0 ;
 int test = 1 ;  
@@ -80,7 +80,6 @@ void doc()
     {
     	cin>>w[i] ; 
     	g[p[i]].pb({i,w[i]}) ; 
-    	// cout<<p[i]<<" "<<i<<" "<<w[i]<<el;
     }
 }
 
@@ -192,19 +191,17 @@ namespace sub2
 		int n ; 
 		ve<node>bit; 
 		int LO ; 
-		vi SL ; 
 		tree_bit(){}
 		tree_bit(int _n)
 		{
 			n=_n ;
-			FOR(i,1,n+2)bit.pb({0,0}),SL.pb(0);
+			FOR(i,1,n+2)bit.pb({0,0}); 
 			LO = lg(n) ; 
 		}
 		void up(ll val , int cnt)
 		{
 			if(val==0)return ; 
 			int id =LB(all(V),val,[](ll a, ll val){return a>val;})-V.begin()+1;
-			SL[id]++;
 			for(int i = id;i<=n;i+=i&-i)
 			{
 				bit[i]=(bit[i]+node(cnt,cnt*val)) ; 
@@ -217,15 +214,14 @@ namespace sub2
 			ll ans = 0 ; 
 			FORD(i,LO,0)if(pos+(1<<i)<=n)
 			{
-				if(cnt+bit[pos+(1<<i)].cnt<k)
+				if(cnt+bit[pos+(1<<i)].cnt<=k)
 				{
 					pos+=(1<<i) ; 
 					cnt+=bit[pos].cnt;  
 					ans+=bit[pos].val;  
 				}
 			}	
-			mini(pos,n-1) ;
-			return ans+V[pos]*(min(SL[pos+1],k-cnt)); 
+			return ans; 
 		}
 	}bit ; 
 	void dfs(int u )
@@ -242,7 +238,6 @@ namespace sub2
 	ll res[N] ;
 	void up(int u)
 	{
-		// cout<<"node "<<u<<el;
 		if(best[u])return;  
 		int need = 0 ;
 		int cur=u ;
@@ -250,24 +245,20 @@ namespace sub2
 		{
 			if(best[cur]==need)
 			{
-
-			}	
+				best[cur] = u ;
+				if(best[p[cur]]!=need)
+				{
+					if(need)bit.up(f[need]-f[p[cur]],-1) ; 
+				}
+			}
 			else
 			{
-
 				if(f[best[cur]]>=f[u])break;
-				bit.up(f[best[cur]]-f[cur],1) ; 
-				need=best[cur] ; 
+				need = best[cur] ; 
+				best[cur] = u ; 
 			}
-			if(best[p[cur]]!=best[cur])
-			{
-				if(need)bit.up(f[need]-f[p[cur]],-1);
-			}
-			best[cur] = u ;
-
 		}
 		bit.up(f[u]-f[cur],1) ;
-		// prt(best,n) ;
 	}
 	void xuly()
 	{
@@ -294,14 +285,13 @@ namespace sub2
 		int it = 1 ;
 		FOR(i,1,q)
 		{
-			// cout<<Q[i].val<<" "<<Q[i].id<<" "<<Q[i].sl<<el;
 			while(it<=Q[i].val)
 			{
 				up(it) ; 
 				++it; 
 			}
-			int id = Q[i].id ; 
-			res[id] = bit.get(Q[i].sl)*2 ; 
+			int id = Q[i].id ;
+			if(it!=2)res[id] = bit.get(Q[i].sl)*2 ; 
 		}
 		FOR(i,1,q)cout<<res[i]<<el;
 	}
@@ -320,8 +310,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ;
-        sub2::xuly() ;
+        sub1::xuly() ;
+        // sub2::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

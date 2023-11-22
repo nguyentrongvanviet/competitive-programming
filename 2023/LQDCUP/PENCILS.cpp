@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "PENCILS"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -58,138 +58,116 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q ;
-struct range
-{
-	int l, r; 
-} ; 
-range a[N] ; 
+int n , K ;
+int a[N][4] ; 
+
 void doc()
 {
-    cin>> n ; 
-    FOR(i,1,n)cin>>a[i].l>>a[i].r ;
+	cin>> n >> K; 
+	FOR(i,1,n)
+	{
+		FOR(j,1,3)cin>>a[i][j] ; 
+	}    
 }
-
+int dis(int i ,int j)
+{
+	int ma = 0 ; 
+	FOR(t,1,3)
+	{		
+		maxi(ma,max({abs(a[i][t]-a[j][t])})) ; 
+	}
+	return ma ; 
+}
 namespace sub1
 {
-	int cnt[N] ; 
     void xuly()
     {
-	    cin>>q ;
-	    while(q--)
-	    {
-	    	int m; cin>> m; 
-	    	while(m--)
-	    	{
-	    		int pos ;cin>>pos ;
-	    		FOR(i,1,n)cnt[i]+=(a[i].l<=pos&&pos<=a[i].r) ;
-	    	}
-	    	int res =0 ; 
-	    	FOR(i,1,n)if(cnt[i]&1)res++,cnt[i]=0 ;
-	    	cout<<res<<el;
-	    }
+    	int res = oo ; 
+    	int res_msk = 0 ; 
+        FORN(msk,1,Mask(n))if(btpc(msk)==K)
+        {
+        	int tmp = 0 ;
+        	FORN(i,0,n)if(BIT(msk,i))FORN(j,0,n)if(BIT(msk,j))
+        	{
+        		maxi(tmp,dis(i+1,j+1)) ; 
+        	}
+        	if(mini(res,tmp))res_msk=msk;  
+        }
+        cout<<res<<el;
+        FORN(i,0,n)if(BIT(res_msk,i))
+        {
+        	FOR(j,1,3)cout<<a[i+1][j]<<" " ;
+        	cout<<el;
+        }
     }
 }
 namespace sub2
 {
-	vi Left[N] ;
-	int node= 0 ; 
-	int st[N*LO],L[N*LO],R[N*LO] ;
-	int s[N] ; 
-	int H[N] ;
-	int pos[N];
-	int up(int old ,int l ,int r, int pos)
+	int s[260][260][260];
+	bool check(int len ,int ok )
 	{
-		int cur=++node ;
-		if(l==r)
+		int d = len+1; 
+
+		FOR(i,d,256)FOR(j,d,256)FOR(k,d,256)
+		// FOR(i,4,4)FOR(j,7,7)FOR(k,5,5)
 		{
-			st[cur] = st[old]+1;
-			return cur ; 
+			int sum = s[i][j][k]
+			-s[i-d][j][k]
+			-s[i][j-d][k]
+			-s[i][j][k-d]
+			+s[i-d][j-d][k]+s[i-d][j][k-d]+s[i][j-d][k-d]
+			-s[i-d][j-d][k-d] ; 
+			;
+			// cout<<sum<<el;
+			if(sum>=K)
+			{
+				if(ok)
+				{
+					FOR(id,1,n)
+					{	
+						if(i-len<=a[id][1]&&a[id][1]<=i&&j-len<=a[id][2]&&a[id][2]<=j&&k-len<=a[id][3]&&a[id][3]<=k)
+						{
+							FOR(j,1,3)cout<<a[id][j]-1<<" ";
+							cout<<el;
+							K--;
+						}
+						if(K==0)return 1; 
+					}
+				}
+				return 1; 
+			}
 		}
-		int mid=(l+r)/2;
-		if(pos<=mid)
-		{
-			R[cur] = R[old] ;
-			L[cur]=up(L[old],l,mid,pos) ;
-		}
-		else
-		{
-			L[cur] = L[old] ; 
-			R[cur] = up(R[old],mid+1,r,pos) ; 
-		}
-		st[cur] = st[L[cur]]+st[R[cur]] ; 
-		return cur; 
-	}
-	int get(int id ,int l ,int r ,int t,int p)
-	{
-		if(id==0||r<t||p<l)return 0 ;
-		if(t<=l&&r<=p)return st[id] ; 
-		int mid=(l+r)/2;
-		return get(L[id],l,mid,t,p)+get(R[id],mid+1,r,t,p) ;
+		return 0; 
 	}
 	void xuly()
 	{
 		FOR(i,1,n)
 		{
-			Left[a[i].r].pb(a[i].l) ; 
+			++a[i][1] ;
+			++a[i][2] ; 
+			++a[i][3] ;
+			s[a[i][1]][a[i][2]][a[i][3]]++ ;
 		}
-		FOR(i,1,n)
+		FOR(i,1,256)FOR(j,1,256)FOR(k,1,256)
 		{
-			sort(all(Left[i])) ;
-			H[i] = H[i-1] ; 
-			for(auto l : Left[i])
-			{
-				H[i] = up(H[i],1,n,l) ; 
-			}
+			s[i][j][k] += s[i - 1][j][k] + s[i][j - 1][k] + s[i][j][k - 1] 
+                           - s[i - 1][j - 1][k] - s[i][j - 1][k - 1] - s[i - 1][j][k - 1] 
+                          + s[i - 1][j - 1][k - 1] ; 
 		}
-		cin>>q ;
-		while(q--)
+		int l = 0  ;
+		int r = 255 ; 
+		int ans = 0 ; 
+		while(l<=r)
 		{
-			int k;  cin>>k ;
-			FOR(i,1,k)
-			{
-				cin>>pos[i] ; 
-			}
-			sort(pos+1,pos+k+1) ;
-			pos[k+1] = n+1;
-			if(k<=200)
-			{
-				int res =0 ; 
-				FOR(i,1,k)for(int j=i;j<=k;j+=2)
-				{
-					int u= pos[i-1] ; 
-					int v = pos[j+1]-1;
-					res+=get(H[v],1,n,u+1,pos[i])-get(H[pos[j]-1],1,n,u+1,pos[i]); 
-				}	
-				cout<<res<<el;
-			}	
-			else
-			{
-				FOR(i,1,n)s[i]=0;
-				FOR(i,1,k)s[pos[i]]=1; 
-				FOR(i,1,n)s[i]+=s[i-1] ;
-				int res = 0 ; 
-				FOR(i,1,n)
-				{
-					int l =a[i].l ;
-					int r =a[i].r ;
-					res+=((s[r]-s[l-1])&1);
-				}
-				cout<<res<<el;
-			}
+			int mid=(l+r)/2;
+			if(check(mid,0))ans=mid,r=mid-1 ;
+			else l=mid+1 ; 
 		}
-		FOR(i,1,node)
-		{
-			st[i] = 0; 
-			L[i] = 0 ; 
-			R[i] = 0 ; 
-			H[i] = 0;
-		}
-		node = 0; 
-		FOR(i,1,n)Left[i].clear();
+		cout<<ans<<el;
+		check(ans,1) ; 
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -202,12 +180,17 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
+    else 
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
+    }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
         // sub1::xuly() ; 
-        sub2::xuly() ;
+        sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

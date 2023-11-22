@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "II"
 #define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
+#define OUTPUT TASK".ANS"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -57,139 +57,87 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
+const ll inf = 1e18 , cs = 331 , sm = 20215201314; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+int n , k ,s ; 
+int a[N] ;
 
-int n , q ;
-struct range
-{
-	int l, r; 
-} ; 
-range a[N] ; 
 void doc()
 {
-    cin>> n ; 
-    FOR(i,1,n)cin>>a[i].l>>a[i].r ;
+    cin>> n >> k >> s; 
+    FOR(i,1,n)cin>>a[i] ; 
 }
 
 namespace sub1
 {
-	int cnt[N] ; 
+	int b[N] ; 
+	bool check()
+	{
+		int ans = 0 ; 
+		FOR(i,1,n)
+		{
+			FOR(it,0,n-i)
+			{
+				if(a[i+it]<b[i+it])
+				{
+					ans+=n-(i+it)+1;
+					break; 
+				}
+				else if(a[i+it]>b[i+it])
+				{
+					break;
+				}
+			}
+		}
+		return ans == k;  
+	}
+	int res = 0 ; 
+	void go(int pos)
+	{
+		if(pos==n+1)
+		{
+			res+=check();
+			return ; 
+		} 
+		FOR(i,1,s)
+		{
+			b[pos] = i ; 
+			go(pos+1) ; 
+		}
+	}
     void xuly()
     {
-	    cin>>q ;
-	    while(q--)
-	    {
-	    	int m; cin>> m; 
-	    	while(m--)
-	    	{
-	    		int pos ;cin>>pos ;
-	    		FOR(i,1,n)cnt[i]+=(a[i].l<=pos&&pos<=a[i].r) ;
-	    	}
-	    	int res =0 ; 
-	    	FOR(i,1,n)if(cnt[i]&1)res++,cnt[i]=0 ;
-	    	cout<<res<<el;
-	    }
+    	go(1) ; 
+    	check() ; 
+    	cout<<res;
     }
 }
 namespace sub2
 {
-	vi Left[N] ;
-	int node= 0 ; 
-	int st[N*LO],L[N*LO],R[N*LO] ;
-	int s[N] ; 
-	int H[N] ;
-	int pos[N];
-	int up(int old ,int l ,int r, int pos)
-	{
-		int cur=++node ;
-		if(l==r)
-		{
-			st[cur] = st[old]+1;
-			return cur ; 
-		}
-		int mid=(l+r)/2;
-		if(pos<=mid)
-		{
-			R[cur] = R[old] ;
-			L[cur]=up(L[old],l,mid,pos) ;
-		}
-		else
-		{
-			L[cur] = L[old] ; 
-			R[cur] = up(R[old],mid+1,r,pos) ; 
-		}
-		st[cur] = st[L[cur]]+st[R[cur]] ; 
-		return cur; 
-	}
-	int get(int id ,int l ,int r ,int t,int p)
-	{
-		if(id==0||r<t||p<l)return 0 ;
-		if(t<=l&&r<=p)return st[id] ; 
-		int mid=(l+r)/2;
-		return get(L[id],l,mid,t,p)+get(R[id],mid+1,r,t,p) ;
-	}
+	ll f[2023][9215][2];
 	void xuly()
-	{
+	{ 
+		f[0][0][0] = 1 ; 
 		FOR(i,1,n)
 		{
-			Left[a[i].r].pb(a[i].l) ; 
-		}
-		FOR(i,1,n)
-		{
-			sort(all(Left[i])) ;
-			H[i] = H[i-1] ; 
-			for(auto l : Left[i])
+			FOR(tot,0,k)
 			{
-				H[i] = up(H[i],1,n,l) ; 
-			}
-		}
-		cin>>q ;
-		while(q--)
-		{
-			int k;  cin>>k ;
-			FOR(i,1,k)
-			{
-				cin>>pos[i] ; 
-			}
-			sort(pos+1,pos+k+1) ;
-			pos[k+1] = n+1;
-			if(k<=200)
-			{
-				int res =0 ; 
-				FOR(i,1,k)for(int j=i;j<=k;j+=2)
+				f[i][tot][0]=(f[i-1][tot][0]+f[i-1][tot][1])%sm ; 
+				f[i][tot][1]=(f[i-1][tot][0]+f[i-1][tot][1])*(a[i]-1)%sm ; 
+				FOR(j,0,i-1)
 				{
-					int u= pos[i-1] ; 
-					int v = pos[j+1]-1;
-					res+=get(H[v],1,n,u+1,pos[i])-get(H[pos[j]-1],1,n,u+1,pos[i]); 
-				}	
-				cout<<res<<el;
-			}	
-			else
-			{
-				FOR(i,1,n)s[i]=0;
-				FOR(i,1,k)s[pos[i]]=1; 
-				FOR(i,1,n)s[i]+=s[i-1] ;
-				int res = 0 ; 
-				FOR(i,1,n)
-				{
-					int l =a[i].l ;
-					int r =a[i].r ;
-					res+=((s[r]-s[l-1])&1);
+					if(tot-(n-i+1)*(i-j)<0)break;
+					if(j==0)
+					{
+						(f[i][tot][1]+=f[j][tot-(n-i+1)*(i-j)][0]*(s-a[i])%sm)%=sm;						
+					}
+					else (f[i][tot][1]+=f[j][tot-(n-i+1)*(i-j)][1]*(s-a[i])%sm)%=sm;
 				}
-				cout<<res<<el;
 			}
 		}
-		FOR(i,1,node)
-		{
-			st[i] = 0; 
-			L[i] = 0 ; 
-			R[i] = 0 ; 
-			H[i] = 0;
-		}
-		node = 0; 
-		FOR(i,1,n)Left[i].clear();
+		ll res = (f[n][k][1]+f[n][k][0])%sm;
+		cout<<res;
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -206,8 +154,10 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ; 
-        sub2::xuly() ;
+        // if(n<=8)
+        	sub1::xuly() ; 
+        // else 
+        // sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

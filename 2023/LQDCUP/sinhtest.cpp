@@ -16,18 +16,11 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-
-    int n= rd(1,5) , q= rd(1,3) ;
-    cout<<n<<" "<<q<<el; 
-    FOR(i,2,n)cout<<rd(1,i-1)<<" " ;
-    cout<<el;
-    FOR(i,2,n)cout<<rd(1,n)<<" " ;
-    cout<<el;
-    FOR(i,1,q)
+    int n = 1e5 , k= rd(1,n) ;  
+    cout<<n<<" "<<k<<el; 
+    FOR(i,1,n)
     {
-        int val = rd(1,n) ;
-        int sl =rd(1,val) ;
-        cout<<sl<<" "<<val<<el;
+    	cout<<rd(1,254)<<" "<<rd(1,254)<<" "<<rd(1,254)<<el;
     }
     cout.close();
 }
@@ -38,13 +31,13 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("d13apegamev""_trau.exe");
-        system("d13apegamev"".exe"); 
-        if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
-        {   
-            cout<<"Test "<<i<<" WA"<<"\n";
-            return  0 ; 
-        }
-        cout<<"Test "<<i<<" AC"<<"\n";
+        // system("PENCILS""_trau.exe");
+        system("PENCILS"".exe"); 
+        // if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
+        // {   
+        //     cout<<"Test "<<i<<" WA"<<"\n";
+        //     return  0 ; 
+        // }
+        // cout<<"Test "<<i<<" AC"<<"\n";
     }
 }

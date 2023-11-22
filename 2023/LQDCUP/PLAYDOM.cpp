@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "PLAYDOM"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -58,138 +58,91 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
+const int N = 2e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q ;
-struct range
-{
-	int l, r; 
-} ; 
-range a[N] ; 
+int n , D , T ; 
+int a[N] ; 
+
 void doc()
 {
-    cin>> n ; 
-    FOR(i,1,n)cin>>a[i].l>>a[i].r ;
+    cin>> n >> D >> T ;
+    mini(D,n-1);
+    FOR(i,1,n)
+    {
+    	cin>>a[i] ; 
+    }
 }
 
 namespace sub1
 {
-	int cnt[N] ; 
+	const int  N =5e2+5; 
+	int f[N][N][N] ;
     void xuly()
     {
-	    cin>>q ;
-	    while(q--)
-	    {
-	    	int m; cin>> m; 
-	    	while(m--)
-	    	{
-	    		int pos ;cin>>pos ;
-	    		FOR(i,1,n)cnt[i]+=(a[i].l<=pos&&pos<=a[i].r) ;
-	    	}
-	    	int res =0 ; 
-	    	FOR(i,1,n)if(cnt[i]&1)res++,cnt[i]=0 ;
-	    	cout<<res<<el;
-	    }
+    	FOR(i,0,n)FOR(used,0,n)FOR(far,0,n)f[i][used][far] = oo ; 
+    	if(a[1]<=T)
+    	{
+    		f[1][0][1] = 1 ;
+    		f[1][1][0] = 1 ; 
+    	}
+    	else
+    	{
+    		f[1][0][0] = 0 ;
+    	}
+    	FOR(i,2,n)
+    	{	
+    		FOR(used,0,i-1)
+    		{
+    			mini(f[i][used][a[i]<=T?i:0],f[i-1][used][0]+(a[i]<=T));	
+
+    			FOR(far,1,i-1)
+	    		{
+	    			int mi = min(a[i],a[far]+i-far) ; 
+	    			int u = 0 ;
+	    			if(mi>T){} 
+	    			else if(mi==a[i])u=i ;
+	    			else u =far ; 
+    				mini(f[i][used][u] , f[i-1][used][far]+(u>0)) ; 
+	    		}
+	    		FOR(far,1,i)mini(f[i][used+1][0],f[i][used][far]) ; 
+    		}
+    	}
+    	int res  = oo ;
+    	FOR(used,0,D)FOR(far,0,n)mini(res,f[n][used][far]) ; 
+    	cout<<res;
     }
 }
 namespace sub2
 {
-	vi Left[N] ;
-	int node= 0 ; 
-	int st[N*LO],L[N*LO],R[N*LO] ;
-	int s[N] ; 
-	int H[N] ;
-	int pos[N];
-	int up(int old ,int l ,int r, int pos)
-	{
-		int cur=++node ;
-		if(l==r)
-		{
-			st[cur] = st[old]+1;
-			return cur ; 
-		}
-		int mid=(l+r)/2;
-		if(pos<=mid)
-		{
-			R[cur] = R[old] ;
-			L[cur]=up(L[old],l,mid,pos) ;
-		}
-		else
-		{
-			L[cur] = L[old] ; 
-			R[cur] = up(R[old],mid+1,r,pos) ; 
-		}
-		st[cur] = st[L[cur]]+st[R[cur]] ; 
-		return cur; 
-	}
-	int get(int id ,int l ,int r ,int t,int p)
-	{
-		if(id==0||r<t||p<l)return 0 ;
-		if(t<=l&&r<=p)return st[id] ; 
-		int mid=(l+r)/2;
-		return get(L[id],l,mid,t,p)+get(R[id],mid+1,r,t,p) ;
-	}
+	int f[N] ;
 	void xuly()
 	{
+		int far = 0 ; 
 		FOR(i,1,n)
 		{
-			Left[a[i].r].pb(a[i].l) ; 
-		}
-		FOR(i,1,n)
-		{
-			sort(all(Left[i])) ;
-			H[i] = H[i-1] ; 
-			for(auto l : Left[i])
+			f[i] = f[i-1] ; 
+			if((far&&a[far]+i-far<=T)||a[i]<=T)
 			{
-				H[i] = up(H[i],1,n,l) ; 
+				f[i]++ ; 
 			}
-		}
-		cin>>q ;
-		while(q--)
-		{
-			int k;  cin>>k ;
-			FOR(i,1,k)
+			if(a[i]<=T)
 			{
-				cin>>pos[i] ; 
+				if(far==0||a[i]<a[far]+i-far)far=i; 
 			}
-			sort(pos+1,pos+k+1) ;
-			pos[k+1] = n+1;
-			if(k<=200)
-			{
-				int res =0 ; 
-				FOR(i,1,k)for(int j=i;j<=k;j+=2)
-				{
-					int u= pos[i-1] ; 
-					int v = pos[j+1]-1;
-					res+=get(H[v],1,n,u+1,pos[i])-get(H[pos[j]-1],1,n,u+1,pos[i]); 
-				}	
-				cout<<res<<el;
-			}	
+		}	
+		stack<int>st ; 
+		int res = oo ; 
+		FORD(i,n,1)
+		{
+			if(a[i]>T)st.push(i) ; 
 			else
 			{
-				FOR(i,1,n)s[i]=0;
-				FOR(i,1,k)s[pos[i]]=1; 
-				FOR(i,1,n)s[i]+=s[i-1] ;
-				int res = 0 ; 
-				FOR(i,1,n)
-				{
-					int l =a[i].l ;
-					int r =a[i].r ;
-					res+=((s[r]-s[l-1])&1);
-				}
-				cout<<res<<el;
+				while(!st.empty()&&a[i]+st.top()-i<=T)st.pop() ;
 			}
-		}
-		FOR(i,1,node)
-		{
-			st[i] = 0; 
-			L[i] = 0 ; 
-			R[i] = 0 ; 
-			H[i] = 0;
-		}
-		node = 0; 
-		FOR(i,1,n)Left[i].clear();
+			mini(res,f[i-1]+(n-i+1-SZ(st))) ; 
+		} 
+		cout<<res<<el;
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -202,12 +155,21 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
+    else 
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
+    }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ; 
-        sub2::xuly() ;
+        if(n<=500)sub1::xuly() ;
+        else 
+        if(D==1)sub2::xuly() ;
+        else 
+        if()sub3::xuly() ;
+        else abort() ;  
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
