@@ -58,10 +58,10 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e5 +5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 5e5 +5 , oo = 2e9 , LO = 20 , CH = 26 ; 
 
 
-int n , k; 
+int n , k ; 
 int f[N][2] ; 
 vi g[N] ;
 int spec[N] ; 
@@ -134,7 +134,7 @@ namespace sub2
 	{
 		assert(u&&v);
 		if(h[u]<h[v])swap(u,v) ;
-		FORD(i,LO,0)if(h[u]-Mask(i)>=h[v])u=P[u][i] ; 
+		FORD(i,LO,0)if(h[u]-(1<<i)>=h[v])u=P[u][i] ; 
 		if(u==v)return u; 
 		FORD(i,LO,0)
 		{
@@ -170,60 +170,52 @@ namespace sub2
 		return h[u]+h[v]-2*h[c] ; 
 	}
 	int cen[N] ; 
-	bool check(int msk)
+	int mid(int u, int v)
 	{
-		assert(msk);
-		if(btpc(msk)==1)return 1; 
-		if(btpc(msk)==2)
-		{
-			int x=0 , y=0; 
-			int u = cen[msk];
-			FORN(i,0,k)if(BIT(msk,i))
-			{
-				if(x==0)x=spec[i+1] ;
-				else y=spec[i+1];
-			}
-			return near[u]==DIS(x,u)&&near[u]==DIS(y,u);
-		}
-		int x=-1,y=-1,z=-1;
-		FORN(i,0,k)if(BIT(msk,i))
-		{
-			if(x==-1)x=i ;
-			else if(y==-1)y=i ;
-			else z=i ; 
-		}
-		int u = cen[Mask(x)|Mask(y)|Mask(z)] ;
-		assert(1<=u&&u<=n) ;
-		FORN(i,0,k)if(BIT(msk,i))
-		{	
-			if(near[u]!=DIS(u,spec[i+1]))return 0; 
-		}
-		return 1; 
+		if(h[u]<h[v])swap(u,v) ; 
+		int d = DIS(u,v)/2 ; 
+		FORD(i,LO,0)if(BIT(d,i))u=P[u][i] ;
+		return u ;
 	}
 	int build(int msk)
 	{
-		FOR(i,1,n)
-		{
-			int dis = -5 ; 
-			FORN(j,0,k)if(BIT(msk,j))
+		int u = spec[ctz(msk)+1] ; 
+
+		int dis = -5;
+		int ans = 0 ; 
+		assert(u) ;
+		FORN(i,0,k)if(BIT(msk,i))
+		{	
+			if(maxi(dis,DIS(u,spec[i+1])))
 			{
-				if(dis==-5)
-				{
-					dis=DIS(i,spec[j+1]) ; 
-				}else if(dis!=DIS(i,spec[j+1]))
-				{
-					dis=-1;
-					break;
-				}
+				ans = spec[i+1] ; 
 			}
-			if(near[i]==dis)return i ; 
 		}
-		return 1; 
+		u = ans;  
+		dis = -5 ;  
+		ans = 0 ;
+		FORN(i,0,k)if(BIT(msk,i))
+		{
+			if(maxi(dis,DIS(u,spec[i+1])))
+			{
+				ans = spec[i+1] ; 
+			}
+		}
+		int v= ans; 
+		assert(u&&v) ;
+		int d = mid(u,v) ; 
+		assert(d) ; 
+		FORN(i,0,k)if(BIT(msk,i))
+		{
+			if(near[d]!=DIS(d,spec[i+1]))return 0 ;
+		}
+		return d; 
 	}
 	ll f[N] ;
 	int trace[N] ; 
 	void truyvet(int msk)
 	{
+		assert(trace[msk]) ;
 		if(trace[msk] == msk)return void(cout<<cen[msk]<<" ") ; 
 		truyvet(trace[msk]) ;
 		truyvet(msk^trace[msk]) ;
@@ -235,12 +227,12 @@ namespace sub2
 		bfs() ; 
 		FORN(msk,1,Mask(k))
 		{
-			cen[msk]=build(msk);
+			cen[msk] = build(msk) ;
 		}
 		FORN(msk,1,Mask(k))
 		{
 			f[msk] = oo  ; 
-			if(check(msk))f[msk] = 1,trace[msk]=msk; 
+			if(cen[msk])f[msk] = 1,trace[msk]=msk; 
 			else
 			{
 				for(int ss = msk ; ss!=0;ss=(ss-1)&msk)
@@ -254,6 +246,82 @@ namespace sub2
 		}
 		cout<<f[Mask(k)-1]<<el;
 		truyvet(Mask(k)-1) ; 
+	}
+}
+namespace sub4
+{
+	int near[N]  ;
+	void bfs()
+	{
+		queue<int>q; 
+		FOR(i,1,n)near[i] = oo ;
+		FOR(i,1,k)
+		{
+			q.push(spec[i]) ; 
+			near[spec[i]]= 0 ; 
+		}
+		while(!q.empty())
+		{
+			int u = q.front() ; 
+			q.pop() ;
+			for(auto v:g[u])if(mini(near[v],near[u]+1))
+			{
+				q.push(v) ; 
+			}
+		}
+	}
+	int h[N] ; 
+	int pa[N] ; 
+	int dd[N] ;
+	void dfs(int u ,int p)
+	{
+		for(auto v:g[u])if(v!=p)
+		{
+			pa[v] = u ;  
+			h[v] = h[u]+1 ;
+			dfs(v,u) ; 
+		}
+	}
+	void go(int u ,int len)
+	{
+		dd[u] =1 ;
+		if(len-1>=0)
+		{
+			for(auto v:g[u])
+			{	
+				go(v,len-1) ; 
+			}
+		}
+	}
+	void xuly()
+	{
+		bfs() ; 
+		dfs(1,0) ; 
+		sort(spec+1,spec+k+1,[&](int u ,int v){return h[u]>h[v];}) ; 	
+		vi res; 
+		
+		FOR(i,1,k)
+		{		
+			int u =spec[i] ;
+			if(dd[u])continue ; 
+			int ans=u ;
+			int tmp = pa[u] ; 
+			while(tmp)
+			{
+				if(near[tmp]==h[u]-h[tmp]) 	
+				{
+					ans=tmp ; 
+				}
+				tmp = pa[tmp] ;
+
+			}
+			// cout<<u<<" "<<ans<<" "<<h[u]-h[ans]<<el;
+			go(ans,h[u]-h[ans]) ;
+			res.pb(ans) ;  	
+
+		}
+		cout<<SZ(res)<<el; 
+		for(auto v: res)cout<<v<<" "; 
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -275,8 +343,13 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // if(check1())sub1::xuly() ; 
+        if(check1())sub1::xuly() ; 
+        else
+        if(k<=15)
         sub2::xuly() ;
+   		else 
+   		sub4::xuly() ;
+     	// else abort() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
