@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "xap_xep_lai_day"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -61,88 +61,119 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-int spec[N] ; 
-
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
+int n , q, k ;	
+int p[N] ; 
+int id[N]; 
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
-    {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
-    }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
+    cin >> n >>q >> k; 
+    FOR(i,1,n)cin>>p[i] ,id[p[i]]=i ; 
 }
 
 namespace sub1
 {
-	int pa[N] ;
-	int goc(int u )
-	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
-	}
-	bool hop(int u ,int v)
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
-	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
+	int a[N] ; 
+	int b[N] ; 
     void xuly()
     {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+        FOR(i,1,n)a[i] = i; 
+        FOR(i,1,q)
+        {
+        	int l,r ;cin>> l >>r;
+        	FOR(i,l,r)
+        	{
+        		b[a[i]] = p[i-l+1] ; 
+        	}
+        	sort(a+l,a+r+1,[](int x,int y ){return b[x]<b[y];});
+        	// prt(a,n) ;
+        }
+        cout<<a[k]<<el;
     }
+}
+namespace sub2
+{
+	struct PIT
+	{
+		int n;  
+		vi st, H , L , R; 
+		int node = 0; 
+		PIT(int _n=0)
+		{
+			n=_n ;
+			st.resize(n*(LO+2),0) ; 
+			H.resize(n*(LO+2),0)  ;
+			L.resize(n*(LO+2),0) ;
+			R.resize(n*(LO+2),0) ; 
+		}
+		int up(int old ,int l ,int r, int pos)
+		{
+			int cur = ++node ;
+			if(l==r)
+			{
+				st[cur] = 1; 
+				return cur; 
+			}
+			int mid=(l+r)>>1; 
+			if(pos<=mid)
+			{
+				R[cur] = R[old] ;
+				L[cur] = up(L[old],l,mid,pos) ; 
+			}
+			else
+			{
+				L[cur] = L[old] ; 
+				R[cur] = up(R[old],mid+1,r,pos) ;
+			}
+			st[cur] =st[L[cur]]+st[R[cur]] ;
+			return cur; 
+		}
+		int get(int id ,int l ,int r , int val)
+		{
+			if(l==r)return l ;
+			int mid=(l+r)>>1; 
+			if(st[L[id]]>=val)
+			{
+				return get(L[id],l,mid,val) ; 
+			}
+			return get(R[id],mid+1,r,val-st[L[id]]) ;
+		}
+		void up(int pos ,int val)
+		{
+			H[pos] = up(H[pos-1],1,n,val);
+		}
+		int get(int pos ,int val)
+		{
+			return get(H[pos],1,n,val) ;
+		}
+	}tree;
+	struct DL
+	{
+		int l, r; 
+	}; 
+	DL Q[N] ;
+	void xuly()
+	{
+		tree=PIT(n) ; 
+		FOR(i,1,n)
+		{	
+			tree.up(i,p[i]) ;
+		}
+		FOR(i,1,q)
+		{
+			cin>>Q[i].l>>Q[i].r ;
+		}
+		FORD(i,q,1) 
+		{	
+			int l = Q[i].l ;
+			int r = Q[i].r ;
+			if(r<k||k<l)continue;
+			int len = r-l+1 ;
+			int prev = tree.get(len,k-l+1);
+			int nk = id[prev] ;
+			k=l+nk-1;
+		}
+		cout<<k<<el;
+	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -154,7 +185,7 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    else 
+    else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
         freopen("text.OUT","w",stdout) ;   
@@ -163,7 +194,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        // sub1::xuly() ; 
+        sub2::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

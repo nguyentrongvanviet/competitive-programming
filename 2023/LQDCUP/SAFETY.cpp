@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "SAFETY"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -42,7 +42,7 @@ using namespace std;
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
-ll lg(ll a){return __lg(a);}
+#define lg(a) 63 - __builtin_clzll(a)
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
@@ -60,89 +60,81 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+int n, H ; 
+int a[N] ;
 
-int n , m ; 
-int spec[N] ; 
-
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
-    {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
-    }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
+    cin>> n >> H  ; 
+    FOR(i,1,n)cin>>a[i] ;
 }
 
 namespace sub1
 {
-	int pa[N] ;
-	int goc(int u )
-	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
-	}
-	bool hop(int u ,int v)
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
-	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
     void xuly()
     {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+     	sort(a+1,a+n+1) ;
+     	ll res = 0 ; 
+     	FOR(i,1,n)
+     	{
+     		res+=abs(a[i]-a[(1+n)/2]) ; 
+     	}   
+     	cout<<res;
     }
+}
+namespace sub2
+{
+	ll f[505][402]; 
+	void xuly()
+	{
+		FOR(i,1,n)
+		{
+			FOR(j,0,400)
+			{
+				f[i][j] = inf ;
+				FOR(k,max(0,j-H),min(400,H+j))
+				{	
+					mini(f[i][j] , f[i-1][k]+abs(a[i]-j));
+				}
+			}	
+		}
+		ll res= inf ;
+		FOR(i,0,400)mini(res,f[n][i]); 
+		cout<<res ;
+	}	
+}
+namespace sub3
+{
+	const int LO = lg(5005) ;
+	ll st[5005][LO+1];
+	ll f[5005][5005] ; 
+	void build(int id)
+	{
+		FOR(i,0,5000)st[i][0] = f[id][i] ;
+		FOR(j,1,LO)FOR(i,0,5000-Mask(j)+1)
+		{
+			st[i][j] = min(st[i][j-1],st[i+Mask(j-1)][j-1]); 
+		}
+	}
+	ll get(int l ,int r)
+	{
+		int k = lg(r-l+1) ;
+		return min(st[l][k],st[r-Mask(k)+1][k]) ;
+	}
+	void xuly()
+	{
+		FOR(i,1,n)
+		{
+			build(i-1) ; 
+			FOR(j,0,5000)
+			{	
+				f[i][j] = get(max(0,j-H),min(5000,j+H))+abs(a[i]-j) ;
+			}
+		}
+		ll res=inf ; 
+		FOR(i,0,5000)mini(res,f[n][i]) ;
+		cout<<res;
+	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -163,7 +155,13 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        if(H==0)
+        {
+	        sub1::xuly() ; 
+        }
+        else if(n<=500&&*max_element(a+1,a+n+1)<=400)sub2::xuly() ; 
+        else
+        	sub3::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

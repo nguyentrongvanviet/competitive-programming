@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "OXBET"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,88 +61,64 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-int spec[N] ; 
-
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
+int n ; 
+db a[N] , b[N] ; 
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
+    cin>> n ; 
+    FOR(i,1,n)
     {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
+    	cin>>a[i]>>b[i] ; 
     }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
 }
 
 namespace sub1
 {
-	int pa[N] ;
-	int goc(int u )
+	db res = 0 ; 
+	void go(int id , db L , db R )
 	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
+		if(id==n+1)
+		{
+			maxi(res,min(L,R)) ; 
+			return ; 
+		}
+		go(id+1,L,R) ; 
+		go(id+1,L-1+a[id],R-1+b[id]) ; 
+		go(id+1,L-1,R+b[id]-1) ;
+		go(id+1,L+a[id]-1,R-1) ;
 	}
-	bool hop(int u ,int v)
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
-	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
     void xuly()
     {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+        go(1,0,0); 
+        cout<<res; 
     }
+}
+namespace sub2
+{
+	void xuly()
+	{
+		sort(a+1,a+n+1,greater<db>()) ;
+		sort(b+1,b+n+1,greater<db>()) ; 
+		db res = 0;  	 
+		int ita = 1 , itb =1 ; 
+		db L = 0 , R= 0 ; 
+		FOR(i,1,2*n)
+		{	
+			if(L<=R)
+			{
+				L+=a[ita++]-1 ; 
+				R-=1 ; 
+			}
+			else
+			{
+				L-=1;
+				R+=b[itb++]-1;
+			}
+			maxi(res,min(L,R)) ; 
+		}
+		cout<<setprecision(4)<<fixed;
+		cout<<res;
+	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -163,7 +139,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "haichutrinh"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -61,89 +61,78 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-int spec[N] ; 
-
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
+int n ;
+vi g[N] ; 
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
+    cin>> n; 
+    FOR(i,1,2*n-3)
     {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
+    	int u , v; cin>> u >>v ;
+    	g[u].pb(v) ;
+    	g[v].pb(u) ; 
     }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
 }
 
 namespace sub1
 {
-	int pa[N] ;
-	int goc(int u )
+	int dd[N] ; 
+	int pa[N] ; 
+	int h[N] ; 
+	pii res[N] ; 
+	void in(int u ,int v)
 	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
+		while(1)
+		{
+			cout<<u<<" ";
+			if(u==v)break; 
+			u=pa[u] ; 
+		}
 	}
-	bool hop(int u ,int v)
+	int la = 0 ;
+	vi Q[N] ; 
+	void dfs(int u ,int p)
 	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
+		dd[u] = 1; 
+		for(auto v:g[u])if(v!=p)
+		{
+			if(dd[v]&&h[v]<h[u])
+			{
+				if(res[h[u]-h[v]+1]!=mp(0,0))
+				{
+					cout<<h[u]-h[v]+1<<el;
+					in(res[h[u]-h[v]+1].fi,res[h[u]-h[v]+1].se) ;
+					cout<<el;
+					in(u,v) ;
+					exit(0) ; 
+				}
+
+				Q[u].pb(v) ; 
+				res[h[u]-h[v]+1]=mp(u,v) ;
+			}
+			else if(dd[v]==0)
+			{
+				// cout<<u<<" "<<v<<el;
+				h[v] = h[u]+1 ;
+				pa[v] = u ; 
+				dfs(v,u) ;
+			} 
+		}
 	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
     void xuly()
-    {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+    {	
+    	FOR(i,1,n)if(dd[i]==0)dfs(i,0) ;
+    	cout<<3<<el;
+    	in(res[3].fi,res[3].se) ;
+    	cout<<el;
+    	cout<<1<<" ";
+    	int v = find(h+1,h+n+1,n-1)-h;
+    	cout<<v<<" ";
+    	for(auto x:g[1])if(h[x]==n-2)return void(cout<<x<<el) ; 
+    	for(auto x:g[v])if(h[x]==1)return void(cout<<x<<el);
     }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -154,7 +143,7 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    else 
+    else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
         freopen("text.OUT","w",stdout) ;   

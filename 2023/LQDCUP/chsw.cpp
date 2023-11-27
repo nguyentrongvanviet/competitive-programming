@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "chsw"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 1 ; 
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -61,89 +61,45 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-int spec[N] ; 
 
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
-    {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
-    }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
+	str X, Y ; 
+	cin>>X >>Y ; 
+	int A = 0 ,B =0 ,  C =0 , D = 0 ;
+	int n = SZ(X);  
+	FORN(i,0,n)
+	{
+		if(X[i]=='?'&&Y[i]=='0')A++ ;
+		if(X[i]=='?'&&Y[i]=='1')B++ ; 
+		if(X[i]=='0'&&Y[i]=='1')C++ ; 
+		if(X[i]=='1'&&Y[i]=='0')D++ ; 
+	}
+	int res = min(C,D) ; 
+	C-=res , D-=res ;  
+	if(C)
+	{
+		cout<<res+A+B+C<<el ;
+	}
+	else
+	{
+		int t = min(B,D) ; 
+		res+=2*t ; 
+		B-=t; 
+		D-=t;
+		if(D)return void(cout<<-1<<el) ; 
+		cout<<res+A+B<<el;	
+	}
 }
 
 namespace sub1
 {
-	int pa[N] ;
-	int goc(int u )
-	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
-	}
-	bool hop(int u ,int v)
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
-	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
     void xuly()
     {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+        
     }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -154,7 +110,7 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    else 
+    else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
         freopen("text.OUT","w",stdout) ;   

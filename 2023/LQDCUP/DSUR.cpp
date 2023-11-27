@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "DSUR"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,89 +61,111 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-int spec[N] ; 
+int n ,q ;
 
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
+
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
-    {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
-    }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
+	cin>> n >>q; 
 }
 
 namespace sub1
 {
-	int pa[N] ;
+	map<pii,vi>last; 
+	struct edge
+	{
+		int u ,v ; 
+	}; 
+	int pa[N] , SZ[N]  ;
+	stack<edge>st ;
+	ve<edge>canh[4*N] ; 
+	int res[N] ; 
+	edge Q[N] ;
 	int goc(int u )
 	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
+		return pa[u] == u ? u : goc(pa[u]) ; 
 	}
-	bool hop(int u ,int v)
+	void hop(int u ,int v)
 	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
+		int chau = goc(u)  ; 
+		int chav = goc(v) ;
+		if(chau==chav)return ;
+		if(SZ[chau]>SZ[chav])swap(chau,chav); 
+		pa[chau] = chav; 
+		SZ[chav]+=SZ[chau] ;
+		st.push({chau,chav}) ;  
 	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
+	void roll_back(int sz)
+	{
+		while(SZ(st)>sz)
+		{
+			int u =st.top().u ; 
+			int v =st.top().v; 
+			st.pop() ; 
+			pa[u] = u ;
+			SZ[v]-=SZ[u] ; 
+		}
+	}
+	void up(int id ,int l, int r, int t, int p , edge e)
+	{
+		if(t<=l&&r<=p)return void(canh[id].pb(e)) ; 
+		if(r<t||p<l)return ;
+		int mid=(l+r)>>1;
+		up(id<<1,l,mid,t,p,e) ;
+		up(id<<1|1,mid+1,r,t,p,e) ;
+	}
+	void solve(int id ,int l ,int r )
+	{
+		int sz =SZ(st) ;
+		for(auto e:canh[id])hop(e.u,e.v);  
+		if(l==r)
+		{
+			if(Q[l].u&&Q[l].v)
+			{
+				res[l]=(goc(Q[l].u)==goc(Q[l].v)) ; 
+			}
+			roll_back(sz) ; 
+			return;  
+		}	
+		int mid=(l+r)>>1; 
+		solve(id<<1,l,mid) ; 
+		solve(id<<1|1,mid+1,r) ; 
+		roll_back(sz) ; 
+	}
     void xuly()
     {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+    	FOR(i,1,n)pa[i] = i ,SZ[i] =1 ; 
+		FOR(i,1,q)
+		{ 
+			int TYPE  , u ,v ;cin>>TYPE >> u >> v;
+			if(u>v)swap(u,v) ; 
+			if(TYPE==1)
+			{
+				last[mp(u,v)].pb(i) ;  
+			}
+			else if(TYPE==2)
+			{
+				if(!last[mp(u,v)].empty())
+				{
+					up(1,1,q,last[mp(u,v)].back(),i-1,edge{u,v});
+					last[mp(u,v)].pk() ; 
+				}
+			}
+			else
+			{
+				Q[i]={u,v} ;  
+			}
+		}
+		for(auto x:last)if(!x.se.empty())up(1,1,q,x.se[0],q,edge{x.fi.fi,x.fi.se});
+		solve(1,1,q) ;
+        FOR(i,1,q)if(Q[i].u&&Q[i].v)
+        {
+        	if(res[i])cout<<"YES"<<el;
+        	else cout<<"NO"<<el;
+        }
     }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -156,8 +178,8 @@ signed main()
     }
     else 
     {
-        freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        // freopen("text.INP","r",stdin) ; 
+        // freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)

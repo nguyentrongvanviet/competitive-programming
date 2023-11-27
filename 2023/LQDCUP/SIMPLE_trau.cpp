@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "SIMPLE"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,88 +61,71 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-int spec[N] ; 
+int n; 
+int a[N] ; 
 
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
+    cin>> n; 
+    FOR(i,1,n)
     {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
+    	char x; cin>>x ; 
+    	a[i] = x-'a' ; 
     }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
 }
 
 namespace sub1
 {
-	int pa[N] ;
-	int goc(int u )
-	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
-	}
-	bool hop(int u ,int v)
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
-	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
     void xuly()
     {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
+    	ll tu = n+1 , mau =1 ; 
+    	int L ,R ; 
+    	FOR(i,1,n)
+    	{
+    		set<int>s ;
+    		FOR(j,i,n)
+	    	{
+	    		s.insert(a[j]) ; 
+	    		if(tu*(j-i+1)>mau*SZ(s))
 	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
+	    			tu = SZ(s) ; 
+	    			mau = (j-i+1) ;
+	    			L=i,R=j ;
 	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
+	    	}
+	    }
+	    cout<<L<<" "<<R<<el;
     }
+}
+namespace sub2
+{
+	int la[N];
+	set<int,greater<int>>s ;
+	void xuly()
+	{
+		s.insert(0) ; 
+		ll tu =1 , mau =1 ;	
+		int L = 1,  R =1 ; 
+		FOR(i,1,n)
+		{
+			if(la[a[i]]!=0)s.erase(la[a[i]]) ; 
+			s.insert(la[a[i]]=i) ; 				
+			int c = 0 ; 
+			for(auto k:s)
+			{
+				if(tu*(i-k)>mau*c)
+				{
+					L = k+1 ; 
+					R = i ; 
+					tu = c; 
+					mau = (i-k) ; 
+				}
+				c++ ; 
+			}
+		}
+		// cout<<(db)tu/mau<<el;
+		cout<<L<<" "<<R<<el;
+	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -157,13 +140,14 @@ signed main()
     else 
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        freopen("text.ANS","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
         sub1::xuly() ; 
+        // sub2::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

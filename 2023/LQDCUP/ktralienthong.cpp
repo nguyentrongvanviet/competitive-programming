@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -58,92 +58,115 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+int tp[N] ;
+vi g[N] ;
+void init(int n,ve<pii>	e ){	
 
-int n , m ; 
-int spec[N] ; 
-
-struct Edge
+	for(auto x:e)g[x.fi].pb(x.se),g[x.se].pb(x.fi) ; 
+	FOR(i,1,n)tp[i] = 1 ;
+    return;
+}
+int tt = 1 ;  
+int used[N],D[N] ; 
+void close(int u,int v)
 {
-	int u , v , id ;
-}E[N] ;
-int dd[N] ; 
-void doc()
-{
-    cin>> n >>m ;
-    FOR(i,1,m)
-    {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
-    }
-    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
+	queue<int>ql  ,qr ; 
+	vi nodel,noder ; 
+	ql.push(u) ;
+	qr.push(v) ;  
+	used[u] = 1; 
+	used[v] = 1; 
+	nodel.pb(u) ; 
+	noder.pb(v) ;
+	D[u] =SZ(g[u])-1 ;
+	D[v] =SZ(g[v])-1 ; 
+	int ok ; 
+	while(1)
+	{
+		int U = 0 , V = 0  ; 
+		while(!ql.empty())
+		{
+			int u =ql.front(); 
+			while(D[u]>=0)
+			{
+				int tu= g[u][D[u]] ;
+				if(used[tu]||tp[tu]!=tp[u])D[u]--;
+				else 
+				{
+					U=tu ;
+					break;
+				}
+			}
+			if(U==0)ql.pop() ;
+			else 
+			{
+				D[u]--; 
+				break;
+			}
+		}
+		while(!qr.empty())
+		{
+			int v =qr.front() ;
+			while(D[v]>=0)
+			{
+				int tv = g[v][D[v]] ;
+				if(used[tv]||tp[tv]!=tp[v])D[v]--;
+				else 
+				{
+					V=tv; 
+					break;
+				}
+			}
+			if(V==0)qr.pop() ;
+			else 
+			{
+				D[v]--; 
+				break;
+			}
+		}
+		if(U==0)
+		{
+			ok =1 ;
+			break;
+		}
+		if(V==0)
+		{
+			ok =2 ;
+			break; 
+		}
+		ql.push(U) ;
+		nodel.pb(U) ; 
+		
+		used[U] = used[V] =1 ; 
+		
+		D[U] = SZ(g[U])-1 ;
+
+		qr.push(V) ; 
+		
+		noder.pb(V) ; 
+		
+		D[V] = SZ(g[V])-1 ;
+	}
+	++tt; 
+	for(auto u :nodel)used[u] = 0 ; 
+	for(auto u :noder)used[u] = 0 ;
+
+	if(ok==1)
+	{
+		for(auto u :nodel)tp[u]=tt; 
+	}
+	else
+	{
+		for(auto u :noder)tp[u]=tt; 	
+	}	
 }
 
-namespace sub1
-{
-	int pa[N] ;
-	int goc(int u )
-	{
-		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
-	}
-	bool hop(int u ,int v)
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ; 
-		if(chau==chav)return 0; 
-		pa[chau]=chav ; 
-		return 1 ; 
-	}
-	int tt[N] ; 
-	int res[N] ; 
-	int tmp[N] ; 
-    void xuly()
-    {
-    	FOR(i,1,m)res[i] =  oo ; 
-    	FOR(i,1,m)tt[i] = i ;
-    	do
-	{
-    		FOR(i,1,n)pa[i] =i ;
-    		bool ok = 1 ;  
-    		FOR(i,1,m)
-    		{
-    			int id = E[tt[i]].id;
-    			if(hop(E[tt[i]].u,E[tt[i]].v))
-    			{
-    				if(dd[id]==0)
-    				{
-    					ok =  0 ;
-    					break; 
-    				} 
-    			}
-				tmp[id] = i ; 
-    		}
-    		if(ok)
-    		{
-    			ok = 0 ; 
-	    		FOR(i,1,m)
-	    		{
-	    			if(res[i]<tmp[i])
-	    			{
-	    				ok = 0; 
-	    				break ; 
-	    			} 
-	    			if(res[i]>tmp[i])
-	    			{
-	    				ok = 1; 
-	    				break;
-	    			}
-	    		}	
-	    		if(ok)
-	    		{
-	    			FOR(i,1,m)res[i] = tmp[i] ;  
-	    		}
-    		}
-    	}while(next_permutation(tt+1,tt+m+1)); 	
-    	prt(res,m) ; 
-    }
+bool question(int u,int v){
+	return tp[u] == tp[v] ; 
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -154,7 +177,7 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    else 
+    else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
         freopen("text.OUT","w",stdout) ;   
@@ -162,8 +185,13 @@ signed main()
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
-        doc() ; 
-        sub1::xuly() ; 
+    	init(7,{{1,2},{1,3},{1,4},{4,6},{4,5},{6,7}});
+    	close(1,4)  ;
+    	cout<<question(3,5)<<el;
+    	cout<<question(4,7)<<el; 
+    	close(4,5) ; 
+    	cout<<question(1,2)<<el; 
+    	cout<<question(5,7)<<el; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
