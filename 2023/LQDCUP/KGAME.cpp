@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "dichuyennhonhat"
+#define TASK "KGAME"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -49,7 +49,7 @@ ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
 #define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
 #define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
-
+#define int ll 
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 
@@ -57,114 +57,109 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 , cs = 27 , sm = 1e9+7; 
+const int N = 3e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q , k ; 
-ll a[N] ,b[N] ;
+int n , k; 
+int f[N] ;
+
 void doc()
-{	
-    cin>> n >> q >> k; 	
-    FOR(i,1,n)cin>>a[i] ; 
-    FOR(i,1,n)cin>>b[i] ; 
+{
+   	cin>> n >> k; 
+   	if(k==1)
+   	{
+   		cout<<1;
+   		exit(0) ;
+   	}
 }
 
 namespace sub1
 {
-	const int N = 105; 
-	int C[N][N] ; 
+	int f[N][105];
+	int a[N] ;  
+	ll ha[N],mu[N] ;
+	int cnt =0 ;  
+	ll get(int l ,int r)
+	{
+		return (ha[r] - ha[l-1]*mu[r-l+1]%sm+sm)%sm;
+	}
+	bool check(int len)
+	{
+		for(int i=1;i+len-1<=cnt;i+=len)
+		{
+			if(get(i,i+len-1)!=get(1,len))return 0; 
+		}
+		return 1; 
+	}
     void xuly()
     {
-    	FOR(i,1,n) 	
-    	{
-    		FOR(j,1,n)
-    		{
-    			C[i][j] = (a[i]-a[j]<=k?1:1+b[j]) ; 
-    		}
-    	}
-    	FOR(k,1,n)FOR(i,1,n)FOR(j,1,n)
-    	{
-    		mini(C[i][j],C[i][k]+C[k][j]) ;
-    	}
-    	while(q--)
-    	{
-    		int u ,v ;cin>> u >> v ; 
-    		if(u<v)
-    		{
-    			cout<<1<<el;
-    			continue ;
-    		}
-    		else
-    		{
-    			cout<<C[u][v]<<el;
-    		}
-    	}
+	   	FOR(i,1,3e4)
+	   	{
+	   		FOR(pre,1,k)
+	   		{
+	   			FOR(cur,1,k)if(pre!=cur)
+	   			{
+	   				if(i>=cur&&f[i-cur][cur]==0)
+	   				{
+	   					f[i][pre] =1 ; 
+	   				}
+	   			}
+	   		}
+	   	}
+	   	mu[0] = 1; 
+
+	   	FOR(i,1,3e4)mu[i] = mu[i-1]*cs%sm ; 
+	   	int pre =0 ;  
+	   	FOR(i,1,3e4)
+	   	{
+	   		bool ok = 0; 
+	   		FOR(j,1,k)
+	   		{
+	   			if(i>=j&&f[i-j][j]==0)
+	   			{
+	   				ok =1 ;
+	   				break;
+	   			}
+	   		}
+	   		if(ok==0)
+	   		 	{
+	   			a[++cnt] =  i-pre ; 
+	   			ha[cnt] = (ha[cnt-1]*cs+a[cnt])%sm;
+	   			pre=i ; 
+	   		}
+	   	}
+	   	int ck =0  ; 
+	   	FOR(i,1,cnt)
+	   	{
+	   		if(check(i))
+	   		{
+	   			ck = i; 
+	   			break;
+	   		}
+	   	}
+	   	// prt(a,cnt) ;
+	   	// cout<<ck<<el;
+	   	assert(ck) ;
+	   	assert(ck<=cnt) ;  
+	   	int sum = 0; 
+	   	FOR(i,1,ck)sum+=a[i] ;
+	   	assert(sum) ;
+	   	n%=sum ;
+	   	int tot = 0;    
+	   	FOR(i,1,ck)
+	   	{
+	   		(tot+=a[i])%=sum; 
+	   		if(tot==n)return void(cout<<0) ; 
+	   	}
+	   	cout<<1<<el; 
     }
 }
 namespace sub2
 {
-	ll st[N][LO+2] ;
-	int best[N] ; 
-	ll mi[N] ;
-	void build()
-	{
-		FOR(i,1,n)
-		{
-			st[i][0] = LB(a+1,a+n+1,a[i]-k)-a ;
-		}
-		FOR(j,1,LO)FOR(i,1,n)
-		{
-			st[i][j] = st[st[i][j-1]][j-1] ; 
-		}
-	} 
-	ll go(int u ,int v)
-	{
-		ll ans =0 ; 
-		FORD(i,LO,0)
-		{
-			if(st[u][i]>v)
-			{
-				ans+=M(i) ; 
-				u=st[u][i];
-			}
-		}
-		u = st[u][0] ; 
-		if(u>v)return inf ;
-		++ans; 
-		return ans; 
-	}
-	void xuly()
-	{
-		mi[0] = oo ; 
-		FOR(i,1,n)mi[i] = min(b[i]+1,mi[i-1]) ; 
-		best[n] = n ; 
-		build() ;
-		FORD(i,n-1,1) 
-		{ 
-			best[i] = best[i+1] ; 
-			if(b[best[i]]+1+go(best[i],i)>b[i]+1)
-			{
-				best[i] = i ; 
-			}
-		}
-		while(q--)
-		{
-			int u ,v; cin>> u >> v;
-			if(u<v)
-			{
-				cout<<1<<el;
-				continue ; 
-			}
-			else
-			{
-			 	ll res = min({mi[v-1]+1,b[v]+1,go(u,v)}) ; 
-				mini(res,b[best[v]]+1+go(best[v],v)) ;
-				cout<<res<<el;
-			}
-		}
-	}	
+
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -184,7 +179,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub2::xuly() ; 
+        sub1::xuly() ;
+        // sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

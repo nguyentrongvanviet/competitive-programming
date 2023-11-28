@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "dichuyennhonhat"
+#define TASK "probs3"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,109 +61,131 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q , k ; 
-ll a[N] ,b[N] ;
+int n , k;  
+struct DL
+{
+	int a ,b ;  
+	bool operator<(const DL& other)const
+	{
+		return a<other.a||(a==other.a&&b<other.b) ; 
+	}
+};
+DL a[N] ; 
+
 void doc()
-{	
-    cin>> n >> q >> k; 	
-    FOR(i,1,n)cin>>a[i] ; 
-    FOR(i,1,n)cin>>b[i] ; 
+{   
+    cin>> n >> k; 
+    FOR(i,1,n)cin>>a[i].a>>a[i].b; 
 }
 
 namespace sub1
 {
-	const int N = 105; 
-	int C[N][N] ; 
+    int f[N][2] ; 
     void xuly()
     {
-    	FOR(i,1,n) 	
-    	{
-    		FOR(j,1,n)
-    		{
-    			C[i][j] = (a[i]-a[j]<=k?1:1+b[j]) ; 
-    		}
-    	}
-    	FOR(k,1,n)FOR(i,1,n)FOR(j,1,n)
-    	{
-    		mini(C[i][j],C[i][k]+C[k][j]) ;
-    	}
-    	while(q--)
-    	{
-    		int u ,v ;cin>> u >> v ; 
-    		if(u<v)
-    		{
-    			cout<<1<<el;
-    			continue ;
-    		}
-    		else
-    		{
-    			cout<<C[u][v]<<el;
-    		}
-    	}
+        sort(a+1,a+n+1) ; 
+        FOR(i,1,n)
+        {
+            f[i][0] = 1 ;
+            f[i][1] = 2 ; 
+            FOR(j,1,i-1)if(a[j].b<=a[i].b)
+            {
+                if(abs(a[i].b-a[j].b)<=k)
+                {
+                    maxi(f[i][0],f[j][0]+1) ;
+                    maxi(f[i][1],f[j][1]+1) ; 
+                }
+                else
+                {
+                    if(abs(a[i].b-a[j].b)<=2*k)
+                    {
+                        maxi(f[i][1],f[j][0]+2) ; 
+                    }
+                }   
+            }
+        }
+        int res = 0 ;
+
+        FOR(i,1,n)
+        {
+            maxi(res,max(f[i][0]+1,f[i][1])) ; 
+        }
+        cout<<res;
     }
 }
 namespace sub2
 {
-	ll st[N][LO+2] ;
-	int best[N] ; 
-	ll mi[N] ;
-	void build()
-	{
-		FOR(i,1,n)
-		{
-			st[i][0] = LB(a+1,a+n+1,a[i]-k)-a ;
-		}
-		FOR(j,1,LO)FOR(i,1,n)
-		{
-			st[i][j] = st[st[i][j-1]][j-1] ; 
-		}
-	} 
-	ll go(int u ,int v)
-	{
-		ll ans =0 ; 
-		FORD(i,LO,0)
-		{
-			if(st[u][i]>v)
-			{
-				ans+=M(i) ; 
-				u=st[u][i];
-			}
-		}
-		u = st[u][0] ; 
-		if(u>v)return inf ;
-		++ans; 
-		return ans; 
-	}
-	void xuly()
-	{
-		mi[0] = oo ; 
-		FOR(i,1,n)mi[i] = min(b[i]+1,mi[i-1]) ; 
-		best[n] = n ; 
-		build() ;
-		FORD(i,n-1,1) 
-		{ 
-			best[i] = best[i+1] ; 
-			if(b[best[i]]+1+go(best[i],i)>b[i]+1)
-			{
-				best[i] = i ; 
-			}
-		}
-		while(q--)
-		{
-			int u ,v; cin>> u >> v;
-			if(u<v)
-			{
-				cout<<1<<el;
-				continue ; 
-			}
-			else
-			{
-			 	ll res = min({mi[v-1]+1,b[v]+1,go(u,v)}) ; 
-				mini(res,b[best[v]]+1+go(best[v],v)) ;
-				cout<<res<<el;
-			}
-		}
-	}	
+    struct data
+    {
+        int f0 ,f1; 
+        data(int _f0=0, int _f1=0)
+        {
+            f0 = _f0 ; 
+            f1 = _f1 ;
+        }
+        data operator +(const data&x)
+        {
+            return data(max(f0,x.f0),max(f1,x.f1)) ; 
+        }
+    } ; 
+    data st[4*N] ; 
+    int f[N][2] ; 
+    void up(int id ,int l ,int r, int pos , int f0,int f1)
+    {
+        if(l==r&&l==pos)
+        {
+            maxi(st[id].f0,f0) ; 
+            maxi(st[id].f1,f1) ; 
+            return ; 
+        }
+        if(r<pos||pos<l)return ;
+        int mid=(l+r)>>1; 
+        up(id<<1,l,mid,pos,f0,f1) ; 
+        up(id<<1|1,mid+1,r,pos,f0,f1) ; 
+        st[id] = st[id<<1]+st[id<<1|1] ; 
+    }
+    data get(int id ,int l, int r, int t ,int p)
+    {
+        if(t<=l&&r<=p)
+        {
+            return st[id] ; 
+        }
+        if(r<t||p<l)
+        {
+            return data(0,0) ; 
+        }
+        int mid = (l+r)>>1; 
+        return get(id<<1,l,mid,t,p)+get(id<<1|1,mid+1,r,t,p) ; 
+    }
+    int VAL[N] ; 
+    void xuly()
+    {
+        vi V ; 
+        FOR(i,1,n)V.pb(a[i].b) ;
+        uni(V) ;
+        int m = SZ(V) ; 
+        FOR(i,1,m)
+        {
+            VAL[i] = V[i-1] ; 
+        }
+        sort(a+1,a+n+1) ;  
+        FOR(i,1,n)
+        {
+            int pos = LB(VAL+1,VAL+m+1,a[i].b)-VAL ; 
+            int l = LB(VAL+1,VAL+m+1,a[i].b-k)-VAL ; 
+            f[i][0] = get(1,1,m,l,pos).f0+1 ;
+            f[i][1] = get(1,1,m,l,pos).f1+1 ;
+            l = LB(VAL+1,VAL+m+1,a[i].b-2*k)-VAL ; 
+            maxi(f[i][1] , get(1,1,m,l,pos).f0+2) ;  
+            up(1,1,m,pos,f[i][0],f[i][1]) ; 
+        }
+        int res = 0 ; 
+        FOR(i,1,n)
+        {
+            maxi(res,max(f[i][0]+1,f[i][1])) ; 
+        }
+        cout<<res<<el;
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -184,7 +206,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub2::xuly() ; 
+        // sub1::xuly() ;
+        sub2::xuly() ;  
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

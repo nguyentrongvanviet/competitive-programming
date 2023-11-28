@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "dichuyennhonhat"
+#define TASK "tiacay"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -13,8 +13,7 @@ bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
-using namespace std; 
-
+using namespace std;
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -61,109 +60,66 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q , k ; 
-ll a[N] ,b[N] ;
+int n , m , k , x;
+int h[N] , g[N] ;
 void doc()
-{	
-    cin>> n >> q >> k; 	
-    FOR(i,1,n)cin>>a[i] ; 
-    FOR(i,1,n)cin>>b[i] ; 
+{
+    cin>> n >> m >> k >>x; 
+    FOR(i,1,n)
+    {
+        cin>>h[i]>>g[i] ; 
+    }
 }
 
 namespace sub1
 {
-	const int N = 105; 
-	int C[N][N] ; 
     void xuly()
     {
-    	FOR(i,1,n) 	
-    	{
-    		FOR(j,1,n)
-    		{
-    			C[i][j] = (a[i]-a[j]<=k?1:1+b[j]) ; 
-    		}
-    	}
-    	FOR(k,1,n)FOR(i,1,n)FOR(j,1,n)
-    	{
-    		mini(C[i][j],C[i][k]+C[k][j]) ;
-    	}
-    	while(q--)
-    	{
-    		int u ,v ;cin>> u >> v ; 
-    		if(u<v)
-    		{
-    			cout<<1<<el;
-    			continue ;
-    		}
-    		else
-    		{
-    			cout<<C[u][v]<<el;
-    		}
-    	}
+        priority_queue<ll>q ;
+        FOR(i,1,n)
+        {
+            q.push(1ll*h[i]+1ll*g[i]*m) ;
+        }
+        FOR(i,1,m*k)
+        {   
+            ll val = q.top() ; 
+            q.pop() ; 
+            if(val>=x)
+            {
+                val-=x ; 
+            }
+            q.push(val) ; 
+        }
+        ll res = q.top() ; 
+        cout<<res;
     }
 }
 namespace sub2
 {
-	ll st[N][LO+2] ;
-	int best[N] ; 
-	ll mi[N] ;
-	void build()
-	{
-		FOR(i,1,n)
-		{
-			st[i][0] = LB(a+1,a+n+1,a[i]-k)-a ;
-		}
-		FOR(j,1,LO)FOR(i,1,n)
-		{
-			st[i][j] = st[st[i][j-1]][j-1] ; 
-		}
-	} 
-	ll go(int u ,int v)
-	{
-		ll ans =0 ; 
-		FORD(i,LO,0)
-		{
-			if(st[u][i]>v)
-			{
-				ans+=M(i) ; 
-				u=st[u][i];
-			}
-		}
-		u = st[u][0] ; 
-		if(u>v)return inf ;
-		++ans; 
-		return ans; 
-	}
-	void xuly()
-	{
-		mi[0] = oo ; 
-		FOR(i,1,n)mi[i] = min(b[i]+1,mi[i-1]) ; 
-		best[n] = n ; 
-		build() ;
-		FORD(i,n-1,1) 
-		{ 
-			best[i] = best[i+1] ; 
-			if(b[best[i]]+1+go(best[i],i)>b[i]+1)
-			{
-				best[i] = i ; 
-			}
-		}
-		while(q--)
-		{
-			int u ,v; cin>> u >> v;
-			if(u<v)
-			{
-				cout<<1<<el;
-				continue ; 
-			}
-			else
-			{
-			 	ll res = min({mi[v-1]+1,b[v]+1,go(u,v)}) ; 
-				mini(res,b[best[v]]+1+go(best[v],v)) ;
-				cout<<res<<el;
-			}
-		}
-	}	
+
+    bool check(int val)
+    {
+        FOR(i,1,n)
+        {
+            if(1ll*h[i]+1ll*g[i]*m>val)
+            {
+                q.push({i,h[i]}) ; 
+            }
+        }
+    }
+    void xuly()
+    {
+        int l = 0 ;
+        int r = 2e8 ;
+        int ans = -1 ;  
+        while(l<=r)
+        {
+            int mid = (l+r)>>1; 
+            if(check(mid))ans=mid,r=mid-1; 
+            else l=mid+1; 
+        }
+        cout<<ans; 
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -184,7 +140,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub2::xuly() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

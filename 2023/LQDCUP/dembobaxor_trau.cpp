@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "dichuyennhonhat"
+#define TASK "dembobaxor"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,113 +58,101 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 60 , CH = 26 ; 
 
 
-int n , q , k ; 
-ll a[N] ,b[N] ;
+int n; 
+ll a[N] ; 
+
 void doc()
-{	
-    cin>> n >> q >> k; 	
-    FOR(i,1,n)cin>>a[i] ; 
-    FOR(i,1,n)cin>>b[i] ; 
+{
+    cin>> n  ; 
+    FOR(i,1,n)
+    {
+    	cin>>a[i] ; 
+    }
 }
 
 namespace sub1
 {
-	const int N = 105; 
-	int C[N][N] ; 
-    void xuly()
-    {
-    	FOR(i,1,n) 	
-    	{
-    		FOR(j,1,n)
-    		{
-    			C[i][j] = (a[i]-a[j]<=k?1:1+b[j]) ; 
-    		}
-    	}
-    	FOR(k,1,n)FOR(i,1,n)FOR(j,1,n)
-    	{
-    		mini(C[i][j],C[i][k]+C[k][j]) ;
-    	}
-    	while(q--)
-    	{
-    		int u ,v ;cin>> u >> v ; 
-    		if(u<v)
-    		{
-    			cout<<1<<el;
-    			continue ;
-    		}
-    		else
-    		{
-    			cout<<C[u][v]<<el;
-    		}
-    	}
-    }
-}
-namespace sub2
-{
-	ll st[N][LO+2] ;
-	int best[N] ; 
-	ll mi[N] ;
-	void build()
+	unordered_map<ll,int>cntL[LO+1],cntR[LO+1] ;
+	ll sl_0_1[LO+1],sl_1_0[LO+1] ;
+	void inc(ll val)
 	{
-		FOR(i,1,n)
+		FORN(j,0,LO)
 		{
-			st[i][0] = LB(a+1,a+n+1,a[i]-k)-a ;
-		}
-		FOR(j,1,LO)FOR(i,1,n)
-		{
-			st[i][j] = st[st[i][j-1]][j-1] ; 
-		}
-	} 
-	ll go(int u ,int v)
-	{
-		ll ans =0 ; 
-		FORD(i,LO,0)
-		{
-			if(st[u][i]>v)
+			ll nval = val>>j&(M(LO-j)-1) ; 
+			cntL[LO-j][nval]++ ; 
+			if(nval&1)
 			{
-				ans+=M(i) ; 
-				u=st[u][i];
-			}
-		}
-		u = st[u][0] ; 
-		if(u>v)return inf ;
-		++ans; 
-		return ans; 
-	}
-	void xuly()
-	{
-		mi[0] = oo ; 
-		FOR(i,1,n)mi[i] = min(b[i]+1,mi[i-1]) ; 
-		best[n] = n ; 
-		build() ;
-		FORD(i,n-1,1) 
-		{ 
-			best[i] = best[i+1] ; 
-			if(b[best[i]]+1+go(best[i],i)>b[i]+1)
-			{
-				best[i] = i ; 
-			}
-		}
-		while(q--)
-		{
-			int u ,v; cin>> u >> v;
-			if(u<v)
-			{
-				cout<<1<<el;
-				continue ; 
+				if(cntR[LO-j].count(nval^1))sl_1_0[LO-j]+=cntR[LO-j][nval^1]; 
 			}
 			else
 			{
-			 	ll res = min({mi[v-1]+1,b[v]+1,go(u,v)}) ; 
-				mini(res,b[best[v]]+1+go(best[v],v)) ;
-				cout<<res<<el;
+				if(cntR[LO-j].count(nval^1))sl_0_1[LO-j]+=cntR[LO-j][nval^1] ;
 			}
 		}
-	}	
+	}
+	void dec(ll val)
+	{
+		FORN(j,0,LO)
+		{
+			ll nval = val>>j&(M(LO-j)-1) ; 
+			cntR[LO-j][nval]-- ; 
+			if(nval&1)
+			{
+				if(cntL[LO-j].count(nval^1))sl_0_1[LO-j]-=cntL[LO-j][nval^1]; 
+			}
+			else
+			{
+				if(cntL[LO-j].count(nval^1))sl_1_0[LO-j]-=cntL[LO-j][nval^1] ;
+			}
+		}
+	}
+	ll res = 0 ; 
+    void xuly()
+    {
+    	FORN(j,0,LO)
+    	{
+    		ll nval = a[1]>>j&(M(LO-j)-1) ;
+    		cntL[LO-j][nval]++; 
+    	}
+    	FOR(i,3,n)
+    	{
+	    	FORN(j,0,LO)
+			{
+				ll nval =a[i]>>j&(M(LO-j)-1);
+				cntR[LO-j][nval]++;  
+				if(nval&1)
+				{
+					if(cntL[LO-j].count(nval^1))sl_0_1[LO-j]+=cntL[LO-j][nval^1];
+				}
+				else 
+				{
+					if(cntL[LO-j].count(nval^1))sl_1_0[LO-j]+=cntL[LO-j][nval^1];
+				}
+			}
+		}
+    	FOR(i,2,n-1)
+    	{
+    		FORN(j,0,LO)
+    		{
+    			if(BIT(a[i],j))
+    			{
+    				res+=sl_1_0[LO-j];
+    			}
+    			else
+    			{
+    				res+=sl_0_1[LO-j] ; 
+    			}
+    		}
+    		inc(a[i]) ; 
+    		dec(a[i+1]) ; 
+    	}
+    	cout<<res;
+    }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -178,13 +166,13 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        freopen("text.ANS","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        sub2::xuly() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

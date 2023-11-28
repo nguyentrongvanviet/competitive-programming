@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "dichuyennhonhat"
+#define TASK "truyvanxoathemdinh"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,110 +61,85 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , q , k ; 
-ll a[N] ,b[N] ;
+int n , q ; 
+vi g[N]  ; 
+int pa[N] ;
 void doc()
-{	
-    cin>> n >> q >> k; 	
-    FOR(i,1,n)cin>>a[i] ; 
-    FOR(i,1,n)cin>>b[i] ; 
+{
+    cin>> n >> q ; 
+    FOR(i,2,n)
+    {
+    	cin>>pa[i] ;
+    	g[pa[i]].pb(i) ;  
+    }
 }
 
 namespace sub1
 {
-	const int N = 105; 
-	int C[N][N] ; 
+	int h[N] ; 
+	int in[N] , out[N] , tt =0 ; 
+	int st[4*N] ; 
+	void up(int id ,int l ,int r, int pos ,int val)
+	{
+		if(l==r&&l==pos)
+		{
+			st[id]+=val ;
+			return ; 
+		}
+		if(r<pos||pos<l)return ;  
+		int mid = (l+r)>>1; 
+		up(id<<1,l,mid,pos,val) ; 
+		up(id<<1|1,mid+1,r,pos,val) ;
+		st[id] = max(st[id<<1],st[id<<1|1]) ;
+	}
+	int get(int id ,int l ,int r, int t ,int p )
+	{
+		if(t<=l&&r<=p)return st[id] ;
+		if(r<t||p<l)return 0 ; 
+		int mid=(l+r)>>1; 
+		return max(get(id<<1,l,mid,t,p),get(id<<1|1,mid+1,r,t,p)) ; 
+	}
+	void dfs(int u )
+	{
+		in[u] = ++tt; 
+		for(auto v:g[u])
+		{
+			h[v] = h[u]+1 ;
+			dfs(v) ;
+		}
+		out[u] = tt; 
+	}
     void xuly()
     {
-    	FOR(i,1,n) 	
-    	{
-    		FOR(j,1,n)
-    		{
-    			C[i][j] = (a[i]-a[j]<=k?1:1+b[j]) ; 
-    		}
-    	}
-    	FOR(k,1,n)FOR(i,1,n)FOR(j,1,n)
-    	{
-    		mini(C[i][j],C[i][k]+C[k][j]) ;
-    	}
-    	while(q--)
-    	{
-    		int u ,v ;cin>> u >> v ; 
-    		if(u<v)
-    		{
-    			cout<<1<<el;
-    			continue ;
-    		}
-    		else
-    		{
-    			cout<<C[u][v]<<el;
-    		}
-    	}
+        dfs(1) ; 
+        FOR(i,1,n)up(1,1,n,in[i],h[i]) ; 
+        pa[1] = 1 ;
+        FOR(i,1,q)
+        {
+        	int type ; cin>>type ;
+        	if(type==1)
+        	{
+        		int u ; cin>> u; 
+        		int P = pa[pa[u]] ;
+        		if(pa[u]==P||u==1)continue ; 
+        		pa[u] = P ;
+        		// cout<<get(1,1,n,in[P],in[P])-get(1,1,n,in[u],in[u])<<el;
+        		up(1,1,n,in[u],get(1,1,n,in[P],in[P])-get(1,1,n,in[u],in[u])+1) ;
+        	}
+        	else
+        	{
+        		int u ;cin>> u ;
+        		cout<<get(1,1,n,in[u],out[u])-get(1,1,n,in[u],in[u])<<el; 	
+        	}
+        	// FOR(i,1,n)
+        	// {
+        	// 	cout<<get(1,1,n,in[i],in[i])<<" ";
+        	// }
+        	// cout<<el;
+        }
     }
 }
-namespace sub2
-{
-	ll st[N][LO+2] ;
-	int best[N] ; 
-	ll mi[N] ;
-	void build()
-	{
-		FOR(i,1,n)
-		{
-			st[i][0] = LB(a+1,a+n+1,a[i]-k)-a ;
-		}
-		FOR(j,1,LO)FOR(i,1,n)
-		{
-			st[i][j] = st[st[i][j-1]][j-1] ; 
-		}
-	} 
-	ll go(int u ,int v)
-	{
-		ll ans =0 ; 
-		FORD(i,LO,0)
-		{
-			if(st[u][i]>v)
-			{
-				ans+=M(i) ; 
-				u=st[u][i];
-			}
-		}
-		u = st[u][0] ; 
-		if(u>v)return inf ;
-		++ans; 
-		return ans; 
-	}
-	void xuly()
-	{
-		mi[0] = oo ; 
-		FOR(i,1,n)mi[i] = min(b[i]+1,mi[i-1]) ; 
-		best[n] = n ; 
-		build() ;
-		FORD(i,n-1,1) 
-		{ 
-			best[i] = best[i+1] ; 
-			if(b[best[i]]+1+go(best[i],i)>b[i]+1)
-			{
-				best[i] = i ; 
-			}
-		}
-		while(q--)
-		{
-			int u ,v; cin>> u >> v;
-			if(u<v)
-			{
-				cout<<1<<el;
-				continue ; 
-			}
-			else
-			{
-			 	ll res = min({mi[v-1]+1,b[v]+1,go(u,v)}) ; 
-				mini(res,b[best[v]]+1+go(best[v],v)) ;
-				cout<<res<<el;
-			}
-		}
-	}	
-}
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -184,7 +159,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub2::xuly() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
