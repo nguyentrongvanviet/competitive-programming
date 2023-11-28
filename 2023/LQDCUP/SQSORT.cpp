@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "KGAME"
+#define TASK "SQSORT"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -49,7 +49,7 @@ ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
 #define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
 #define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
-#define int ll 
+
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 
@@ -57,102 +57,76 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 27 , sm = 1e9+7; 
-const int N = 3e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
 int n , k; 
-int f[N] ;
-
+vi V ; 
 void doc()
-{
-   	cin>> n >> k; 
-   	if(k==1)
-   	{
-   		cout<<1;
-   		exit(0) ;
-   	}
+{	
+    cin>> n >> k; 
+    FOR(i,1,k)
+    {
+    	int val ; cin>>val; 
+    	V.pb(val) ;
+    }
 }
 
 namespace sub1
 {
-	int f[N][105];
-	int a[N] ;  
-	ll ha[N],mu[N] ;
-	int cnt =0 ;  
-	ll get(int l ,int r)
+	vi res ;
+	vi tmp ;
+	vi la ; 
+	void solve(vi value ,int id )
 	{
-		return (ha[r] - ha[l-1]*mu[r-l+1]%sm+sm)%sm;
-	}
-	bool check(int len)
-	{
-		for(int i=1;i+len-1<=cnt;i+=len)
+		if(id==2*n+1)
 		{
-			if(get(i,i+len-1)!=get(1,len))return 0; 
+			la.pb(value[0]) ; 
+			assert(SZ(value)==1) ; 
+			return ;
+		} 
+		tmp = value; 
+		sort(all(tmp)) ;
+		multiset<int>left;  
+		int cnt= (SZ(value)+1)/2;
+		FORN(i,0,cnt)
+		{
+			left.insert(tmp[i]) ; 
 		}
-		return 1; 
+		vi L , R ; 
+		for(auto x:value)
+		{
+			if(left.count(x)) 
+			{
+				left.erase(left.find(x)) ; 
+				res.pb(id) ;
+				res.pb(id+1) ; 
+				L.pb(x) ; 
+			}
+			else
+			{
+				res.pb(id) ; 
+				R.pb(x) ; 
+			}
+		}
+		solve(L,id+2); 
+		if(!R.empty())
+		{
+			reverse(all(R)) ; 
+			FOR(i,1,SZ(R))res.pb(id+1) ; 
+			solve(R,id+2) ; 
+		}
+
 	}
     void xuly()
     {
-	   	FOR(i,1,3e4)
-	   	{
-	   		FOR(pre,1,k)
-	   		{
-	   			FOR(cur,1,k)if(pre!=cur)
-	   			{
-	   				if(i>=cur&&f[i-cur][cur]==0)
-	   				{
-	   					f[i][pre] =1 ; 
-	   				}
-	   			}
-	   		}
-	   	}
-	   	mu[0] = 1; 
-
-	   	FOR(i,1,3e4)mu[i] = mu[i-1]*cs%sm ; 
-	   	int pre =0 ;  
-	   	FOR(i,1,3e4)
-	   	{
-	   		bool ok = 0; 
-	   		FOR(j,1,k)
-	   		{
-	   			if(i>=j&&f[i-j][j]==0)
-	   			{
-	   				ok =1 ;
-	   				break;
-	   			}
-	   		}
-	   		if(ok==0)
-   		 	{
-	   			a[++cnt] =  i-pre ; 
-	   			ha[cnt] = (ha[cnt-1]*cs+a[cnt])%sm;
-	   			pre=i ; 
-	   		}
-	   	}
-	   	int ck =0  ; 
-	   	FOR(i,1,cnt)
-	   	{
-	   		if(check(i))
-	   		{
-	   			ck = i; 
-	   			break;
-	   		}
-	   	}
-	   	int sum = 0; 
-	   	FOR(i,1,ck)sum+=a[i] ;
-	   	n%=sum ;
-	   	int tot = 0;    
-	   	FOR(i,1,ck)
-	   	{	
-	   		(tot+=a[i])%=sum; 
-	   		if(tot==n)return void(cout<<0) ; 
-	   	}
-	   	cout<<1<<el; 
+		solve(V,1) ; 
+		cout<<SZ(res)<<el;
+		prv(res) ;
+		// prv(la) ; 
+		// FORN(i,1,SZ(la))if(la[i-1]>la[i])while(1) ;
     }
-}
-namespace sub2
-{
-
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -174,8 +148,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ;
-        // sub2::xuly() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

@@ -16,9 +16,19 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-    int k = rd(1,4) ;
-    int n =rd(k,1000) ;
-    cout<<n<<" "<<k<<el;
+    int n =3 ;
+    int m =rd(1,n) ;  
+    cout<<n<<" "<<m<<el;
+    FOR(i,2,n)
+    {
+    	cout<<rd(1,i-1)<<" ";
+    }
+    cout<<el; 
+    FOR(i,1,m){
+    	int u =rd(1,n-1) ;
+    	int v= rd(u+1,n) ; 
+    	cout<<u<<" "<<v<<el;
+    }
     cout.close();
 }
 
@@ -28,8 +38,8 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("KGAME""_trau.exe");
-        system("KGAME"".exe"); 
+        system("TREEGAME""_trau.exe");
+        system("TREEGAME"".exe"); 
         if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
         {   
             cout<<"Test "<<i<<" WA"<<"\n";
