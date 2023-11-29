@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "tiacay"
+#define TASK "sport"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -13,7 +13,8 @@ bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
-using namespace std;
+using namespace std; 
+
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -57,111 +58,92 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m , k , x;
-int h[N] , g[N] ;
+int n ;
+int a[N] ; 
 void doc()
 {
-    cin>> n >> m >> k >>x; 
-    FOR(i,1,n)
-    {
-        cin>>h[i]>>g[i] ; 
-    }
+	cin>> n; 
+	FOR(i,1,n)cin>>a[i] ; 
+	FOR(i,n+1,n+n)cin>>a[i] ; 
 }
 
 namespace sub1
 {
+	struct DL{
+		int u ,v;
+		int dis ;
+		DL(int _u=0,int _v=0)
+		{
+			u=_u ;
+			v=_v ;
+			if((u<=n&&v<=n)||(u>n&&v>n))dis=1e9+1 ;
+			else dis = abs(a[u]-a[v]) ;
+		}  
+	} ; 
+	struct cmp
+	{
+		bool operator()(const DL& x,  const DL& y)const
+		{
+			return x.dis<y.dis||(x.dis==y.dis&&x.u<y.u)||(x.dis==y.dis&&x.u==y.u&&x.v<y.v);
+		}
+	}; 
+	set<DL,cmp>dis ; 
     void xuly()
     {
-        priority_queue<ll>q ;
-        FOR(i,1,n)
-        {
-            q.push(1ll*h[i]+1ll*g[i]*m) ;
-        }
-        FOR(i,1,m*k)
-        {   
-            ll val = q.top() ; 
-            q.pop() ; 
-            if(val>=x)
-            {
-                val-=x ; 
-            }
-            q.push(val) ; 
-        }
-        ll res = q.top() ; 
-        cout<<res;
+    	set<pii>s ; 
+    	FOR(i,1,n)
+    	{
+    		s.insert({a[i],i}) ; 
+    	}
+    	FOR(i,n+1,2*n)
+    	{
+    		s.insert({a[i],i}) ;
+    	}
+    	pii prev={0,0} ; 
+    	for(auto u :s)
+    	{		 
+			int id =u.se ; 
+			if(prev!=mp(0,0))
+			{
+				dis.insert(DL(prev.se,id));
+			}
+    		prev = u ; 
+    	}
+    	FOR(i,1,n)
+    	{
+    		DL tmp = (*dis.begin()) ; 
+    		dis.erase(dis.begin()) ;
+    		int u =tmp.u ; 
+    		int v =tmp.v ; 
+    		auto L = s.find({a[u],u}) ;
+    		auto oldL = L; 
+    		auto R = s.find({a[v],v}) ;
+    		auto oldR = R ;  
+    		bool ok = 1 ;
+    		if(L!=s.begin())
+    		{
+    			--L ; 
+    			dis.erase(DL((*L).se,u)) ;
+    		}else ok=0 ;
+    		
+    		++R; 
+    		if(R!=s.end())dis.erase(DL(v,(*R).se)) ;
+    		else ok = 0 ;
+    		
+    		if(ok)xzxdis.insert(DL((*L).se,(*R).se));
+    		
+    		s.erase(oldL) ; 
+    		s.erase(oldR) ;
+
+    		if(u<=n)cout<<u<<" "<<v-n<<el;
+    		else cout<<v<<" "<<u-n<<el;
+    	}
     }
 }
-namespace sub2
-{
-    struct DL
-    {
-        int id ; 
-        int h ; 
-        ll val; 
-    };
-    struct cmp
-    {
-        bool operator()(const DL&a ,const DL&b)const
-        {
-            return (a.h>=x) < (b.h>=x)|| ( (a.h>=x) == (b.h>=x) && a.val<b.val ); 
-        }
-    } ;  
-    void xuly()
-    {
-        FOR(i,1,m)
-        {
-            priority_queue<DL,ve<DL>,cmp>q ;
-            FOR(j,1,n)
-            {
-                h[j]+=g[j] ; 
-                q.push({j,h[j],h[j]+g[j]*(m-i)});
-            }
-            FOR(j,1,k)
-            {
-                int u =q.top().h ; 
-                int id = q.top().id;
-                q.pop() ; 
-                if(u<x)break; 
-                h[id]-=x;
-                q.push({id,h[id],h[id]+g[id]*(m-i)});
-            }
-        }
-        cout<<*max_element(h+1,h+n+1) ; 
-    }
-}
-namespace sub3
-{
-    struct DL
-    {
-        int id ;
-        ll val ; 
-    };
-    int can[N] , cut[N] ; 
-    void xuly()
-    {
-        queue<int>q; 
-        ve<pii>tree; 
-        FOR(i,1,n)
-        {
-            tree.pb({h[i]+m*g[i],i});
-        }
-        sort(all(tree)) ; 
-        pii u = tree.back() ; 
-        tree.push(u) ; 
-        while(!tree.empty()&&tree.back().se>=u.se-x)
-        {
-            q.push(tree.back()) ;
-            tree.back() ; 
-        }
-        while(!q.empty())
-        {
-            int u= q.front() ;
-        }
-    }
-}
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -181,8 +163,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ;
-        sub2::xuly() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

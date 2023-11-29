@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "tiacay"
+#define TASK "lcmgroup"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -13,7 +13,8 @@ bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
-using namespace std;
+using namespace std; 
+
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -57,111 +58,61 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m , k , x;
-int h[N] , g[N] ;
+int n; 
+int a[N] ; 
+vi res[N] ; 
+vi pos[N];
 void doc()
 {
-    cin>> n >> m >> k >>x; 
+    cin>> n; 
     FOR(i,1,n)
     {
-        cin>>h[i]>>g[i] ; 
+    	cin>>a[i] ; 
+    	pos[a[i]].pb(i) ; 
     }
+
 }
 
 namespace sub1
 {
+	vi uoc[N];
     void xuly()
     {
-        priority_queue<ll>q ;
-        FOR(i,1,n)
-        {
-            q.push(1ll*h[i]+1ll*g[i]*m) ;
-        }
-        FOR(i,1,m*k)
-        {   
-            ll val = q.top() ; 
-            q.pop() ; 
-            if(val>=x)
-            {
-                val-=x ; 
-            }
-            q.push(val) ; 
-        }
-        ll res = q.top() ; 
-        cout<<res;
-    }
+    	FOR(i,1,2e5)
+    	{
+    		FOR(j,1,2e5/i)
+    		{
+    			uoc[i*j].pb(i); 
+    		}
+    	}
+    	int cnt = 0 ;
+    	FORD(i,2e5,1)
+    	{	
+    		if(SZ(pos[i]))
+    		{
+    			cnt++ ;
+    			for(auto x:uoc[i])
+    			{
+    				for(auto id :pos[x])
+    				{
+    					res[cnt].pb(id) ;
+    				}
+    				pos[x].clear() ;
+    			}
+    		}
+    	}
+    	cout<<cnt<<el;
+    	FOR(i,1,cnt)
+    	{
+    		cout<<SZ(res[i])<<" " ;
+    		prv(res[i]) ;
+    	}
+    }	
 }
-namespace sub2
-{
-    struct DL
-    {
-        int id ; 
-        int h ; 
-        ll val; 
-    };
-    struct cmp
-    {
-        bool operator()(const DL&a ,const DL&b)const
-        {
-            return (a.h>=x) < (b.h>=x)|| ( (a.h>=x) == (b.h>=x) && a.val<b.val ); 
-        }
-    } ;  
-    void xuly()
-    {
-        FOR(i,1,m)
-        {
-            priority_queue<DL,ve<DL>,cmp>q ;
-            FOR(j,1,n)
-            {
-                h[j]+=g[j] ; 
-                q.push({j,h[j],h[j]+g[j]*(m-i)});
-            }
-            FOR(j,1,k)
-            {
-                int u =q.top().h ; 
-                int id = q.top().id;
-                q.pop() ; 
-                if(u<x)break; 
-                h[id]-=x;
-                q.push({id,h[id],h[id]+g[id]*(m-i)});
-            }
-        }
-        cout<<*max_element(h+1,h+n+1) ; 
-    }
-}
-namespace sub3
-{
-    struct DL
-    {
-        int id ;
-        ll val ; 
-    };
-    int can[N] , cut[N] ; 
-    void xuly()
-    {
-        queue<int>q; 
-        ve<pii>tree; 
-        FOR(i,1,n)
-        {
-            tree.pb({h[i]+m*g[i],i});
-        }
-        sort(all(tree)) ; 
-        pii u = tree.back() ; 
-        tree.push(u) ; 
-        while(!tree.empty()&&tree.back().se>=u.se-x)
-        {
-            q.push(tree.back()) ;
-            tree.back() ; 
-        }
-        while(!q.empty())
-        {
-            int u= q.front() ;
-        }
-    }
-}
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -181,8 +132,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ;
-        sub2::xuly() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

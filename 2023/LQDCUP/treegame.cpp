@@ -288,6 +288,7 @@ namespace sub3
 		int ST = SZ(st) ;  
 		FOR(i,l,mid)merge(i,0) ;
 		FOR(i,mid+1,r)merge(i,1) ; 
+
 		if(st.top().ok)(res+=tmp)%=sm; 
 		roll_back(ST) ;
 		

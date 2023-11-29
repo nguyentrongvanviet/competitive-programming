@@ -282,15 +282,12 @@ namespace sub4
 			dfs(v,u) ; 
 		}
 	}
-	void go(int u ,int len)
+	void go(int u)
 	{
 		dd[u] =1 ;
-		if(len-1>=0)
-		{
-			for(auto v:g[u])
-			{	
-				go(v,len-1) ; 
-			}
+		for(auto v:g[u])if(dd[v]==0&&near[v]==near[u]-1)
+		{	
+			go(v) ; 
 		}
 	}
 	void xuly()
@@ -299,24 +296,23 @@ namespace sub4
 		dfs(1,0) ; 
 		sort(spec+1,spec+k+1,[&](int u ,int v){return h[u]>h[v];}) ; 	
 		vi res; 
-		
+		// prt(near,n) ; 
 		FOR(i,1,k)
 		{		
 			int u =spec[i] ;
 			if(dd[u])continue ; 
 			int ans=u ;
 			int tmp = pa[u] ; 
-			while(tmp)
+			while(tmp&&dd[tmp]==0)
 			{
 				if(near[tmp]==h[u]-h[tmp]) 	
 				{
 					ans=tmp ; 
 				}
+				else break; 
 				tmp = pa[tmp] ;
-
 			}
-			// cout<<u<<" "<<ans<<" "<<h[u]-h[ans]<<el;
-			go(ans,h[u]-h[ans]) ;
+			go(ans) ;
 			res.pb(ans) ;  	
 
 		}
@@ -343,11 +339,11 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        if(check1())sub1::xuly() ; 
-        else
-        if(k<=15)
-        sub2::xuly() ;
-   		else 
+        // if(check1())sub1::xuly() ; 
+        // else
+        // if(k<=15)
+        // sub2::xuly() ;
+   		// else 
    		sub4::xuly() ;
      	// else abort() ;
     }

@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "tiacay"
+#define TASK "netsdesign"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -13,7 +13,8 @@ bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
-using namespace std;
+using namespace std; 
+
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -60,108 +61,176 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 1e4+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m , k , x;
-int h[N] , g[N] ;
+int n ,m ;
+struct pt
+{
+	int x, y ;
+} ;
+ll dis(pt a, pt b)
+{
+	return sq(a.x-b.x)+sq(a.y-b.y) ; 
+}
+pt a[N] ,b[N] ;
 void doc()
 {
-    cin>> n >> m >> k >>x; 
-    FOR(i,1,n)
+    cin>> m >> n  ; 
+    FOR(i,1,m)
     {
-        cin>>h[i]>>g[i] ; 
+    	cin>>b[i].x>>b[i].y ; 
     }
+    FOR(i,1,n)cin>>a[i].x>>a[i].y ; 
 }
-
 namespace sub1
 {
+    struct Edge
+    {
+    	int u ,v  ; 
+    	ll len ; 
+    	bool operator<(const Edge&a)const
+    	{
+    		return len<a.len ;
+    	}
+    }E[N] ; 
+    int pa[N] ;
+    int goc(int u )
+    {
+    	return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
+    }
+    bool hop(int u ,int v)
+    {
+    	int chau = goc(u) ; 
+    	int chav = goc(v) ; 
+    	if(chau==chav)return 0; 
+    	pa[chau]=chav ; 
+    	return 1; 
+    }
+    vi g[N] ;
+    ll res = 0 ; 
+    ve<pii>ans;  
+    void dfs(int u ,int p)
+    {
+    	for(auto v:g[u])if(v!=p)
+    	{
+    		cout<<'u'<<" "<<u<<" "<<v<<el;
+    		dfs(v,u) ;
+    	}
+    }
     void xuly()
     {
-        priority_queue<ll>q ;
+        int e = 0 ; 
+        FOR(i,1,n)FOR(j,i+1,n)
+        {   
+            E[++e]={i,j,dis(a[i],a[j])} ; 
+        }
+        sort(E+1,E+e+1) ; 
+        FOR(i,1,n)pa[i] = i ;
+        FOR(i,1,e)
+        {
+            int u =E[i].u ;
+            int v =E[i].v ;
+            if(hop(u,v))
+            {
+                g[u].pb(v) ; 
+                g[v].pb(u) ; 
+                res+=E[i].len; 
+            }
+        }   
+        int start = 0 ;
+        ll tot = inf ; 
         FOR(i,1,n)
         {
-            q.push(1ll*h[i]+1ll*g[i]*m) ;
-        }
-        FOR(i,1,m*k)
-        {   
-            ll val = q.top() ; 
-            q.pop() ; 
-            if(val>=x)
-            {
-                val-=x ; 
+            ll tmp = 0 ; 
+            FOR(j,1,m)
+            {   
+                tmp+=dis(a[i],b[j]) ; 
             }
-            q.push(val) ; 
+            if(mini(tot,tmp))
+            {
+                start = i ;
+            }
         }
-        ll res = q.top() ; 
-        cout<<res;
+        res+=tot ; 
+        cout<<res<<el;
+        cout<<n+m-1<<el;  
+        FOR(i,1,m)
+        {
+            cout<<'s'<<" "<<i<<" "<<start<<el;
+        }
+        dfs(start,0) ;
     }
 }
 namespace sub2
 {
-    struct DL
+    // O(n^2) hct chi bai 
+    // luu tap near la dinh gan va kc bao nhieu 
+    // moi vong lap tim ra dinh gap cap gan nhat hien tai 
+    pair<int,ll>near[N] ;
+    int used[N] ;
+    ll res = 0 ; 
+    vi g[N] ; 
+    void PRIM() 
     {
-        int id ; 
-        int h ; 
-        ll val; 
-    };
-    struct cmp
-    {
-        bool operator()(const DL&a ,const DL&b)const
-        {
-            return (a.h>=x) < (b.h>=x)|| ( (a.h>=x) == (b.h>=x) && a.val<b.val ); 
+        used[1] = 1 ; 
+        FOR(i,2,n)
+        {   
+            near[i] = {1,dis(a[1],a[i])} ; 
         }
-    } ;  
-    void xuly()
-    {
-        FOR(i,1,m)
+        near[0] = {0,inf} ; 
+        FOR(loop,1,n-1)
         {
-            priority_queue<DL,ve<DL>,cmp>q ;
-            FOR(j,1,n)
+            int c = 0 ; 
+            FOR(i,1,n)if(used[i]==0)
             {
-                h[j]+=g[j] ; 
-                q.push({j,h[j],h[j]+g[j]*(m-i)});
+                if(near[c].se>near[i].se)
+                {
+                    c=i ;  
+                }
             }
-            FOR(j,1,k)
+            used[c] = 1 ;
+            res+=near[c].se ; 
+            g[c].pb(near[c].fi) ;
+            g[near[c].fi].pb(c) ;
+            FOR(i,1,n)if(used[i]==0)
             {
-                int u =q.top().h ; 
-                int id = q.top().id;
-                q.pop() ; 
-                if(u<x)break; 
-                h[id]-=x;
-                q.push({id,h[id],h[id]+g[id]*(m-i)});
+                if(near[i].se>dis(a[c],a[i]))
+                {
+                    near[i] = {c,dis(a[c],a[i])} ; 
+                }
             }
         }
-        cout<<*max_element(h+1,h+n+1) ; 
     }
-}
-namespace sub3
-{
-    struct DL
+    void dfs(int u ,int p)
     {
-        int id ;
-        ll val ; 
-    };
-    int can[N] , cut[N] ; 
+        for(auto v:g[u])if(v!=p)
+        {
+            cout<<"u "<<u<<" "<<v<<el;
+            dfs(v,u) ; 
+        }
+    }
     void xuly()
     {
-        queue<int>q; 
-        ve<pii>tree; 
+        PRIM() ; 
+        int ans = 0 ;
+        ll tot = inf ; 
         FOR(i,1,n)
         {
-            tree.pb({h[i]+m*g[i],i});
+            ll tmp = 0 ; 
+            FOR(j,1,m)
+            {   
+                tmp+=dis(a[i],b[j]) ; 
+            }
+            if(mini(tot,tmp))
+            {
+                ans = i ;
+            }
         }
-        sort(all(tree)) ; 
-        pii u = tree.back() ; 
-        tree.push(u) ; 
-        while(!tree.empty()&&tree.back().se>=u.se-x)
-        {
-            q.push(tree.back()) ;
-            tree.back() ; 
-        }
-        while(!q.empty())
-        {
-            int u= q.front() ;
-        }
+        cout<<res+tot<<el;
+        cout<<n+m-1<<el;
+        FOR(i,1,m)cout<<"s "<<i<<" "<<ans<<el;
+        dfs(ans,0) ; 
     }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -181,7 +250,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ;
+        // sub1::xuly() ; 
         sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
