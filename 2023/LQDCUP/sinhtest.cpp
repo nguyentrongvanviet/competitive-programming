@@ -16,19 +16,28 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-    int n =1000 ,q = 5000 ; 
-    cout<<n<<" "<<q<<el; 
+    int n =1e3  ;
+    cout<<n<<el; 
     FOR(i,1,n)
     {
-    	cout<<rd(-5,5)<<" ";
+    	cout<<rd(1,10)<<" ";
     }
-    cout<<el;
+    cout<<el; 
+    int q =rd(1,n) ;
+    cout<<q<<el; 
     FOR(i,1,q)
     {
-    	cout<<'?'<<" ";
+    	int type  =rd(1,1) ; 
     	int l =rd(1,n) ;
     	int r =rd(l,n) ;
-    	cout<<l<<" "<<r<<el;
+    	cout<<type<<" "<<l<<" "<<r<<" "; 
+    	if(type==2)
+    	{
+    		int x =rd(1,10); 
+    		int y =rd(1,10) ;
+    		cout<<x<<" "<<y;
+    	}
+    	cout<<el;
     }
     cout.close();
 }
@@ -39,8 +48,8 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("d13surfh""_trau.exe");
-        system("d13surfh"".exe"); 
+        system("truy_van_max""_trau.exe");
+        system("truy_van_max"".exe"); 
         if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
         {   
             cout<<"Test "<<i<<" WA"<<"\n";

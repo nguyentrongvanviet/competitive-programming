@@ -58,7 +58,7 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 102405 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
 int n ; 
@@ -67,7 +67,7 @@ ll a[N] ;
 void doc()
 {
     cin>>n  ; 
-    FOR(i,1,n)cin>>a[i] ; 
+    FORN(i,0,n)cin>>a[i] ; 
 }
 
 namespace sub1
@@ -78,6 +78,8 @@ namespace sub1
     	FOR(i,1,q)
     	{
     		int type  , l ,r ;
+    		--l ;
+    		--r ; 
     		cin>>type>>l>>r;
     		if(type==1)
     		{
@@ -104,150 +106,141 @@ namespace sub1
 }
 namespace sub2
 {
-	const int B = 320 ; 
-	int BL(int x)
-	{
-		return x/B;
-	}
+	const int B  = 320 ;
 	struct line
 	{
-		ll a, b; 
+		ll a, b ;
+		line(ll _a=0 ,ll _b=0)
+		{
+			a=_a; 
+			b=_b; 
+		}
 		ll operator()(ll x)
 		{
 			return a*x+b;
 		}
-		line(ll _a=0,ll _b=0)
+		db operator / (const line& x)const 
 		{
-			a=_a ;
-			b=_b ; 
+			return 1.0*(x.b-b)/(a-x.a) ; 
 		}
-		db operator / ( line x)
+	} ;
+	struct CHT
+	{
+		deque<line>q ;
+		void add(const line&a)
 		{
-			return 1.0*(x.b-b)/(a-x.a) ;
+			while(SZ(q)>1 && q[SZ(q)-2]/a>=q.back()/a)
+			{
+				q.pk() ; 
+			}
+			q.pb(a) ;
 		}
-	}; 
-	int st[B+4] , en[B+4] ; 
-	line q[B+4][B+4] ; 
-	void add(int &st, int &en ,line q[] , line x)
+		ll get(ll x)
+		{
+			while(SZ(q)>1&&q[0](x)<=q[1](x))q.pop_front() ; 
+			return q[0](x) ;
+		}
+	}A[B+5] ;
+	
+	ll lz_x[B]  , lz_val[B] ;
+
+	void build(int id)
 	{
-		while
-		(
-			en-st+1>=2
-			&& 
-			x/q[en-1] >= q[en]/x
-		)en--;
-		q[++en] = x ; 
+		A[id].q.clear() ; 
+		FORN(i,id*B,(id+1)*B)
+		{
+			A[id].add(line(i,a[i])) ;
+		}
 	}
-	ll get(int &st , int &en  , line q[] , ll x) 
+	ll get_trau(int l ,int r)
+	{	
+		ll res = 0 ; 
+		FOR(i,l,r)
+		{
+			maxi(res,a[i]+i*lz_x[i/B]+lz_val[i/B]); 
+		}
+		return res ; 
+	}	
+	ll get_block(int l ,int r)
 	{
-		while
-		(
-			en-st+1>=2
-			&&
-			q[st]/q[st+1]<1.0*x
-		)++st; 
-		return q[st](x);
+		ll res =0 ; 	
+		FOR(i,l,r)
+		{
+			maxi(res,A[i].get(lz_x[i])+lz_val[i]);
+		}
+		return res; 
 	}
-	int L[N] , R[N] ;
-	ll L_val[N] , L_x[N] ;
-	void solve(int l, int r )
+	// ll get(int l, int r)
+	// {
+	//     int BL = (l + B - 1) / B, BR = r / B;
+	//     if (BL >= BR) return get_trau(l, r);
+	//     ll res = get_block(BL, BR - 1);
+	//     if (l < BL * B) maxi(res, get_trau(l, BL * B - 1));
+	//     maxi(res, get_trau(BR * B, r));
+	//     return res;
+	// }
+
+	ll get(int l ,int r)
 	{
 		ll res = 0 ;
-		int U = BL(l) ; 
-		int V = BL(r) ; 
-		if(U==V)
-		{	
-			FOR(i,l,r)
-			{
-				maxi(res,a[i]+L_val[U]+L_x[U]*i); 
-			}
-		}
-		else
+		if(l/B==r/B)
 		{
-			FOR(i,l,R[U])
-			{
-				maxi(res,a[i]+L_val[U]+L_x[U]*i);
-			}
-			FOR(i,L[V],r)
-			{
-				maxi(res,a[i]+L_val[V]+L_x[V]*i); 
-			}
-			FOR(i,U+1,V-1)
-			{
-				maxi(res,get(st[i],en[i],q[i],L_x[i])+L_val[i]); 
-			}
+			return get_trau(l,r); 
 		}
-		cout<<res<<el;
+		int L = (l/B+1)*B-1 ; 
+		maxi(res,get_trau(l,L)) ;
+		int R = (r/B)*B;
+		maxi(res,get_trau(R,r)) ; 
+		maxi(res,get_block(l/B+1,r/B-1)) ;
+		return res;
 	}
-	void up(int l ,int r , ll x , ll y)
+	void up_trau(int l ,int r, ll x, ll y)
+	{	 
+		FOR(i,l,r)a[i]+=x+y*i;
+		build(l/B) ; 
+	}	
+	void up_block(int l ,int r, ll x , ll y )
 	{
-		int U = BL(l) ; 
-		int V = BL(r) ; 
-		if(U==V)
+		FOR(i,l,r)
 		{
-			st[U] = 1 ; 
-			en[U] = 0 ; 
+			lz_x[i]+=y ; 
+			lz_val[i]+=x ;
+		} 
+	}
+	void up(int l ,int r , ll x ,ll y )
+	{
+		if(l/B==r/B)
+		{
+			up_trau(l,r,x,y);
+			return ; 
+		}
 
-			FOR(i,L[U],R[U])
-			{
-				a[i]+=L_x[U]*i+L_val[U];
-				if(l<=i&&i<=r)a[i]+=x+y*(i-l); 
-			}
-			FOR(i,L[U],R[U])add(st[U],en[U],q[U],line(i,a[i])) ; 
-			L_x[U] = L_val[U] = 0 ; 
-		}
-		else
-		{
-			st[U] = 1 ;
-			en[U] = 0 ; 
-			FOR(i,L[U],R[U])
-			{	
-				a[i]+=L_x[U]*i + L_val[U] ;
-				if(i>=l)a[i]+=x+y*(i-l) ; 
-				add(st[U],en[U],q[U],line(i,a[i])) ; 
-			}
-			L_x[U] = L_val[U] = 0 ;  
-			st[V] = 1 ; 
-			en[V] = 0 ; 
-			FOR(i,L[V],R[V])
-			{
-				a[i]+=L_x[V]*i + L_val[V] ; 
-				if(i<=r)a[i]+=x+y*(i-l);
-				add(st[V],en[V],q[V],line(i,a[i]));
-			}
-			L_x[V] = L_val[V] = 0 ;
-			FOR(i,U+1,V-1)
-			{
-				L_val[i]+=x-y*l ;
-				L_x[i]+=y;
-			} 			
-		}
+		int L = (l/B+1)*B-1 ; 
+		up_trau(l,L,x,y) ;
+
+		int R = (r/B)*B;
+		up_trau(R,r,x,y) ; 
+		
+		up_block(l/B+1,r/B-1,x,y) ;
 	}
 	void xuly()
 	{
-		FOR(i,1,n/B+1)L[i]=oo,R[i]=0,st[i]=1,en[i]=0;
-		
-		FOR(i,1,n)
+		FORN(i,0,B)build(i) ;
+		int q; cin>>q ; 
+		FOR(i,1,q)
 		{
-
-			mini(L[BL(i)],i) ; 
-			maxi(R[BL(i)],i) ; 
-			add(st[BL(i)],en[BL(i)],q[BL(i)],line(i,a[i])) ;
-		}
-		int Q; 
-		cin>> Q; 
-		while(Q--)
-		{
-			int type , l ,r ;cin>>type>>l>>r; 
+			int type , l , r ; cin >> type >> l >>r ;
+			--l ;
+			--r ;
 			if(type==1)
 			{
-				solve(l,r) ;  
-			}
-			else
-			{
-				ll x ,y ; cin>>x>>y;
-				up(l,r,x,y) ; 
+				cout<<get(l,r)<<el;
 			}	
+			else
+			{	
+				ll x, y; cin >> x >> y;
+				up(l,r,x-y*l,y); 
+			}
 		}
 	}
 }

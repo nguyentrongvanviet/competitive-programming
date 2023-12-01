@@ -142,25 +142,6 @@ namespace sub1
 }
 namespace sub2
 {
-	int sz[N] , dd[N] ;
-
-	void dfsz(int u ,int p)
-	{
-		sz[u] =1 ; 
-		for(auto [v,w]:g[u])if(v!=p&&dd[v]==0)
-		{
-			dfsz(v,u) ;
-			sz[u]+=sz[v] ; 
-		}
-	}
-	int cen(int u ,int p ,int n)
-	{
-		for(auto [v,w]:g[u])if(v!=p&&dd[v]==0)
-		{
-			if(sz[v]>n/2)return cen(v,u,n) ; 
-		}
-		return u ;
-	}
 	struct DL
 	{
 		int len , ma; 
@@ -213,6 +194,25 @@ namespace sub2
 		{
 			if(ma-len-k>=0)up(min(n+1,ma-len-k+1),-1) ; 
 		}
+	}
+	int sz[N] , dd[N] ;
+
+	void dfsz(int u ,int p)
+	{
+		sz[u] =1 ; 
+		for(auto [v,w]:g[u])if(v!=p&&dd[v]==0)
+		{
+			dfsz(v,u) ;
+			sz[u]+=sz[v] ; 
+		}
+	}
+	int cen(int u ,int p ,int n)
+	{
+		for(auto [v,w]:g[u])if(v!=p&&dd[v]==0)
+		{
+			if(sz[v]>n/2)return cen(v,u,n) ; 
+		}
+		return u ;
 	}
 	void solve(int u) 
 	{

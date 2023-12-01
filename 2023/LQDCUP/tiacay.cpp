@@ -139,26 +139,53 @@ namespace sub3
         int id ;
         ll val ; 
     };
-    int can[N] , cut[N] ; 
+    int can[N] , cut[N] ;
+    int cnt[N] ; 
     void xuly()
     {
-        queue<int>q; 
+        queue<pii>q; 
         ve<pii>tree; 
         FOR(i,1,n)
         {
             tree.pb({h[i]+m*g[i],i});
+            cnt[i] = 0 ;
+            can[i] = 1 ; 
         }
+        FOR(i,1,m)cut[i] = k ;  
         sort(all(tree)) ; 
-        pii u = tree.back() ; 
-        tree.push(u) ; 
-        while(!tree.empty()&&tree.back().se>=u.se-x)
+        pii u = tree.back() ;
+        q.push(u) ; 
+        tree.pk() ; 
+        while(!tree.empty()&&tree.back().fi>=u.fi-x)
         {
             q.push(tree.back()) ;
-            tree.back() ; 
+            tree.pk() ;
         }
         while(!q.empty())
         {
-            int u= q.front() ;
+            int u= q.front().se; 
+            int val =q.front().fi; 
+            while(can[u]<=m && (can[u]*g[u]+h[u] < (cnt[u]+1)*x||cut[can[u]]==0) )
+            {
+                ++can[u] ; 
+            }
+            if(can[u]<=m)
+            {
+                cut[can[u]]--;
+                cnt[u]++;
+                val-=x ; 
+                q.pop() ; 
+                q.push({val,u}) ;
+                while(!tree.empty()&&tree.back().fi>=q.front().fi-x)
+                {
+                    q.push({tree.back()}) ;
+                    tree.pk() ;
+                }
+            }
+            else
+            {
+                return void(cout<<val<<el) ; 
+            }
         }
     }
 }
@@ -182,7 +209,8 @@ signed main()
     {
         doc() ; 
         // sub1::xuly() ;
-        sub2::xuly() ; 
+        // sub2::xuly() ; 
+        sub3::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
