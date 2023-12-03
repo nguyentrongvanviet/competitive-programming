@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "V"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -61,126 +61,110 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n ; 
-ll T ; 
-vi g[N] ;
-int p[N] ;
-ll w[N] , b[N] , tt[N] ;
+int n , m ;
+struct ke
+{
+	int v  ,w ; 
+}; 
+ve<ke>g[N] ; 
+int S ,T , U ,V  ; 
+struct Edge{
+	int u ,v ,w ; 
+}E[N] ; 
+
 void doc()
 {
-    cin>> n >>T ; 
-    FOR(i,2,n)
+    cin>> n >> m; 
+    cin>>S>>T ; 
+    cin>>U>>V ;
+    FOR(i,1,m)
     {
-    	cin>>p[i] ; 
-    	g[p[i]].pb(i) ; 
-    }
-    FOR(i,1,n)
-    {
-    	cin>>w[i];
-    }
-    FOR(i,1,n)
-    {
-    	cin>>b[i] ; 
-    }
-    FOR(i,1,n)
-    {
-    	cin>>tt[i] ; 
+    	int u,v  ,c; cin>> u >>v>>c ;
+    	g[u].pb({v,c}) ; 
+    	g[v].pb({u,c}) ;
+    	E[i] = {u,v,c}; 
     }
 }
 
 namespace sub1
 {
-	int P[N][LO+3] ;
-	int h[N] ; 
-	void build_lca()
+	struct DL
 	{
-		FOR(j,1,LO)FOR(i,1,n)P[i][j]=P[P[i][j-1]][j-1] ; 
-	}
-	int lca(int u ,int v)
+		int u ; 
+		ll val; 
+	} ; 
+	struct cmp
 	{
-		if(h[u]<h[v])swap(u,v) ;  
-		FORD(i,LO,0)if(h[u]-(1<<i)>=h[v])u=P[u][i] ;
-		if(u==v)return u ; 
-		FORD(i,LO,0)
+		bool operator()(const DL&a , const DL&b)const
 		{
-			int nu = P[u][i] ; 
-			int nv = P[v][i] ; 
-			if(nu!=nv)
+			return a.val>b.val; 
+		}
+	} ; 
+	void dij(int S , ll f[])
+	{
+		priority_queue<DL,ve<DL>,cmp>q ;
+
+		FOR(i,1,n)f[i] = inf ;
+		f[S]= 0 ; 
+		q.push({S,0}) ;
+		while(!q.empty())
+		{
+			int u = q.top().u; 
+			ll val = q.top().val;
+			q.pop() ;
+			if(f[u]<val)continue ;
+			for(auto x:g[u])
 			{
-				u=nu ; 
-				v=nv ; 
+				int v=x.v ;
+				int w=x.w; 
+				if(mini(f[v],f[u]+w))q.push({v,f[v]}) ; 
 			}
 		}
-		return P[u][0] ; 
 	}
-	void dfs(int u ,int p)
+	ll fs[N] , ft[N] , fu[N] , fv[N] ; 
+	vi adj[N] ; 
+	void build()
 	{
-		for(auto v: g[u])if(v!=p)
+		FOR(i,1,m)
 		{
-			P[v][0] = u ; 
-			h[v]=h[u]+1;
-			dfs(v,u) ; 
+			int u =E[i].u ; 
+			int v =E[i].v ;
+			int w = E[i].w ; 
+			if(fs[u]+ft[v]+w==fs[T])adj[u].pb(v) ; 
+			else if(fs[v]+ft[u]+w==fs[T])adj[v].pb(u) ; 
 		}
+	}	
+	ll MU[N] , MV[N] ; 
+	ll res  =inf;  
+	void dfs(int u )
+	{
+		if(MU[u]!=inf)return ; 
+		MU[u] = fu[u] ; 
+		MV[u] = fv[u] ; 
+		// cout<<u<<" "<<MV[u]<<el;
+		for(auto v:adj[u])
+		{
+			dfs(v) ; 
+			mini(MU[u],MU[v]) ; 
+			mini(MV[u],MV[v]) ; 
+		}
+		mini(res,fu[u]+MV[u]) ; 
+		mini(res,fv[u]+MU[u]) ; 
+
 	}
     void xuly()
     {
-    	dfs(1,0) ;
-    	build_lca() ; 
-    	ll res = 0 ; 
-    	int res_k = 0 ; 
-    	vi res_tot ; 
-    	FORN(msk,1,Mask(n))
-    	{
-    		int c = 0 ; 
-    		ll sw = 0 ;
-    		int k = btpc(msk) ;
-    		vi tot ; 
-    		FOR(i,1,n)if(BIT(msk,i-1))
-    		{
-    			if(!c)c=i;
-    			else c=lca(c,i) ;
-    			sw+=w[i] ;  
-    			tot.pb(tt[i]) ; 
-    		}
-    		sort(all(tot)) ;
-    		ll tmp = 0 ; 
-    		while(c)
-    		{
-    			maxi(tmp,b[c]+sq(k)) ;
-    			c=p[c] ; 
-    		}
-    		if(sw<=T)
-    		{
-    			if(maxi(res,tmp))
-    			{
-    				res_k = k  ; 
-    				res_tot = tot ;
-    			}
-    			else if(res==tmp)
-    			{
-    				if(mini(res_k,k))
-    				{
-    					res_tot = tot ; 
-    				}
-    				else if(res_k==k)
-    				{
-    					FORN(i,0,min(SZ(res_tot),SZ(tot)))
-    					{
-    						if(res_tot[i]<tot[i])break;
-    						else if(res_tot[i]>tot[i])
-    						{
-    							res_tot=tot; 
-    							break;
-    						}
-    					}
-    				}
-    			}
-    		}
-    	}
-    	cout<<res<<" "<<res_k<<el;
-    	prv(res_tot) ;
-    	FOR(i,1,n)g[i].clear();
-    }	
+    	dij(S,fs) ;
+    	dij(T,ft) ; 
+    	dij(U,fu) ;
+    	dij(V,fv) ; 
+    	build() ;
+    	FOR(i,1,n)MU[i] = MV[i] = inf;
+    	res = fu[V] ; 
+    	dfs(S) ;
+    	// cout<<fu[1]<<" "<<MV[1]<<el;
+    	cout<<res; 
+    }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -193,7 +177,11 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    int sub ;  cin>>sub ;
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
+    }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {

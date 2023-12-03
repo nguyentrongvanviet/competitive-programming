@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "V"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -57,130 +57,51 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
+const ll inf = 1e18 , cs = 331 ; 
+const int sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-int n ; 
-ll T ; 
-vi g[N] ;
-int p[N] ;
-ll w[N] , b[N] , tt[N] ;
-void doc()
+int n , m , L , R ; 
+ll pw(ll a, ll n)
 {
-    cin>> n >>T ; 
-    FOR(i,2,n)
-    {
-    	cin>>p[i] ; 
-    	g[p[i]].pb(i) ; 
-    }
-    FOR(i,1,n)
-    {
-    	cin>>w[i];
-    }
-    FOR(i,1,n)
-    {
-    	cin>>b[i] ; 
-    }
-    FOR(i,1,n)
-    {
-    	cin>>tt[i] ; 
-    }
+	if(n==0) return 1;   
+	ll b = pw(a,n/2); 
+	if(n&1)return b*b%sm*a%sm;
+	return b*b%sm ;
+}
+int cnt[(int)1e7+5] ;
+
+void doc()
+{	
+	cin >> n >> m >> L >> R ; 
+	FOR(i,1,m/L)
+	{	
+		cnt[i] = pw(i,n); 
+	}
 }
 
 namespace sub1
 {
-	int P[N][LO+3] ;
-	int h[N] ; 
-	void build_lca()
-	{
-		FOR(j,1,LO)FOR(i,1,n)P[i][j]=P[P[i][j-1]][j-1] ; 
-	}
-	int lca(int u ,int v)
-	{
-		if(h[u]<h[v])swap(u,v) ;  
-		FORD(i,LO,0)if(h[u]-(1<<i)>=h[v])u=P[u][i] ;
-		if(u==v)return u ; 
-		FORD(i,LO,0)
-		{
-			int nu = P[u][i] ; 
-			int nv = P[v][i] ; 
-			if(nu!=nv)
-			{
-				u=nu ; 
-				v=nv ; 
-			}
-		}
-		return P[u][0] ; 
-	}
-	void dfs(int u ,int p)
-	{
-		for(auto v: g[u])if(v!=p)
-		{
-			P[v][0] = u ; 
-			h[v]=h[u]+1;
-			dfs(v,u) ; 
-		}
-	}
+	int f[(int)1e7+5] ; 
     void xuly()
-    {
-    	dfs(1,0) ;
-    	build_lca() ; 
-    	ll res = 0 ; 
-    	int res_k = 0 ; 
-    	vi res_tot ; 
-    	FORN(msk,1,Mask(n))
+    {   
+    	FORD(i,m,L)
     	{
-    		int c = 0 ; 
-    		ll sw = 0 ;
-    		int k = btpc(msk) ;
-    		vi tot ; 
-    		FOR(i,1,n)if(BIT(msk,i-1))
+    		f[i] = cnt[m/i] ;
+    		FOR(j,2,m/i)
     		{
-    			if(!c)c=i;
-    			else c=lca(c,i) ;
-    			sw+=w[i] ;  
-    			tot.pb(tt[i]) ; 
-    		}
-    		sort(all(tot)) ;
-    		ll tmp = 0 ; 
-    		while(c)
-    		{
-    			maxi(tmp,b[c]+sq(k)) ;
-    			c=p[c] ; 
-    		}
-    		if(sw<=T)
-    		{
-    			if(maxi(res,tmp))
-    			{
-    				res_k = k  ; 
-    				res_tot = tot ;
-    			}
-    			else if(res==tmp)
-    			{
-    				if(mini(res_k,k))
-    				{
-    					res_tot = tot ; 
-    				}
-    				else if(res_k==k)
-    				{
-    					FORN(i,0,min(SZ(res_tot),SZ(tot)))
-    					{
-    						if(res_tot[i]<tot[i])break;
-    						else if(res_tot[i]>tot[i])
-    						{
-    							res_tot=tot; 
-    							break;
-    						}
-    					}
-    				}
-    			}
+    			f[i]-=f[i*j] ;
+    			if(f[i]<0)f[i]+=sm ;  
     		}
     	}
-    	cout<<res<<" "<<res_k<<el;
-    	prv(res_tot) ;
-    	FOR(i,1,n)g[i].clear();
-    }	
+    	ll res = 0 ;
+    	FOR(i,L,R)
+    	{
+    		res+=f[i] ; 
+    		if(res>sm)res-=sm;
+    	} 
+    	cout<<res<<el;
+    }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -193,7 +114,11 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    int sub ;  cin>>sub ;
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
+    }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {

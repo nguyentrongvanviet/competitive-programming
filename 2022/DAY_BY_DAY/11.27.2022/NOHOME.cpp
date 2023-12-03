@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "V"
+#define TASK "NOHOME"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -61,128 +61,148 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n ; 
-ll T ; 
-vi g[N] ;
-int p[N] ;
-ll w[N] , b[N] , tt[N] ;
+int n , m , q; 
+struct Edge
+{
+	int u,v ; 
+}E[N] ; 
 void doc()
 {
-    cin>> n >>T ; 
-    FOR(i,2,n)
-    {
-    	cin>>p[i] ; 
-    	g[p[i]].pb(i) ; 
-    }
-    FOR(i,1,n)
-    {
-    	cin>>w[i];
-    }
-    FOR(i,1,n)
-    {
-    	cin>>b[i] ; 
-    }
-    FOR(i,1,n)
-    {
-    	cin>>tt[i] ; 
-    }
+	cin>> n >> m >> q; 
+	FOR(i,1,m)
+	{
+		int u , v; cin>> u >> v ; 
+		E[i] = {u,v} ;
+	}
 }
 
 namespace sub1
 {
-	int P[N][LO+3] ;
-	int h[N] ; 
-	void build_lca()
+	pii pa[N] ;
+	int sz[N] ;  
+
+	pii goc(int u )
 	{
-		FOR(j,1,LO)FOR(i,1,n)P[i][j]=P[P[i][j-1]][j-1] ; 
-	}
-	int lca(int u ,int v)
-	{
-		if(h[u]<h[v])swap(u,v) ;  
-		FORD(i,LO,0)if(h[u]-(1<<i)>=h[v])u=P[u][i] ;
-		if(u==v)return u ; 
-		FORD(i,LO,0)
+		int du = 0; 
+		while(pa[u].fi!=u)
 		{
-			int nu = P[u][i] ; 
-			int nv = P[v][i] ; 
-			if(nu!=nv)
-			{
-				u=nu ; 
-				v=nv ; 
-			}
+			du^=pa[u].se;
+			u=pa[u].fi ;
 		}
-		return P[u][0] ; 
+		return mp(u,du) ; 
 	}
-	void dfs(int u ,int p)
+	bool hop(int u ,int v)
 	{
-		for(auto v: g[u])if(v!=p)
+		pii U = goc(u) ;
+		pii V = goc(v) ; 
+		int chau = U.fi ;
+		int du = U.se ; 
+		int chav = V.fi ;
+		int dv = V.se ;
+		if(sz[chau]>sz[chav])swap(chau,chav),swap(du,dv) ; 
+		if(chau!=chav)
 		{
-			P[v][0] = u ; 
-			h[v]=h[u]+1;
-			dfs(v,u) ; 
+			pa[chau].fi = chav ; 
+			sz[chav]+=sz[chau] ;
+			pa[chau].se = du^dv^1 ; 
+			return 1; 
 		}
+		return (du^dv)==1;
 	}
     void xuly()
     {
-    	dfs(1,0) ;
-    	build_lca() ; 
-    	ll res = 0 ; 
-    	int res_k = 0 ; 
-    	vi res_tot ; 
-    	FORN(msk,1,Mask(n))
-    	{
-    		int c = 0 ; 
-    		ll sw = 0 ;
-    		int k = btpc(msk) ;
-    		vi tot ; 
-    		FOR(i,1,n)if(BIT(msk,i-1))
-    		{
-    			if(!c)c=i;
-    			else c=lca(c,i) ;
-    			sw+=w[i] ;  
-    			tot.pb(tt[i]) ; 
-    		}
-    		sort(all(tot)) ;
-    		ll tmp = 0 ; 
-    		while(c)
-    		{
-    			maxi(tmp,b[c]+sq(k)) ;
-    			c=p[c] ; 
-    		}
-    		if(sw<=T)
-    		{
-    			if(maxi(res,tmp))
-    			{
-    				res_k = k  ; 
-    				res_tot = tot ;
-    			}
-    			else if(res==tmp)
-    			{
-    				if(mini(res_k,k))
-    				{
-    					res_tot = tot ; 
-    				}
-    				else if(res_k==k)
-    				{
-    					FORN(i,0,min(SZ(res_tot),SZ(tot)))
-    					{
-    						if(res_tot[i]<tot[i])break;
-    						else if(res_tot[i]>tot[i])
-    						{
-    							res_tot=tot; 
-    							break;
-    						}
-    					}
-    				}
-    			}
-    		}
-    	}
-    	cout<<res<<" "<<res_k<<el;
-    	prv(res_tot) ;
-    	FOR(i,1,n)g[i].clear();
-    }	
-}
 
+     	while(q--)
+     	{
+     		int l,r ;cin>> l>>r ;
+     		FOR(i,1,n)pa[i] = {i,0},sz[i]=1; 
+     		bool ok = 1; 
+     		FOR(i,1,m)if(i<l||r<i)
+     		{
+     			ok&=hop(E[i].u,E[i].v);
+     		}
+     		if(ok)cout<<"NO"<<el;
+     		else cout<<"YES"<<el;
+     	}   
+    }
+}
+namespace sub2
+{
+	pii pa[N] ;
+	int sz[N] ;  
+	stack<pii>st;
+	pii goc(int u )
+	{
+		int du = 0; 
+		while(pa[u].fi!=u)
+		{
+			du^=pa[u].se;
+			u=pa[u].fi ;
+		}
+		return mp(u,du) ; 
+	}
+	void roll_back(int len )
+	{
+		while(SZ(st)>len)
+		{
+			int u =st.top().fi ; 
+			int v =st.top().se ; 
+			sz[v]-=sz[u] ; 
+			pa[u] = mp(u,0) ;
+		}
+	}
+
+	bool hop(int u ,int v)
+	{
+		pii U = goc(u) ;
+		pii V = goc(v) ; 
+		int chau = U.fi ;
+		int du = U.se ; 
+		int chav = V.fi ;
+		int dv = V.se ;
+		if(sz[chau]>sz[chav])swap(chau,chav),swap(du,dv) ; 
+		if(chau!=chav)
+		{
+			pa[chau].fi = chav ; 
+			sz[chav]+=sz[chau] ;
+			pa[chau].se = du^dv^1 ; 
+			st.push(mp(chau,chav)) ; 
+			return 1; 
+		}
+		return (du^dv)==1;
+	}
+	void solve(int l ,int r, int oL , int oR)
+	{	
+		if(l>r)return ;
+
+		int mid=(l+r)>>1 ;
+
+
+		FOR(i,l,mid)
+		{
+			hop(E[i].u,E[i].v) ; 
+		}
+		int ans=oR ; 
+		FORD(i,oR,max(mid,oL))
+		{	
+			hop(E[i].u,E[i].v) 
+		}
+		solve(l,mid-1,oL,ans) ; 
+		solve(mid+1,r,ans,oR) ; 
+
+	}
+
+	void xuly()
+	{
+		solve(1,m,1,m) ; 
+		while(q--)
+		{
+			int l ,r ;cin>> l >>r; 
+			if(res[l]<=r)cout<<"YES"<<el ;
+			else cout<<"NO"<<el;
+		}
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -193,12 +213,16 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
-    int sub ;  cin>>sub ;
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
+    }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        if(n*q<=1e6)sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
