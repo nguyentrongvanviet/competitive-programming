@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "LABLE"
+#define TASK "LUCKY"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 1 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -58,87 +58,77 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 10000+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , m;
-vi g[N] ; 
-int dd[N] ;
 
+int n , m ;
+vi g[N<<1^1] ; 
+void add(int u ,int tu ,int v ,int tv)
+{
+	g[u<<1^tu^1].pb(v<<1^tv) ; 
+	g[v<<1^tv^1].pb(u<<1^tu) ;
+}
+pii a[N] ;
 void doc()
-{	
-    cin>> n >>m ; 
-    assert(max(n,m)<=5e5) ;
+{
+    cin>> n >> m; 
     FOR(i,1,m)
     {
-    	int u ,v; cin>>u>>v;
-    	g[u].pb(v) ; 
-    	if(u==v)dd[u]=1;
+    	FOR(i,1,3)
+    	{
+    		cin>>a[i].fi ;
+    		char x; cin>>x ;
+    		a[i].se = (x=='B') ; 
+    	}
+    	FOR(i,1,3)FOR(j,i+1,3)
+    	{
+    		add(a[i].fi,a[i].se,a[j].fi,a[j].se) ; 
+    	}
     }
+
 }
 
 namespace sub1
 {
-	int id[N] , low[N] , tp[N] , sz[N] , tt= 0 , tplt = 0 ;
-	stack<int>st;  
+	int id[N] , low[N] , tp[N] , tt = 0 ,tplt = 0   ; 
+	stack<int>st; 
 	void dfs(int u )
 	{
-		id[u] = low[u] = ++tt  ;
-		st.push(u) ;
-		for(auto v: g[u])
+		id[u] = low[u] = ++tt ;
+		st.push(u) ; 
+		for(auto v:g[u])if(!tp[v])
 		{
-			if(tp[v])continue ;
 			if(id[v])mini(low[u],id[v]) ;
-			else dfs(v) ,mini(low[u],low[v]) ;
+			else dfs(v) , mini(low[u],low[v]) ;
 		}
 		if(id[u]==low[u])
 		{
-			int t ; 
-			++tplt ;
+			int t; 
+			++tplt;
 			do
 			{
-				t=st.top() ;
+				t=st.top() ; 
 				st.pop() ; 
-				tp[t] =tplt ; 
-				sz[tplt]++ ;
-				if(dd[t])sz[tplt]++;
-			}while(t!=u) ;
+				tp[t] = tplt ; 
+			}while(t!=u);	
 		}
-	}
-	int f[N] ;
-	set<int>adj[N] ;
-	ll solve(int u)
-	{
-		if(f[u]!=-10)return f[u] ;
-		if(u==tp[1])
-		{
-			if(sz[u]==1)return f[u]=1;
-			else return f[u] = -1 ;
-		}
-		f[u]=0 ;
-		for(auto v:adj[u])
-		{
-			int tmp = solve(v) ;
-			if(tmp==-1)return f[u]=-1 ;
-			f[u]+=tmp;
-		}
-		if(f[u]&&sz[u]!=1)return f[u]=-1;
-		mini(f[u],2) ;
-		return f[u] ; 
 	}
     void xuly()
     {
-    	FOR(i,1,n)if(id[i]==0)dfs(i) ; 
-    	FOR(u,1,n)for(auto v:g[u])
+    	FOR(i,1<<1,n<<1^1)if(id[i]==0)dfs(i) ;  
+    	bool ok = 1 ;
+    	FOR(i,1,n)
     	{
-    		int tpu= tp[u] ; 
-    		int tpv = tp[v] ;
-    		if(tpu!=tpv)
+    		if(tp[i<<1]==tp[i<<1^1])
     		{
-    			adj[tpv].insert(tpu) ;
+    			ok = 0; 
+    			break;
     		}
     	}
-    	FOR(i,1,tplt)f[i] = -10 ;
-    	FOR(i,1,n)cout<<solve(tp[i])<<" ";
+    	if(ok)cout<<"YES"<<el; 
+    	else cout<<"NO"<<el;
+    	FOR(i,1<<1,n<<1^1)g[i].clear(),tp[i]=id[i]=low[i]= 0 ;
+    	tt= 0 , tplt = 0; 
     }
 }
 
@@ -151,6 +141,11 @@ signed main()
     {
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
+    }
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)

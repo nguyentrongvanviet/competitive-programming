@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "LABLE"
+#define TASK "DISTRIBUTE"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -58,87 +58,78 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , m;
-vi g[N] ; 
-int dd[N] ;
 
+int n,m;
+vi g[N] ;
+pii E[N] ; 
+int a[N] ;
 void doc()
-{	
-    cin>> n >>m ; 
-    assert(max(n,m)<=5e5) ;
-    FOR(i,1,m)
+{
+    cin>> n; 
+    FOR(i,1,n-1)
     {
-    	int u ,v; cin>>u>>v;
-    	g[u].pb(v) ; 
-    	if(u==v)dd[u]=1;
+    	int u ,v; cin>> u >>v ;
+    	E[i] = mp(u,v) ;
+    	g[u].pb(v) ;
+    	g[v].pb(u) ; 
     }
+   	cin>> m; 
+   	FOR(i,1,m)
+   	{
+   		cin>>a[i] ; 
+   	}
+   	sort(a+1,a+m+1) ; 
 }
 
 namespace sub1
 {
-	int id[N] , low[N] , tp[N] , sz[N] , tt= 0 , tplt = 0 ;
-	stack<int>st;  
-	void dfs(int u )
+	int sz[N] ; 
+	void dfs(int u ,int p)
 	{
-		id[u] = low[u] = ++tt  ;
-		st.push(u) ;
-		for(auto v: g[u])
+		sz[u] = 1 ;
+		for(auto v:g[u])if(v!=p)
 		{
-			if(tp[v])continue ;
-			if(id[v])mini(low[u],id[v]) ;
-			else dfs(v) ,mini(low[u],low[v]) ;
-		}
-		if(id[u]==low[u])
-		{
-			int t ; 
-			++tplt ;
-			do
-			{
-				t=st.top() ;
-				st.pop() ; 
-				tp[t] =tplt ; 
-				sz[tplt]++ ;
-				if(dd[t])sz[tplt]++;
-			}while(t!=u) ;
+			dfs(v,u);  
+			sz[u]+=sz[v] ;
 		}
 	}
-	int f[N] ;
-	set<int>adj[N] ;
-	ll solve(int u)
-	{
-		if(f[u]!=-10)return f[u] ;
-		if(u==tp[1])
-		{
-			if(sz[u]==1)return f[u]=1;
-			else return f[u] = -1 ;
-		}
-		f[u]=0 ;
-		for(auto v:adj[u])
-		{
-			int tmp = solve(v) ;
-			if(tmp==-1)return f[u]=-1 ;
-			f[u]+=tmp;
-		}
-		if(f[u]&&sz[u]!=1)return f[u]=-1;
-		mini(f[u],2) ;
-		return f[u] ; 
-	}
+
     void xuly()
     {
-    	FOR(i,1,n)if(id[i]==0)dfs(i) ; 
-    	FOR(u,1,n)for(auto v:g[u])
-    	{
-    		int tpu= tp[u] ; 
-    		int tpv = tp[v] ;
-    		if(tpu!=tpv)
-    		{
-    			adj[tpv].insert(tpu) ;
-    		}
-    	}
-    	FOR(i,1,tplt)f[i] = -10 ;
-    	FOR(i,1,n)cout<<solve(tp[i])<<" ";
+ 		dfs(1,0) ; 
+ 		FOR(i,1,n-1)
+ 		{
+ 			if(sz[E[i].fi]>sz[E[i].se])swap(E[i].fi,E[i].se) ; 
+ 		}       
+ 		sort(E+1,E+n-1+1,[&](pii x ,pii y )
+		{
+			return 1ll*sz[x.fi]*(n-sz[x.fi])<1ll*sz[y.fi]*(n-sz[y.fi]) ; 
+		}) ;
+		ll res = 0; 
+		if(m<=n-1)
+		{
+			FOR(i,1,m)
+			{
+				(res+=1ll*sz[E[n-i].fi]*(n-sz[E[n-i].fi])%sm*a[m-i+1]%sm)%=sm;
+			}	
+			FOR(i,1,n-m-1)
+			{
+				(res+=1ll*sz[E[i].fi]*(n-sz[E[i].fi]))%=sm;
+			}
+		}
+		else
+		{
+			FOR(i,1,n-2)
+			{
+				(res+=1ll*sz[E[i].fi]*(n-sz[E[i].fi])%sm*a[i]%sm)%=sm;
+			}
+			ll tmp = 1ll*sz[E[n-1].fi]*(n-sz[E[n-1].fi])%sm ;
+			FOR(i,n-1,m)(tmp*=a[i])%=sm ;
+			(res+=tmp)%=sm ;
+		}
+		cout<<res<<el;
     }
 }
 
@@ -151,6 +142,11 @@ signed main()
     {
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
+    }
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)

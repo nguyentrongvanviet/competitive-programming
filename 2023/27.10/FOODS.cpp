@@ -125,7 +125,7 @@ namespace sub1
     			adj[tp[u]].pb(tp[v]);
     		}
     	}		
-    	prt(VAL,tplt) ;
+    	// prt(VAL,tplt) ;
     	FOR(i,1,tplt)f[i] = -inf ;
     	FOR(i,1,n)cout<<solve(tp[i])<<" ";
     }
@@ -136,11 +136,11 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-    if(fopen(INPUT,"r"))
-    {
-        freopen(INPUT ,"r",stdin) ;
-        freopen(OUTPUT,"w",stdout);
-    }
+    // if(fopen(INPUT,"r"))
+    // {
+    //     freopen(INPUT ,"r",stdin) ;
+    //     freopen(OUTPUT,"w",stdout);
+    // }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {

@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "LABLE"
+#define TASK "VINGAME"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -58,87 +58,116 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , m;
-vi g[N] ; 
-int dd[N] ;
 
+int n , m; 
+vi g[N]  ;
+int a[N] ; 
 void doc()
-{	
-    cin>> n >>m ; 
-    assert(max(n,m)<=5e5) ;
+{
+    cin>> n >> m; 
+    FOR(i,1,n)cin>>a[i] ; 
     FOR(i,1,m)
     {
-    	int u ,v; cin>>u>>v;
+    	int u ,v ; cin>> u >>v ;
     	g[u].pb(v) ; 
-    	if(u==v)dd[u]=1;
     }
 }
 
 namespace sub1
 {
-	int id[N] , low[N] , tp[N] , sz[N] , tt= 0 , tplt = 0 ;
-	stack<int>st;  
+	const int MAX = 150000; 
+	vi Q[MAX+5] ; 
+	int id[N] , low[N] , tp[N] , tt = 0 , tplt = 0 ;
+	stack<int>st; 
+	int A[N] ; 
 	void dfs(int u )
 	{
-		id[u] = low[u] = ++tt  ;
-		st.push(u) ;
-		for(auto v: g[u])
+		id[u] = low[u] = ++tt ; 
+		st.push(u) ; 
+
+		for(auto v:g[u])
 		{
 			if(tp[v])continue ;
-			if(id[v])mini(low[u],id[v]) ;
-			else dfs(v) ,mini(low[u],low[v]) ;
+			if(id[v])mini(low[u],id[v]);
+			else dfs(v) , mini(low[u],low[v]) ; 
 		}
 		if(id[u]==low[u])
 		{
 			int t ; 
 			++tplt ;
+			int uc = 0 ; 
 			do
 			{
-				t=st.top() ;
+				t = st.top() ; 
 				st.pop() ; 
-				tp[t] =tplt ; 
-				sz[tplt]++ ;
-				if(dd[t])sz[tplt]++;
-			}while(t!=u) ;
+				tp[t] = tplt ;
+				uc=gcd(uc,a[t]) ;
+			}
+			while(t!=u) ; 
+			if(uc==1)
+			{
+				cout<<uc<<el;
+				exit(0) ; 
+			}
+			A[tplt] = uc; 
 		}
 	}
-	int f[N] ;
-	set<int>adj[N] ;
+	map<pii,int>exist; 
+	vi adj[N] ; 
+	vi ke[N] ; 
+	ll f[N] ,cnt[MAX+5] ; 
 	ll solve(int u)
 	{
-		if(f[u]!=-10)return f[u] ;
-		if(u==tp[1])
+		if(f[u])return f[u] ; 
+		f[u] = 1 ;
+		for(auto v:ke[u])
 		{
-			if(sz[u]==1)return f[u]=1;
-			else return f[u] = -1 ;
+			f[u]+=solve(v) ; 
 		}
-		f[u]=0 ;
-		for(auto v:adj[u])
-		{
-			int tmp = solve(v) ;
-			if(tmp==-1)return f[u]=-1 ;
-			f[u]+=tmp;
-		}
-		if(f[u]&&sz[u]!=1)return f[u]=-1;
-		mini(f[u],2) ;
 		return f[u] ; 
 	}
+	int dd[N] ; 
     void xuly()
     {
-    	FOR(i,1,n)if(id[i]==0)dfs(i) ; 
+    	FOR(i,1,n)if(id[i]==0)dfs(i);
     	FOR(u,1,n)for(auto v:g[u])
     	{
-    		int tpu= tp[u] ; 
-    		int tpv = tp[v] ;
-    		if(tpu!=tpv)
+    		if(tp[u]!=tp[v]&&exist.count(mp(tp[u],tp[v]))==0)
     		{
-    			adj[tpv].insert(tpu) ;
+    			exist[mp(tp[u],tp[v])]=1;
+    			adj[tp[u]].pb(tp[v]) ;
     		}
     	}
-    	FOR(i,1,tplt)f[i] = -10 ;
-    	FOR(i,1,n)cout<<solve(tp[i])<<" ";
+    	FOR(i,1,tplt)
+    	{
+    		Q[A[i]].pb(i) ; 
+    	}
+    	int res = 0; 
+		vi node ; 
+    	FORD(i,MAX,1)
+    	{
+
+    		FOR(j,1,MAX/i)
+    		{
+    			for(auto u :Q[i*j])node.pb(u),dd[u]=1 ;
+    		}
+    		for(auto u :node)
+    		{
+    			for(auto v:adj[u])if(dd[v])
+    			{
+    				ke[u].pb(v) ; 
+    			}
+    		}
+    		FOR(j,2,MAX/i)cnt[i]-=cnt[i*j] ;  
+    		if(cnt[i])res=i;
+    		for(auto u : node)cnt[i]+=solve(u) ; 
+    		for(auto u : node)ke[u].clear() , dd[u] = 0 ; 
+    		node.clear() ;
+    	}
+    	assert(res) ; 
+    	cout<<res<<el;
     }
 }
 
@@ -151,6 +180,11 @@ signed main()
     {
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
+    }
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)

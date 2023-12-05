@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "LABLE"
+#define TASK "rbgame"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -58,87 +58,58 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 5e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , m;
-vi g[N] ; 
-int dd[N] ;
 
+int n , die ; 
+int a[N] ;
 void doc()
-{	
-    cin>> n >>m ; 
-    assert(max(n,m)<=5e5) ;
-    FOR(i,1,m)
-    {
-    	int u ,v; cin>>u>>v;
-    	g[u].pb(v) ; 
-    	if(u==v)dd[u]=1;
-    }
+{
+	cin>> n >> die;  
+	FOR(i,1,n)
+	{
+		char x; cin>>x ;
+		a[i] = (x=='B') ; 
+	}    
 }
 
 namespace sub1
 {
-	int id[N] , low[N] , tp[N] , sz[N] , tt= 0 , tplt = 0 ;
-	stack<int>st;  
-	void dfs(int u )
+	int L[N] , R[N] ;
+	int f[N][N][35] ;
+	bool solve(int l, int r, int k)
 	{
-		id[u] = low[u] = ++tt  ;
-		st.push(u) ;
-		for(auto v: g[u])
+		int &d = f[l][r][k] ; 
+		if(d!=-1)return d ; 
+		if((r-l+1)%2==n%2)
 		{
-			if(tp[v])continue ;
-			if(id[v])mini(low[u],id[v]) ;
-			else dfs(v) ,mini(low[u],low[v]) ;
+			d = 0 ;
+			if(k + a[l] < die && solve(l+1,r,k+a[l]) )d = 1 ; 
+			if(k + a[r] < die && solve(l,r-1,k+a[r]) )d = 1 ;
 		}
-		if(id[u]==low[u])
+		else
 		{
-			int t ; 
-			++tplt ;
-			do
-			{
-				t=st.top() ;
-				st.pop() ; 
-				tp[t] =tplt ; 
-				sz[tplt]++ ;
-				if(dd[t])sz[tplt]++;
-			}while(t!=u) ;
+			d=1 ; 
+			int cur = L[l-1]+R[r+1]-k ; 
+			if(cur + a[l] < die && solve(l+1,r,k)==0)d = 0 ; 
+			if(cur + a[r] < die && solve(l,r-1,k)==0)d = 0 ; 
 		}
-	}
-	int f[N] ;
-	set<int>adj[N] ;
-	ll solve(int u)
-	{
-		if(f[u]!=-10)return f[u] ;
-		if(u==tp[1])
-		{
-			if(sz[u]==1)return f[u]=1;
-			else return f[u] = -1 ;
-		}
-		f[u]=0 ;
-		for(auto v:adj[u])
-		{
-			int tmp = solve(v) ;
-			if(tmp==-1)return f[u]=-1 ;
-			f[u]+=tmp;
-		}
-		if(f[u]&&sz[u]!=1)return f[u]=-1;
-		mini(f[u],2) ;
-		return f[u] ; 
+		return d ; 
 	}
     void xuly()
-    {
-    	FOR(i,1,n)if(id[i]==0)dfs(i) ; 
-    	FOR(u,1,n)for(auto v:g[u])
+    {       
+    	int res = 0 ; 
+    	FOR(cut,1,n)
     	{
-    		int tpu= tp[u] ; 
-    		int tpv = tp[v] ;
-    		if(tpu!=tpv)
-    		{
-    			adj[tpv].insert(tpu) ;
-    		}
+    		// prt(a,n) ;
+    		FOR(i,1,n)L[i]=L[i-1]+a[i] ; 
+    		FORD(i,n,1)R[i]=R[i+1]+a[i] ; 
+    		FOR(i,1,n)FOR(j,i,n)FOR(k,0,die)f[i][j][k] = -1 ; 
+    		res+=solve(1,n,0) ; 
+    		FOR(i,0,n-1)a[i] = a[i+1] ; 
+    		a[n] = a[0] ; 
     	}
-    	FOR(i,1,tplt)f[i] = -10 ;
-    	FOR(i,1,n)cout<<solve(tp[i])<<" ";
+    	cout<<res;
     }
 }
 
@@ -151,6 +122,11 @@ signed main()
     {
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
+    }
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
