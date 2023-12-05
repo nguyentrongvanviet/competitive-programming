@@ -101,8 +101,9 @@ namespace sub1
         while(q--)
         {
         	ll d , e; cin>>d>>e; 
-        	d=(d+last)%(n-1) ; 
-        	e=(e+last)%W ;
+        	// d=(d+last)%(n-1) ; 
+        	// e=(e+last)%W ;
+        	--d;
         	E[d+1].w=e ; 
         	FOR(i,1,n)g[i].clear() ; 
         	FOR(i,1,n-1)
@@ -309,16 +310,16 @@ namespace subfull
 		FOR(i,0,2)FOR(j,i,2)
 		{
 			ll inc = 0;  
-			if(i<=1&&1<=j)inc-=2*lazy[id] ; 
-			if(i==0)inc+=lazy[id] ; 
-			if(j==2)inc+=lazy[id] ; 
+			if(i==j&&i!=1)inc+=lazy[id] ; 
+			if(i<=1&&1<=j)inc-=2*lazy[id] ;
+			if(i<1&&1<j) inc+=2*lazy[id]; 
 			st[id].a[i][j]+=inc ;
 		}
 		lazy[id<<1]+=lazy[id] ; 
 		lazy[id<<1|1]+=lazy[id] ; 
 		lazy[id] = 0 ; 
 	}
-	void up(int id , int l, int r, int t ,int p ,ll val)
+	void up(int id , int l, int r, int t ,int p ,int val)
 	{
 		dolazy(id) ; 
 		if(t<=l&&r<=p)
@@ -379,18 +380,18 @@ signed main()
     else 
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        freopen("text.ANS","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        // if(max(n,q)<=5000)sub1::xuly() ; 
+        if(max(n,q)<=5000)sub1::xuly() ; 
     	// else 
     	// if(check2())sub2::xuly() ; 
     	// else 
     	// sub3::xuly();
-    	subfull::xuly() ;
+    	// subfull::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

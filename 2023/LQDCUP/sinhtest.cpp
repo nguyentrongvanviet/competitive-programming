@@ -16,28 +16,19 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-    int n =1e3  ;
-    cout<<n<<el; 
-    FOR(i,1,n)
+    int n = rd(3,100); 
+    int q = rd(1,300	) ; 
+    int w = 100 ; 
+    cout<<n<<" "<<q<<" "<<w<<el;
+    FOR(i,1,n-1)
     {
-    	cout<<rd(1,10)<<" ";
-    }
-    cout<<el; 
-    int q =rd(1,n) ;
-    cout<<q<<el; 
-    FOR(i,1,q)
+    	cout<<i<<" "<<rd(i+1,n)<<" "<<rd(1,10)<<el;
+    } 
+    while(q--)
     {
-    	int type  =rd(1,1) ; 
-    	int l =rd(1,n) ;
-    	int r =rd(l,n) ;
-    	cout<<type<<" "<<l<<" "<<r<<" "; 
-    	if(type==2)
-    	{
-    		int x =rd(1,10); 
-    		int y =rd(1,10) ;
-    		cout<<x<<" "<<y;
-    	}
-    	cout<<el;
+    	int d =rd(1,n-1) ;
+    	int e = rd(1,w) ; 
+    	cout<<d<<" "<<e<<el;
     }
     cout.close();
 }
@@ -48,8 +39,8 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("truy_van_max""_trau.exe");
-        system("truy_van_max"".exe"); 
+        system("TRAVEL""_trau.exe");
+        system("TRAVEL"".exe"); 
         if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
         {   
             cout<<"Test "<<i<<" WA"<<"\n";

@@ -58,15 +58,17 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 3e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
+const int N = 3e5+5 , oo = 2e9 , LO = 18 , CH = 26 ; 
 
 
 int n , m ; 
+int spec[N] ; 
+
 struct Edge
 {
 	int u , v , id ;
 }E[N] ;
-int spec[N] ;
+int dd[N] ; 
 void doc()
 {
     cin>> n >>m ;
@@ -75,19 +77,83 @@ void doc()
     	int u ,v ; cin>>u>>v ; 
     	E[i] = {u,v,i}; 
     }
-    FOR(i,1,n-1)cin>>spec[i];
+    FOR(i,1,n-1)cin>>spec[i],dd[spec[i]]=1 ;
 }
 namespace sub1
+{
+	int pa[N] ;
+	int goc(int u )
+	{
+		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
+	}
+	bool hop(int u ,int v)
+	{
+		int chau = goc(u) ; 
+		int chav = goc(v) ; 
+		if(chau==chav)return 0; 
+		pa[chau]=chav ; 
+		return 1 ; 
+	}
+	int tt[N] ; 
+	int res[N] ; 
+	int tmp[N] ; 
+    void xuly()
+    {
+    	FOR(i,1,m)res[i] =  oo ; 
+    	FOR(i,1,m)tt[i] = i ;
+    	do
+	{
+    		FOR(i,1,n)pa[i] =i ;
+    		bool ok = 1 ;  
+    		FOR(i,1,m)
+    		{
+    			int id = E[tt[i]].id;
+    			if(hop(E[tt[i]].u,E[tt[i]].v))
+    			{
+    				if(dd[id]==0)
+    				{
+    					ok =  0 ;
+    					break; 
+    				} 
+    			}
+				tmp[id] = i ; 
+    		}
+    		if(ok)
+    		{
+    			ok = 0 ; 
+	    		FOR(i,1,m)
+	    		{
+	    			if(res[i]<tmp[i])
+	    			{
+	    				ok = 0; 
+	    				break ; 
+	    			} 
+	    			if(res[i]>tmp[i])
+	    			{
+	    				ok = 1; 
+	    				break;
+	    			}
+	    		}	
+	    		if(ok)
+	    		{
+	    			FOR(i,1,m)res[i] = tmp[i] ;  
+	    		}
+    		}
+    	}while(next_permutation(tt+1,tt+m+1)); 	
+    	prt(res,m) ; 
+    }
+}
+namespace sub2
 {	
 	struct ke
 	{
 		int v ,id ; 
 	}; 
 	ve<ke>g[N] ; 
-	int at[N] , in[N] , h[N] ; 
+	int at[N] , val[N] ,in[N] ,h[N] ; 
 	int tt = 0 ; 
 	int time_dfs = 0 ; 
-	int st[2*N][LO+1] ;  
+	int st[N][LO+2] ;  
 	int pa[N] ; 
 	pii up[N] ; 
 	void dfs(int u ,int p)
@@ -95,7 +161,7 @@ namespace sub1
 		++tt; 
 		int cur = ++time_dfs;
 		at[time_dfs] = u ;
-		st[tt][0] = time_dfs; 
+		val[tt] = time_dfs ;
 
 		in[u] = tt;
 		for(auto x:g[u])
@@ -106,11 +172,15 @@ namespace sub1
 			up[v] = {u,id}; 
 			h[v] = h[u]+1 ;  
 			dfs(v,u) ;
-			st[++tt][0] = cur ; 
+			val[++tt] = cur ; 
 		}
 	}
 	void build()
 	{
+		FOR(i,1,tt)
+		{
+			st[i][0] = val[i] ;
+		}
 		FOR(j,1,LO)FOR(i,1,tt-M(j)+1)
 		{
 			st[i][j] = min(st[i][j-1],st[i+M(j-1)][j-1]) ;
@@ -188,7 +258,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ;
+        // sub1::xuly() ; 
+        sub2::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

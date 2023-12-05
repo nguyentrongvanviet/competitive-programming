@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "PFSTREE"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,117 +58,93 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 3e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
+const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int spec[N] ;
+int n ; 
+vi g[N] ; 
+
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
+    cin>> n; 
+    FOR(i,1,n-1)
     {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
+    	int u ,v ;cin>> u >>v  ;
+    	g[u].pb(v) ; 
+    	g[v].pb(u) ; 
     }
-    FOR(i,1,n-1)cin>>spec[i];
 }
-namespace sub1
-{	
-	struct ke
-	{
-		int v ,id ; 
-	}; 
-	ve<ke>g[N] ; 
-	int at[N] , in[N] , h[N] ; 
-	int tt = 0 ; 
-	int time_dfs = 0 ; 
-	int st[2*N][LO+1] ;  
-	int pa[N] ; 
-	pii up[N] ; 
-	void dfs(int u ,int p)
-	{
-		++tt; 
-		int cur = ++time_dfs;
-		at[time_dfs] = u ;
-		st[tt][0] = time_dfs; 
 
-		in[u] = tt;
-		for(auto x:g[u])
+namespace sub1
+{
+	int sz[N] ,dd[N] ;
+	void dfsz(int u ,int p)
+	{
+		sz[u] =1 ; 
+		for(auto v :g[u])if(dd[v]==0&&v!=p)
 		{
-			int v= x.v ;
-			int id = x.id;
-			if(v==p)continue ; 
-			up[v] = {u,id}; 
-			h[v] = h[u]+1 ;  
-			dfs(v,u) ;
-			st[++tt][0] = cur ; 
+			dfsz(v,u) ; 
+			sz[u]+=sz[v] ;
 		}
 	}
-	void build()
+	int cen(int u ,int p ,int n)
 	{
-		FOR(j,1,LO)FOR(i,1,tt-M(j)+1)
+		for(auto v:g[u])if(dd[v]==0&&v!=p)
 		{
-			st[i][j] = min(st[i][j-1],st[i+M(j-1)][j-1]) ;
+			if(sz[v]>n/2)return cen(v,u,n) ; 
+		}
+		return u ;
+	}
+	ll res = 0 ;
+	int cnt[N] ,sl[N];
+	int Q = 0 ; 
+	void dfs(int u ,int p,int h)
+	{
+		Q++ ; 
+		sl[h]++ ;
+		int d = sqrt(h) ; 
+		if(d*d==h)res++ ;
+		FOR(i,1,sqrt(Q))
+		{
+			if(h<sq(i))res+=cnt[sq(i)-h];
+		}
+		for(auto v:g[u])if(v!=p&&dd[v]==0)
+		{
+			dfs(v,u,h+1) ; 
 		}
 	}
-	int lca(int u ,int v)
+	void solve(int u)
 	{
-		if(in[u]>in[v])swap(u,v) ; 
-		int l =in[u] ; 
-		int r =in[v] ; 
-		int k = lg(r-l+1) ; 
-		return at[min(st[l][k],st[r-M(k)+1][k])] ;
-	}
-	int goc(int u)
-	{
-		return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
-	}
-	int res[N] ;
-	void xuly()
-	{
-		FOR(i,1,n-1)
+		dd[u] =1 ; 
+		Q=0 ; 
+		for(auto v:g[u])if(dd[v]==0)
 		{
-			int id = spec[i] ; 
-			g[E[id].u].pb({E[id].v,id}) ;
-			g[E[id].v].pb({E[id].u,id}) ;
-		}
-		dfs(1,0) ;
-		build() ; 
-		FOR(i,1,n)pa[i] = i; 
-		int ans = 0; 
-		FOR(i,1,m)if(!res[i])
-		{
-			int c = lca(E[i].u,E[i].v) ;
-			int u = goc(E[i].u) ;
-			int v = goc(E[i].v) ;
-			vi q;  
-			while(h[u]>h[c])
-			{		
-				q.pb(up[u].se) ;
-				pa[u] = up[u].fi;
-				u=goc(u) ;
-			}
-			while(h[v]>h[c])
+			dfs(v,u,1) ;
+			FOR(i,1,n)
 			{
-				q.pb(up[v].se) ;
-				pa[v] = up[v].fi ;
-				v=goc(v) ;
-			}
-			sort(all(q)) ;
-			for(auto x:q)
-			{
-				res[x]=++ans; 
-			}
-			if(!res[i])res[i]=++ans;
+				if(sl[i])cnt[i]+=sl[i] ,sl[i]=0 ;
+				else break;
+			} 
 		}
-		FOR(i,1,m)cout<<res[i]<<" ";
+		FOR(i,1,n)
+		{
+			if(cnt[i])cnt[i]=0 ; 
+			else break;
+		}
+		for(auto v:g[u])if(dd[v]==0)
+		{
+			dfsz(v,u) ;
+			solve(cen(v,u,sz[v])) ; 
+		}
 	}
+    void xuly()
+    {        
+    	dfsz(1,0) ; 
+    	solve(cen(1,0,n)) ; 
+    	cout<<res; 
+    }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -188,7 +164,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ;
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

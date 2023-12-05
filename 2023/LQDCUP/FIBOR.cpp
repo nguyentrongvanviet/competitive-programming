@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "ZONING"
+#define TASK "FIBOR"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,117 +58,53 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 3e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
+const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-struct Edge
-{
-	int u , v , id ;
-}E[N] ;
-int spec[N] ;
+int n; 
+int a[N] ; 
+
 void doc()
 {
-    cin>> n >>m ;
-    FOR(i,1,m)
-    {
-    	int u ,v ; cin>>u>>v ; 
-    	E[i] = {u,v,i}; 
-    }
-    FOR(i,1,n-1)cin>>spec[i];
-}
-namespace sub1
-{	
-	struct ke
-	{
-		int v ,id ; 
-	}; 
-	ve<ke>g[N] ; 
-	int at[N] , in[N] , h[N] ; 
-	int tt = 0 ; 
-	int time_dfs = 0 ; 
-	int st[2*N][LO+1] ;  
-	int pa[N] ; 
-	pii up[N] ; 
-	void dfs(int u ,int p)
-	{
-		++tt; 
-		int cur = ++time_dfs;
-		at[time_dfs] = u ;
-		st[tt][0] = time_dfs; 
+    cin>> n; 
+    FOR(i,1,n)cin>>a[i] ; 
 
-		in[u] = tt;
-		for(auto x:g[u])
-		{
-			int v= x.v ;
-			int id = x.id;
-			if(v==p)continue ; 
-			up[v] = {u,id}; 
-			h[v] = h[u]+1 ;  
-			dfs(v,u) ;
-			st[++tt][0] = cur ; 
-		}
-	}
-	void build()
-	{
-		FOR(j,1,LO)FOR(i,1,tt-M(j)+1)
-		{
-			st[i][j] = min(st[i][j-1],st[i+M(j-1)][j-1]) ;
-		}
-	}
-	int lca(int u ,int v)
-	{
-		if(in[u]>in[v])swap(u,v) ; 
-		int l =in[u] ; 
-		int r =in[v] ; 
-		int k = lg(r-l+1) ; 
-		return at[min(st[l][k],st[r-M(k)+1][k])] ;
-	}
-	int goc(int u)
-	{
-		return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
-	}
-	int res[N] ;
-	void xuly()
-	{
-		FOR(i,1,n-1)
-		{
-			int id = spec[i] ; 
-			g[E[id].u].pb({E[id].v,id}) ;
-			g[E[id].v].pb({E[id].u,id}) ;
-		}
-		dfs(1,0) ;
-		build() ; 
-		FOR(i,1,n)pa[i] = i; 
-		int ans = 0; 
-		FOR(i,1,m)if(!res[i])
-		{
-			int c = lca(E[i].u,E[i].v) ;
-			int u = goc(E[i].u) ;
-			int v = goc(E[i].v) ;
-			vi q;  
-			while(h[u]>h[c])
-			{		
-				q.pb(up[u].se) ;
-				pa[u] = up[u].fi;
-				u=goc(u) ;
-			}
-			while(h[v]>h[c])
-			{
-				q.pb(up[v].se) ;
-				pa[v] = up[v].fi ;
-				v=goc(v) ;
-			}
-			sort(all(q)) ;
-			for(auto x:q)
-			{
-				res[x]=++ans; 
-			}
-			if(!res[i])res[i]=++ans;
-		}
-		FOR(i,1,m)cout<<res[i]<<" ";
-	}
 }
+
+namespace sub1
+{
+	ll pw(ll a, ll n)
+	{
+		if(n==0)return 1; 
+		ll b = pw(a,n/2)  ;
+		if(n&1)return b*b%sm*a%sm; 
+		return b*b%sm ;
+	}
+	ll fac[N] , inv_fac[N] ; 
+    ll C(int k ,int n)
+    {
+    	if(k>n)return 0 ;
+    	return fac[n]*inv_fac[k]%sm*inv_fac[n-k]%sm ;
+    }
+    void xuly()
+    {
+    	fac[0] = 1   ; 
+    	FOR(i,1,1e6)fac[i] = fac[i-1]*i%sm; 
+    	inv_fac[(int)1e6]=pw(fac[(int)1e6],sm-2) ;
+    	FORD(i,(int)1e6-1,0)
+    	{
+    		inv_fac[i] = inv_fac[i+1]*(i+1)%sm; 
+    	} 
+            
+    	ll res = 0 ;  
+    	FOR(i,1,n)
+    	{
+    		(res+=C(i,a[i]-i))%=sm; 
+    	}
+    	cout<<res;
+    }
+}
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -188,7 +124,7 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ;
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
