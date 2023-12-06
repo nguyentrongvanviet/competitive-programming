@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "KEYBOARD"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -57,71 +57,102 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 70+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 , cs = 331 ;
+const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+int n ;
+ll sm ; 
+int a[N] ;
 
-int n , m ; 
-char a[N][N] ;
-char b[N][N] ;
-int vowel[256]; 
-int tot = 0 ; 
 void doc()
 {
-    cin>> n >> m ;
-    vowel['u'] = vowel['e'] = vowel['o'] = vowel['a'] = vowel['i'] = vowel['y'] = 1 ;  
-    FOR(i,1,n)FOR(j,1,m)cin>>a[i][j],tot+=vowel[(int)a[i][j]] ; 
-    FOR(i,1,n)FOR(j,1,m)cin>>b[i][j] ; 
+    cin>> n >> sm ;
+    FORN(i,0,n)cin>>a[i] ; 
 }
 
 namespace sub1
 {
-    int can = 0 ;
-    char C[] = {'-','|','-','|'}; 
-    bool in(int x , int y)
-    {
-        return 1<=x && x<=n && 1<=y&&y<=m ; 
-
-    }
-    int f[N][N] , ma[N][N] ; 
-    int dd[N][N] ;
-    bool dfs(int x ,int y)
-    {
-        bool ok = vowel[(int)a[x][y]] ; 
-        dd[x][y] = 1 ;
-        can+=ok ;
-        FORN(i,0,4)
-        {
-            int nx= x+xx[i] ; 
-            int ny= y+yy[i] ; 
-            int dx = nx+xx[i] ; 
-            int dy = ny+yy[i] ; 
-            if(in(dx,dy) && dd[dx][dy]==0 && (b[nx][ny]==C[i]))
-            {
-                if(dfs(dx,dy))
-                {
-                    f[x][y] += f[dx][dy]+1;  
-                    maxi(ma[x][y],ma[dx][dy]+1) ;
-                    ok = 1 ; 
-                }
-            }
-        }
-        return ok ; 
-    }
     void xuly()
     {
-        FOR(i,1,n)FOR(j,1,m)
+    	int res = 0; 
+    	int ma = 0 ; 
+        FORN(msk,1,M(n))
         {
-            if(b[i][j]=='.')
-            {
-                dfs(i,j) ; 
-                if(can<tot)return void(cout<<"NIE"<<el) ; 
-                return void(cout<<2*f[i][j]-ma[i][j]<<el) ;
-            }
-        } 
-    }  
+        	set<int>s; 
+        	bool ok = 1 ; 
+        	for(int MSK = msk ; MSK ; )
+        	{
+        		int i = ctz(MSK) ; 
+        		MSK^=M(i) ;
+        		if(s.count(a[i]*2)||(a[i]%2==0 && s.count(a[i]/2)))
+        		{
+        			ok = 0; 
+        			break ;
+        		}
+        		s.insert(a[i]) ;
+        	}
+        	if(ok)
+        	{
+        		if(maxi(ma,btpc(msk)))
+        		{
+        			res = 1; 
+        		}
+        		else if(ma==btpc(msk))res++ ;
+        	}
+        }
+        cout<<ma<<" "<<res%sm<<el;
+    }
 }
+namespace sub2
+{
+	map<int,vi>V;  
+	ll f[N] , sc[N] ;
+	void xuly()
+	{
+		sort(a,a+n) ;
+		FORN(i,0,n)
+		{
+			int val = a[i] ; 
+			while(val%2==0)
+			{	
+				val/=2 ; 
+			}
+			V[val].pb(a[i]) ; 
+		}
+		ll res = 1; 
+		int tot_len = 0; 
 
+		for(auto x:V)
+		{
+			FOR(i,1,SZ(x.se))
+			{	
+				f[i] = 1;
+				sc[i] = 1%sm ; 
+				FOR(j,i-3,i-1)
+				{
+					if(x.se[j-1]*2!=x.se[i-1])
+					{
+						if(maxi(f[i],f[j]+1))
+						{
+							sc[i] = sc[j] ; 
+						}
+						else if(f[i]==f[j]+1)(sc[i]+=sc[j])%=sm ; 
+					}
+				}
+			}
+			int ma_len = *max_element(f+1,f+SZ(x.se)+1) ; 
+			ll sum = 0 ;
+			FOR(i,1,SZ(x.se))
+			{
+				if(f[i]==ma_len)(sum+=sc[i])%=sm ; 
+			}
+			tot_len+=ma_len ; 
+			(res*=sum)%=sm; 
+		}
+		// FOR(i,1,2)cout<<f[i]<<" "<<sc[i]<<el;
+		cout<<tot_len<<" "<<res<<el;
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -141,7 +172,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        // sub1::xuly() ; 
+        sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

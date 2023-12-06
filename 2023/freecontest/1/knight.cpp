@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "KEYBOARD"
+#define TASK "knight"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,68 +58,97 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 70+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-char a[N][N] ;
-char b[N][N] ;
-int vowel[256]; 
-int tot = 0 ; 
+int n, m ,dra, tho ; 
+struct ke
+{
+	int v, dis , msk ; 
+}; 
+int sword[N] ;
+ve<ke>g[N] ;
 void doc()
 {
-    cin>> n >> m ;
-    vowel['u'] = vowel['e'] = vowel['o'] = vowel['a'] = vowel['i'] = vowel['y'] = 1 ;  
-    FOR(i,1,n)FOR(j,1,m)cin>>a[i][j],tot+=vowel[(int)a[i][j]] ; 
-    FOR(i,1,n)FOR(j,1,m)cin>>b[i][j] ; 
+    cin>> n >>m>> dra >> tho ;
+    FOR(i,1,tho)
+    {
+    	int u ;cin>> u ;
+    	int sl; cin>>sl ; 
+    	while(sl--)
+    	{
+    		int type ;cin>>type ;
+    		--type ; 
+    		sword[u]|=M(type) ;
+    	} 
+    }
+    FOR(i,1,m)
+    {
+    	int u ,v , dis ,sl; 
+    	cin>> u >>v >>dis>>sl ;
+    	int msk = 0 ; 
+    	while(sl--)
+    	{
+    		int type ; cin>>type;
+    		--type; 
+    		msk|=M(type) ; 
+    	}
+    	g[u].pb({v,dis,msk}) ;
+    	g[v].pb({u,dis,msk}) ; 
+    }
 }
 
 namespace sub1
 {
-    int can = 0 ;
-    char C[] = {'-','|','-','|'}; 
-    bool in(int x , int y)
-    {
-        return 1<=x && x<=n && 1<=y&&y<=m ; 
+	ll f[N][M(16)] ;
+	struct DL
+	{
+		int u , msk ; 
+		ll val; 
+	} ;
+	struct cmp
+	{
+		bool operator()(const DL&a , const DL&b)const
+		{
+			return a.val>b.val; 
+		}
+	} ; 
+	void dij()
+	{
+		FOR(i,1,n)FORN(msk,0,M(dra))
+		{
+			f[i][msk] = inf;  
+		}
+		priority_queue<DL,ve<DL>,cmp>q ;
+		q.push({1,sword[1],f[1][sword[1]]=0}) ; 
+		while(!q.empty())
+		{
+			int u = q.top().u ;
+			int have = q.top().msk; 
+			ll val = q.top().val; 
+			if(u==n)return void(cout<<val<<el) ;
+			q.pop() ; 
+			if(f[u][have]<val)continue ; 
+			for(auto x :g[u])
+			{
+				int v=x.v; 
+				int dis = x.dis; 
+				if((have|x.msk)==have)
+				{
+					if(mini(f[v][have|sword[v]],val+dis))
+					{
+						q.push({v,have|sword[v],f[v][have|sword[v]]}) ; 
+					}
+				}
+			}
+		}
 
-    }
-    int f[N][N] , ma[N][N] ; 
-    int dd[N][N] ;
-    bool dfs(int x ,int y)
-    {
-        bool ok = vowel[(int)a[x][y]] ; 
-        dd[x][y] = 1 ;
-        can+=ok ;
-        FORN(i,0,4)
-        {
-            int nx= x+xx[i] ; 
-            int ny= y+yy[i] ; 
-            int dx = nx+xx[i] ; 
-            int dy = ny+yy[i] ; 
-            if(in(dx,dy) && dd[dx][dy]==0 && (b[nx][ny]==C[i]))
-            {
-                if(dfs(dx,dy))
-                {
-                    f[x][y] += f[dx][dy]+1;  
-                    maxi(ma[x][y],ma[dx][dy]+1) ;
-                    ok = 1 ; 
-                }
-            }
-        }
-        return ok ; 
-    }
+		cout<<-1<<el;
+	}
     void xuly()
     {
-        FOR(i,1,n)FOR(j,1,m)
-        {
-            if(b[i][j]=='.')
-            {
-                dfs(i,j) ; 
-                if(can<tot)return void(cout<<"NIE"<<el) ; 
-                return void(cout<<2*f[i][j]-ma[i][j]<<el) ;
-            }
-        } 
-    }  
+        dij() ;
+    }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/

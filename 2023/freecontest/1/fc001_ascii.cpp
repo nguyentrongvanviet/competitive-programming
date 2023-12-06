@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "KEYBOARD"
+#define TASK "fc001_ascii"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,68 +58,100 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 70+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
 int n , m ; 
+struct pt
+{
+	ll x ,y; 
+	pt(ll _x , ll _y)
+	{
+		x=_x ;
+		y=_y ; 
+	}
+	pt operator - (pt a)
+	{
+		return pt(x-a.x,y-a.y) ;
+	}
+	ll operator * (pt a )
+	{
+		return x*a.y-y*a.x ;
+	}
+} ;
+ll ccw(pt a , pt b , pt c)
+{
+	return (b-a)*(c-b) ; 
+}
 char a[N][N] ;
-char b[N][N] ;
-int vowel[256]; 
-int tot = 0 ; 
 void doc()
 {
-    cin>> n >> m ;
-    vowel['u'] = vowel['e'] = vowel['o'] = vowel['a'] = vowel['i'] = vowel['y'] = 1 ;  
-    FOR(i,1,n)FOR(j,1,m)cin>>a[i][j],tot+=vowel[(int)a[i][j]] ; 
-    FOR(i,1,n)FOR(j,1,m)cin>>b[i][j] ; 
+	cin>> n >> m ;
+	FOR(i,1,n)FOR(j,1,m)
+	{
+		cin>>a[i][j] ; 
+	} 
 }
 
 namespace sub1
 {
-    int can = 0 ;
-    char C[] = {'-','|','-','|'}; 
-    bool in(int x , int y)
-    {
-        return 1<=x && x<=n && 1<=y&&y<=m ; 
-
-    }
-    int f[N][N] , ma[N][N] ; 
-    int dd[N][N] ;
-    bool dfs(int x ,int y)
-    {
-        bool ok = vowel[(int)a[x][y]] ; 
-        dd[x][y] = 1 ;
-        can+=ok ;
-        FORN(i,0,4)
-        {
-            int nx= x+xx[i] ; 
-            int ny= y+yy[i] ; 
-            int dx = nx+xx[i] ; 
-            int dy = ny+yy[i] ; 
-            if(in(dx,dy) && dd[dx][dy]==0 && (b[nx][ny]==C[i]))
-            {
-                if(dfs(dx,dy))
-                {
-                    f[x][y] += f[dx][dy]+1;  
-                    maxi(ma[x][y],ma[dx][dy]+1) ;
-                    ok = 1 ; 
-                }
-            }
-        }
-        return ok ; 
-    }
+	ve<pt>P ; 
+	ve<pii>g[N][N] ;
+	int dd[N][N]; 
+	void dfs(int x, int y)
+	{
+		dd[x][y]=1 ; 
+		P.pb(pt(x,y)) ;
+		for(auto ke:g[x][y])
+		{
+			int nx=ke.fi ; 
+			int ny=ke.se ;
+			if(dd[nx][ny]==0)
+			{
+				dfs(nx,ny) ;
+			}
+		}
+	} 
+	void build_polygon()
+	{
+		int cnt = 0; 
+		int x=-oo , y= -oo ; 
+		FOR(i,1,n)FOR(j,1,m)
+		{
+			if(a[i][j]=='/')
+			{
+				cnt++ ; 
+				x=i-1; 
+				y=j ;
+				g[i-1][j].pb(mp(i,j-1)) ;
+				g[i][j-1].pb(mp(i-1,j)) ; 
+			}
+			else if(a[i][j]!='.')
+			{
+				cnt++ ; 
+				g[i-1][j-1].pb(mp(i,j)) ; 
+				g[i][j].pb(mp(i-1,j-1)) ; 
+			}
+		}
+		assert(x!=-oo&&y!=-oo&&cnt>=4) ; 
+		dfs(x,y) ; 
+		P.pb(pt(x,y)) ;	
+	}
+	int area(ve<pt>&P)
+	{
+		// for(auto [x,y]:P)cout<<x<<" "<<y<<el;
+		int res = 0 ;
+		FORN(i,0,SZ(P)-1)
+		{
+			res+=P[i]*P[i+1]; 
+		}
+		return res/2 ; 
+	}
     void xuly()
     {
-        FOR(i,1,n)FOR(j,1,m)
-        {
-            if(b[i][j]=='.')
-            {
-                dfs(i,j) ; 
-                if(can<tot)return void(cout<<"NIE"<<el) ; 
-                return void(cout<<2*f[i][j]-ma[i][j]<<el) ;
-            }
-        } 
-    }  
+    	build_polygon() ;
+    	cout<<area(P)<<el; 
+    }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/

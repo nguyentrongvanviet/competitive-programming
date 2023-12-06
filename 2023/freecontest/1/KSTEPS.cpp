@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "KEYBOARD"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,68 +58,93 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 70+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ; 
-char a[N][N] ;
-char b[N][N] ;
-int vowel[256]; 
-int tot = 0 ; 
+int n , m , S , T ;
+ll len; 
+
+// matrix multiplication count path length k 
 void doc()
 {
-    cin>> n >> m ;
-    vowel['u'] = vowel['e'] = vowel['o'] = vowel['a'] = vowel['i'] = vowel['y'] = 1 ;  
-    FOR(i,1,n)FOR(j,1,m)cin>>a[i][j],tot+=vowel[(int)a[i][j]] ; 
-    FOR(i,1,n)FOR(j,1,m)cin>>b[i][j] ; 
+	cin>> n >> S >> T >> len ; 
 }
 
 namespace sub1
 {
-    int can = 0 ;
-    char C[] = {'-','|','-','|'}; 
-    bool in(int x , int y)
-    {
-        return 1<=x && x<=n && 1<=y&&y<=m ; 
+	struct MT
+	{
+	    int n , m; 
+	    ve<vll> mt ; 
+	    MT(int _n ,int _m)
+	    {
+	        n = _n ;
+	        m = _m ; 
+	        mt=ve<vll>(n+1,vll(m+1,0)); 
+	    }
+	};
+	MT mul(MT A , MT B )
+	{   
+	    int n = A.n ;
+	    int m = B.m ; 
+	    MT ans(n,m) ; 
+	    FOR(i,1,n)
+	        FOR(j,1,m)
+	            FOR(k,1,A.m)
+	                ans.mt[i][j]=(ans.mt[i][j]+A.mt[i][k]*B.mt[k][j]%sm)%sm;
+	    return ans ;
+	}
+	MT pw(MT A , ll n)
+	{
+	    if(n==1)return A ; 
+	    MT B = pw(A,n/2) ;
+	    if(n&1)return mul(mul(B,B),A) ; 
+	    return mul(B,B) ; 
+	}
+	// struct MT
+	// {
+	// 	int n ,m ;
+	// 	ve<vll>mt ;  
+	// 	MT(int _n=0 ,int _m=0)
+	// 	{
+	// 		n=_n ; 
+	// 		m=_m ; 	
+	// 		mt=ve<vll>(n+1,vll(m+1,0))  ;
+	// 	}
+	// } ;
+	// MT mul(MT A , MT B)
+	// {
+	// 	int n = A.n ;
+	// 	int m = B.m ;
+	// 	MT C(n,m) ; 
+	// 	FOR(i,1,n)FOR(j,1,m)
+	// 	{
+	// 		FOR(k,1,A.m)
+	// 		{
+	// 			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%sm)%=sm; 
+	// 		}
+	// 	}
 
-    }
-    int f[N][N] , ma[N][N] ; 
-    int dd[N][N] ;
-    bool dfs(int x ,int y)
-    {
-        bool ok = vowel[(int)a[x][y]] ; 
-        dd[x][y] = 1 ;
-        can+=ok ;
-        FORN(i,0,4)
-        {
-            int nx= x+xx[i] ; 
-            int ny= y+yy[i] ; 
-            int dx = nx+xx[i] ; 
-            int dy = ny+yy[i] ; 
-            if(in(dx,dy) && dd[dx][dy]==0 && (b[nx][ny]==C[i]))
-            {
-                if(dfs(dx,dy))
-                {
-                    f[x][y] += f[dx][dy]+1;  
-                    maxi(ma[x][y],ma[dx][dy]+1) ;
-                    ok = 1 ; 
-                }
-            }
-        }
-        return ok ; 
-    }
+	// 	return C ;
+	// }
+	// MT pw(MT A , int n)
+	// {
+	// 	if(n==1)return A ; 
+	// 	MT B = pw(A,n/2) ;
+	// 	if(n&1)return mul(mul(B,B),A) ;
+	// 	return mul(B,B) ; 
+	// }
     void xuly()
     {
-        FOR(i,1,n)FOR(j,1,m)
-        {
-            if(b[i][j]=='.')
-            {
-                dfs(i,j) ; 
-                if(can<tot)return void(cout<<"NIE"<<el) ; 
-                return void(cout<<2*f[i][j]-ma[i][j]<<el) ;
-            }
-        } 
-    }  
+    	MT A(1,n) ;
+    	A.mt[1][S] = 1 ;
+    	MT B(n,n) ;  
+		FOR(i,1,n)FOR(j,1,n)
+		{
+			cin>>B.mt[i][j] ; 
+		}
+		cout<<mul(A,pw(B,len)).mt[1][T]<<el;
+    }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
