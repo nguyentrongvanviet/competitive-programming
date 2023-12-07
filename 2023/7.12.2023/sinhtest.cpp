@@ -16,7 +16,7 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-    int n =1e5 , m =2e5 , q=2e5  ;
+    int n =500 , m =500 , q=500  ;
     cout<<n<<" "<<m<<" "<<q<<el; 
     FOR(i,1,n-1)
     {
@@ -45,13 +45,13 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        // system("tree_3""_trau.exe");
+        system("tree_3""_trau.exe");
         system("tree_3"".exe"); 
-        // if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
-        // {   
-        //     cout<<"Test "<<i<<" WA"<<"\n";
-        //     return  0 ; 
-        // }
-        // cout<<"Test "<<i<<" AC"<<"\n";
+        if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
+        {   
+            cout<<"Test "<<i<<" WA"<<"\n";
+            return  0 ; 
+        }
+        cout<<"Test "<<i<<" AC"<<"\n";
     }
 }

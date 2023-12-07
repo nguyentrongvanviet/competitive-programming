@@ -213,7 +213,112 @@ namespace sub1
     	FOR(i,1,q)cout<<ID[res[i]]<<" ";
     }
 }
-
+namespace sub2
+{
+	struct ke
+	{
+		int v, w; 
+	}; 
+	ve<ke>g[N] ;
+	int h[N] , P[N][LO+1] , MA[N][LO+1] ; 
+	void dfs(int u ,int p)
+	{
+		for(auto x :g[u])
+		{
+			int v=x.v; 
+			int w = x.w; 
+			if(v==p)continue ; 
+			h[v] = h[u]+1 ; 
+			P[v][0] = u ; 
+			MA[v][0] = w ;
+			dfs(v,u) ; 
+		}
+	}
+	pii lca(int u ,int v)
+	{
+		if(h[u]<h[v])swap(u,v) ; 
+		int res = 0 ;
+		FORD(i,LO,0)if(h[u]-M(i)>=h[v])
+		{
+			maxi(res,MA[u][i]) ; 
+			u=P[u][i] ; 
+		}
+		if(u==v)return mp(u,res); 
+		FORD(i,LO,0)
+		{
+			int nu = P[u][i] ; 
+			int nv = P[v][i] ; 
+			if(nu!=nv)
+			{
+				maxi(res,MA[u][i]) ; 
+				maxi(res,MA[v][i]) ; 
+				u=nu ;
+				v=nv ;
+			}
+		}
+		maxi(res,MA[u][0]) ; 
+		maxi(res,MA[v][0]) ;
+		u=P[u][0] ; 
+		return mp(u,res); 
+	}
+	void build_lca()
+	{
+		dfs(1,0); 
+		FOR(j,1,LO)FOR(i,1,n)
+		{
+			P[i][j] = P[P[i][j-1]][j-1] ;
+			MA[i][j] =max(MA[i][j-1],MA[P[i][j-1]][j-1]) ;
+		}
+	}
+	struct DL
+	{
+		int c , ma; 
+		friend DL operator+(DL a , DL b )
+		{
+			pii tmp = lca(a.c,b.c) ;
+			maxi(tmp.se,a.ma) ;
+			maxi(tmp.se,b.ma) ; 
+			return {tmp.fi,tmp.se} ; 
+		}
+	};
+	DL st[4*N] ;
+	void build(int id ,int l ,int r)
+	{
+		if(l==r)
+		{
+			st[id] = {l,0} ;
+			return ; 
+		}
+		int mid=(l+r)>>1 ;
+		build(id<<1,l,mid) ;
+		build(id<<1|1,mid+1,r) ; 
+		st[id] = st[id<<1] + st[id<<1|1] ; 
+	}
+	DL get(int id ,int l, int r, int t, int p)
+	{
+		if(t<=l&&r<=p)return st[id] ;
+		int mid=(l+r)>>1 ; 
+		if(p<mid+1)return get(id<<1,l,mid,t,p) ;
+		if(mid<t)return get(id<<1|1,mid+1,r,t,p) ; 
+		return get(id<<1,l,mid,t,p)+get(id<<1|1,mid+1,r,t,p) ; 
+	}
+	void xuly()
+	{
+		FOR(i,1,n-1)
+		{
+			g[E[i].u].pb({E[i].v,ID[i]}) ; 
+			g[E[i].v].pb({E[i].u,ID[i]}) ;
+		}
+		build_lca() ; 
+		build(1,1,n) ; 
+		while(q--)
+		{
+			int l, r ;cin>> l>>r; 
+			cout<<get(1,1,n,l,r).ma<<" ";
+		}
+		cout<<el;
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -233,7 +338,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        // sub1::xuly() ; 
+        sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
