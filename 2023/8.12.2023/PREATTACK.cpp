@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "SHLGOOD"
+#define TASK "PREATTACK"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -53,109 +53,50 @@ ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 
-int xx[] = {0,-1,0,1,-1,-1,1,1} ; 
-int yy[] = {-1,0,1,0,-1,1,-1,1} ;
+int xx[] = {0,-1,0,1} ; 
+int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e3+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , m; 
-int a[N][N] ;
 
-int color[N][N] ; 
-
+int L,n,r ;
+int a[N] ; 
 void doc()
 {
-   	cin >> n >> m; 
-    FOR(i,1,n)FOR(j,1,m)color[i][j] = -1 ;
-    FOR(i,1,n)FOR(j,1,m)cin>>a[i][j] ; 
+	cin>> n>>L>> r ; 
+    FOR(i,1,n)cin>>a[i] ;
 }
+
 namespace sub1
 {
-    bool in(int x, int y)
-    {
-        return 1<=x && x<=n && 1<=y && y<=m ;
-    }
-    void dfs(int x, int y ,int c)
-    {
-        color[x][y]=c; 
-        if(a[x][y] && a[x][y]%2!=c)
-        {
-            cout<<-1<<el; 
-            exit(0) ;
-        }
-        FORN(i,4,8)
-        {
-            int nx= x+xx[i] ;
-            int ny= y+yy[i] ;
-            if(!in(nx,ny))continue ; 
-            if(color[nx][ny]==-1)
-            {
-                dfs(nx,ny,c^1) ;
-            }
-            else if(color[nx][ny]!=(c^1)) 
-            {
-                cout<<-1<<el;
-                exit(0) ;
-            }
-        }
-    }
-    int b[N][N] ; 
+	const int N = 11 ;
+	ll f[N][1<<N] ;
+	ll tinh(int pos , int msk)
+	{
+		if(pos>L)return 0 ;
+		ll &d = f[pos][msk] ; 
+		if(d!=-1)return d ; 
+		d=oo ;
+		if(msk==M(n)-1)return d; 
+		FORN(i,0,n)if(BIT(msk,i)==0)
+		{
+			int id = a[i+1] ;
+			FOR(j,max(1,pos-r+1),min(L,pos+r-1))
+			{
+				mini(d,abs(j-id)+tinh(j+r,msk|M(i)));
+			}
+		}
+		return d ;
+	}
     void xuly()
     {
-        FOR(i,1,n)FOR(j,1,m)if(a[i][j]&&color[i][j]==-1)
-        {
-            dfs(i,j,a[i][j]&1) ;    
-        }
-        FOR(i,1,n)FOR(j,1,m)b[i][j] = a[i][j] ; 
-        FOR(i,1,n)FOR(j,1,m)
-        {
-            if(a[i][j])
-            {
-                if(a[i-1][j]>=a[i][j]||a[i][j-1]>=a[i][j])return void(cout<<-1<<el) ;
-            }
-            else
-            { 
-                a[i][j] = max(a[i-1][j],a[i][j-1])+1;
-                if(color[i][j]==-1)
-                {
-                    dfs(i,j,a[i][j]&1) ;
-                } 
-                else if(a[i][j]%2!=color[i][j])++a[i][j] ; 
-            }
-        }
-        ll res1 = 0; 
-        FOR(i,1,n)FOR(j,1,m)res1+=a[i][j] ; 
-        if(n>m)
-        {
-            FOR(i,1,n)FOR(j,1,m)a[i][j]=b[i][j] ,color[i][j]=-1; 
-            FOR(i,1,n)FOR(j,1,m)if(a[i][j]&&color[i][j]==-1)
-            {
-                dfs(i,j,a[i][j]&1) ;    
-            }
-            FOR(j,1,m)FOR(i,1,n)
-            {
-                if(a[i][j])
-                {
-                    if(a[i-1][j]>=a[i][j]||a[i][j-1]>=a[i][j])return void(cout<<-1<<el) ;
-                }
-                else
-                { 
-                    a[i][j] = max(a[i-1][j],a[i][j-1])+1;
-                    if(color[i][j]==-1)
-                    {
-                        dfs(i,j,a[i][j]&1) ;
-                    } 
-                    else if(a[i][j]%2!=color[i][j])++a[i][j] ; 
-                }
-            }
-            ll res2 = 0; 
-            FOR(i,1,n)FOR(j,1,m)res2+=a[i][j] ; 
-            return void(cout<<res2<<el) ; 
-        } 
-        return void(cout<<res1<<el) ;
-        // cout<<min(res1,res2) ; 
+    	FOR(i,1,L)FORN(msk,0,M(n))
+    	{
+    		f[i][msk] = -1 ; 
+    	}
+    	cout<<tinh(1,0) ; 
     }
 }
 
@@ -178,7 +119,11 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        if(max({L,n,r})<=10)sub1::xuly() ;
+        else
+        {
+        	
+        } 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

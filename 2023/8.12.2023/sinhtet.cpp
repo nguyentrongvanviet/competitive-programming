@@ -16,9 +16,9 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-    int n = 100 ; 
+    int n = 5; 
     cout<<n<<el; 
-    FOR(i,1,n)cout<<rd(-5,5)<<" ";
+    FOR(i,1,n)cout<<rd(1,5)<<" ";
     cout<<el;
     cout.close();
 }

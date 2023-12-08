@@ -218,8 +218,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // sub1::xuly() ; 
-        sub2::xuly() ; 
+        sub1::xuly() ; 
+        // sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
