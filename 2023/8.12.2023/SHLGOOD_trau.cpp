@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "TREE"
+#define TASK "SHLGOOD"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,45 +61,140 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n ; 
-vi g[N] ; 
-int a[N] ;
+int n ;
+int a[N] ; 
+
 
 void doc()
 {
-	cin>> n; 
-	FOR(i,2,n)
-	{
-		int p ; cin>> p ;
-		++p ;  
-		g[p].pb(i); 
-	}	
-	FOR(i,1,n)cin>>a[i] ; 
+    cin>> n ; 
+    FOR(i,1,n)cin>>a[i] ; 
 }
 
 namespace sub1
 {
-	ll f[N][2] ;
-	int exist[N] ; 
-	void dfs(int u)
-	{ 
-		f[u][0] = (a[u]==0) ; 
-		f[u][1] = (a[u]==1) ;  
-		for(auto v:g[u])
-		{
-			dfs(v) ; 
-			f[u][1] = f[u][1]*(f[v][0]+f[v][1])%sm;  
-			(f[u][1] += f[u][0]*f[v][1]%sm)%=sm; 
-			f[u][0]=f[u][0]*(f[v][1]+f[v][0])%sm ;
-		}
-	}
-    void xuly()
+    int m; 
+    int b[N] ;
+    bool CK()
     {
-    	dfs(1) ; 
-   		cout<<f[1][1]<<el;
+        int ma = -oo , mi =oo ; 
+        FOR(i,1,m/2)maxi(ma,b[i]) ;
+        FOR(i,m/2+1,m)mini(mi,b[i]) ; 
+        return ma<mi ; 
+    }
+    void xuly()
+    {        
+        int res = 0; 
+        FOR(i,1,n)for(int j = i+1;j<=n;j+=2)
+        {
+            m= 0 ; 
+            FOR(k,i,j)
+            {
+                b[++m] = a[k] ; 
+            }
+            FOR(t,1,m)
+            {
+                FOR(pos,0,m-1)b[pos] =  b[pos+1] ;
+                b[m] = b[0] ; 
+                if(CK())
+                {
+                    res++ ;
+                    break;
+                }
+            }
+        }
+        cout<<res<<el;
     }
 }
-
+namespace sub2
+{
+    int mi[N][LO+1] ;
+    void build_rmq()
+    {
+        FOR(i,1,n)mi[i][0] = a[i] ; 
+        FOR(j,1,LO)FOR(i,1,n-M(j)+1)
+        {
+            mi[i][j] =min(mi[i][j-1],mi[i+M(j-1)][j-1]) ;
+        }
+    }
+    int get_mi(int l ,int r)
+    {
+        int k = lg(r-l+1) ; 
+        return min(mi[l][k],mi[r-M(k)+1][k]) ;
+    }
+    ll res =0 ; 
+    int L[N] , R[N] ;
+    int LEFT(int R ,int val)
+    {
+        int ans = R+1 ;
+        int l =1 ;
+        int r =R ;
+        while(l<=r)
+        {
+            int mid = (l+r)>>1 ; 
+            if(get_mi(mid,R)>val)ans=mid,r=mid-1; 
+            else l=mid+1; 
+        }
+        return R-ans+1; 
+    }
+    int RIGHT(int L ,int val)
+    {
+        int ans = L-1 ;
+        int l =L; 
+        int r= n ;
+        while(l<=r)
+        {
+            int mid=(l+r)>>1; 
+            if(get_mi(L,mid)>val)ans=mid,l=mid+1; 
+            else r=mid-1; 
+        }
+        return ans-L+1; 
+    }
+    int giao(int l ,int r, int u,int v)
+    {
+        return max(0,min(r,v)-max(l,u)+1);
+    }
+    void solve()
+    {
+        build_rmq() ;
+        stack<int>st; 
+        FOR(i,1,n)
+        {
+            while(!st.empty()&&a[st.top()]<=a[i])st.pop(); 
+            if(st.empty())L[i] = 1;
+            else L[i] = st.top()+1 ;
+            st.push(i) ;
+        }
+        st=stack<int>{} ; 
+        FORD(i,n,1)
+        {
+            while(!st.empty()&&a[st.top()]<a[i])st.pop() ;
+            if(st.empty())R[i]=n ;
+            else R[i] = st.top()-1 ;
+            st.push(i) ;
+        }
+        prt(L,n) ;
+        prt(R,n) ;
+        FOR(i,1,n)
+        {
+            int l = L[i] ;
+            int r = R[i] ; 
+            int lenl = LEFT(l-1,a[i]) ;
+            int lenr = RIGHT(r+1,a[i]) ;  
+            int len = r-l+1 ;
+            int x = giao(1,lenl,len-lenr,len-1);
+            res+=x ;
+            res+=giao(1,lenl,i-L[i]+1,len) ; 
+        }
+    }
+    void xuly()
+    { 
+        solve() ; 
+        FOR(i,1,n)a[i]=-a[i] ; 
+        solve() ;
+        cout<<res; 
+    }
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -113,13 +208,14 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        freopen("text.ANS","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
         sub1::xuly() ; 
+        // sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

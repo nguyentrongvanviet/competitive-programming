@@ -95,6 +95,7 @@ void doc()
 
 namespace sub1
 { 
+	// randomize + DSU 
 	int val[N] ;
 	ll B[N] ;
 	struct BIT
@@ -215,6 +216,7 @@ namespace sub1
 }
 namespace sub2
 {
+	// IT + LCA 
 	struct ke
 	{
 		int v, w; 

@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "TREE"
+#define TASK "SHLGOOD"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -53,50 +53,79 @@ ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 
-int xx[] = {0,-1,0,1} ; 
-int yy[] = {-1,0,1,0} ;
+int xx[] = {0,-1,0,1,-1,-1,1,1} ; 
+int yy[] = {-1,0,1,0,-1,1,-1,1} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e3+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+int n , m; 
+int a[N][N] ;
 
-int n ; 
-vi g[N] ; 
-int a[N] ;
+int color[N][N] ; 
 
 void doc()
 {
-	cin>> n; 
-	FOR(i,2,n)
-	{
-		int p ; cin>> p ;
-		++p ;  
-		g[p].pb(i); 
-	}	
-	FOR(i,1,n)cin>>a[i] ; 
+   	cin >> n >> m; 
+    FOR(i,1,n)FOR(j,1,m)color[i][j] = -1 ;
+    FOR(i,1,n)FOR(j,1,m)cin>>a[i][j] ; 
 }
-
 namespace sub1
 {
-	ll f[N][2] ;
-	int exist[N] ; 
-	void dfs(int u)
-	{ 
-		f[u][0] = (a[u]==0) ; 
-		f[u][1] = (a[u]==1) ;  
-		for(auto v:g[u])
-		{
-			dfs(v) ; 
-			f[u][1] = f[u][1]*(f[v][0]+f[v][1])%sm;  
-			(f[u][1] += f[u][0]*f[v][1]%sm)%=sm; 
-			f[u][0]=f[u][0]*(f[v][1]+f[v][0])%sm ;
-		}
-	}
+    bool in(int x, int y)
+    {
+        return 1<=x && x<=n && 1<=y && y<=m ;
+    }
+    void dfs(int x, int y ,int c)
+    {
+        color[x][y]=c; 
+        if(a[x][y] && a[x][y]%2!=c)
+        {
+            cout<<-1<<el; 
+            exit(0) ;
+        }
+        FORN(i,4,8)
+        {
+            int nx= x+xx[i] ;
+            int ny= y+yy[i] ;
+            if(!in(nx,ny))continue ; 
+            if(color[nx][ny]==-1)
+            {
+                dfs(nx,ny,c^1) ;
+            }
+            else if(color[nx][ny]!=(c^1)) 
+            {
+                cout<<-1<<el;
+                exit(0) ;
+            }
+        }
+    }
     void xuly()
     {
-    	dfs(1) ; 
-   		cout<<f[1][1]<<el;
+        FOR(i,1,n)FOR(j,1,m)if(color[i][j]==-1)
+        {
+            dfs(i,j,a[i][j]&1) ;    
+        }
+        FOR(i,1,n)FOR(j,1,m)
+        {
+            if(a[i][j])
+            {
+                if(a[i-1][j]>=a[i][j]||a[i][j-1]>=a[i][j])return void(cout<<-1<<el) ;
+            }
+            else
+            { 
+                a[i][j] = max(a[i-1][j],a[i][j-1])+1; 
+                if(color[i][j]==-1)
+                {
+                    dfs(i,j,a[i][j]&1) ;
+                } 
+                else if(a[i][j]%2!=color[i][j])++a[i][j] ; 
+            }
+        }
+        ll res = 0; 
+        FOR(i,1,n)FOR(j,1,m)res+=a[i][j] ; 
+        cout<<res<<el; 
     }
 }
 

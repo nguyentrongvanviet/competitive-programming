@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "TREE"
+#define TASK "GCDLCM"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -57,46 +57,73 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 , cs = 331 , sm = 1e9+9; 
+const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n ; 
-vi g[N] ; 
-int a[N] ;
-
+int n , m , k; 
+int nt[N] ; 
+int sl[N][2] ;
+void snt()
+{
+	FOR(i,2,1e6)if(nt[i]==0)
+	{
+		nt[i] = i ; 
+		FOR(j,2,1e6/i)nt[i*j]=i ;
+	}
+}
+void pt(int val ,int type)
+{
+	while(val>1)
+	{
+		int u = nt[val] ;
+		while(val%u==0)
+		{
+			sl[u][type]++ ; 
+			val/=u ; 
+		}
+	}
+}
 void doc()
 {
-	cin>> n; 
-	FOR(i,2,n)
+	snt() ;
+	cin>> n >> m >> k; 
+	FOR(i,1,n)
 	{
-		int p ; cin>> p ;
-		++p ;  
-		g[p].pb(i); 
-	}	
-	FOR(i,1,n)cin>>a[i] ; 
+		int val ; cin>>val; 
+		pt(val,0) ; 
+	}
+	FOR(i,1,m)
+	{
+		int val; cin>>val; 
+		pt(val,1) ;
+	}
 }
 
 namespace sub1
 {
-	ll f[N][2] ;
-	int exist[N] ; 
-	void dfs(int u)
-	{ 
-		f[u][0] = (a[u]==0) ; 
-		f[u][1] = (a[u]==1) ;  
-		for(auto v:g[u])
-		{
-			dfs(v) ; 
-			f[u][1] = f[u][1]*(f[v][0]+f[v][1])%sm;  
-			(f[u][1] += f[u][0]*f[v][1]%sm)%=sm; 
-			f[u][0]=f[u][0]*(f[v][1]+f[v][0])%sm ;
-		}
+	ll pw(ll a, ll n)
+	{
+		if(n==0)return 1; 
+		ll b = pw(a,n/2) ;
+		if(n&1)return b*b%sm*a%sm; 
+		return b*b%sm; 
 	}
+	ll solve(int x ,int y )
+	{
+		int u = y-x+1 ; 
+		ll res = pw(u,k) ; 
+		(res-=pw(u-1,k)-sm)%=sm ; 
+		(res-=pw(u-1,k)-sm)%=sm ;
+		(res+=pw(u-2,k))%=sm ; 
+		return res; 
+	}		
     void xuly()
     {
-    	dfs(1) ; 
-   		cout<<f[1][1]<<el;
+        FOR(i,1,1e6)if(sl[i][0]>sl[i][1])return void(cout<<0<<el) ;
+    	ll res =1 ; 
+        FOR(i,1,1e6)if(sl[i][0]<sl[i][1])(res*=solve(sl[i][0],sl[i][1]))%=sm;  
+        cout<<res<<el;
     }
 }
 
