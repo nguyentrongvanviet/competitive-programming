@@ -5,10 +5,10 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "men-graph"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
-// #pragma GCC target("popcnt")
+
 bool mtt = 0 ;
 int test = 1 ;  
 
@@ -16,7 +16,7 @@ int test = 1 ;
 using namespace std; 
 
 #define             ll  long long 
-#define             db  double  
+#define             db  double 
 #define             ve  vector 
 #define             vi  vector<int>
 #define            vll  vector<ll>
@@ -57,117 +57,105 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 998244353; 
+const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m; 
+int n ; 
 vi g[N] ;
-struct Edge
-{
-	int u ,v; 
-}E[(int)3e5+5] ;
+int a[N] ; 
+
 void doc()
 {	
-    cin>> n >> m; 
-    FOR(i,1,m)
-    {
-    	int u , v; cin>> u >> v; 
-    	g[u].pb(v) ; 
-    	g[v].pb(u) ; 
-    	E[i] = {u,v} ;
-    }
+	cin>> n;    
+	FOR(i,1,n)cin>>a[i] ;  
+	FOR(i,1,n-1)
+	{
+		int u ,v; cin>> u >>v; 
+		g[u].pb(v) ; 
+		g[v].pb(u) ; 
+	}
 }
 
 namespace sub1
 {
-	bitset<N>KE[800] ;
-	int ID[N] ; 
-	void add(int&a ,int b)
+	ll res = 0 ;
+	void dfs(int u ,int p ,int cur)
 	{
-		a+=b; 
-		if(a>=sm)a-=sm; 
+		cur = gcd(cur,a[u]) ; 
+		res+=cur; 
+		for(auto v :g[u])if(v!=p)
+		{		
+			dfs(v,u,cur) ;
+		}
 	}
-	int res = 0 ; 
-	int one(int n)
-	{
-		return n;
-	}
-	int two(int n)
-	{
-		return 1ll*n*(n-1)/2%sm; 
-	}
-	int three(int n)
-	{
-		return 1ll*n*(n-1)*(n-2)/6%sm;
-	}
- 	void way(int L , int R ,int M)
- 	{
- 		add(res,(1ll*three(L)*two(R+M)+1ll*two(L)*M%sm*two(R+M-1)+1ll*L*two(M)%sm*two(R+M-2)+1ll*three(M)*two(R+M-3))%sm) ; 
- 	}
- 	int dd[N] ;
-	int deg[N] ;
-	void solve1(int u ,int v)
-	{ 
-		int L = deg[u]-1 ; 
-		int R = deg[v]-1 ;
-		int M = 0 ; 
-		for(auto x :g[u])dd[x]=1;
-		for(auto x : g[v])M+=dd[x] ;  
-		L-=M ; 
-		R-=M ; 
-		for(auto x :g[u])dd[x] = 0 ; 
-		way(L,R,M);
-		way(R,L,M); 
-	}
-	void solve2(int u ,int v)
-	{
-		int L = deg[u]-1 ; 
-		int R = deg[v]-1 ;
-		int M = (KE[ID[u]]&KE[ID[v]]).count() ; 
-		L-=M ; 
-		R-=M ; 
-		way(L,R,M) ;
-		way(R,L,M) ;
-	}
-	void solve3(int u ,int v)
-	{
-		if(deg[u]>deg[v])swap(u,v) ;
-		int L = deg[u]-1 ; 
-		int R = deg[v]-1 ;
-		int M = 0; 
-		for(auto x:g[u])M+=KE[ID[v]][x] ;
-		L-=M; 
-		R-=M; 
-		way(L,R,M) ;
-		way(R,L,M) ; 
-	}
-	//...
     void xuly()
     {
-    	int B = sqrt(2*m) ; 
-    	int tt = 0 ; 
     	FOR(i,1,n)
     	{
-    		deg[i]=SZ(g[i]) ;
-    		if(deg[i]>B)
-    		{
-    			ID[i] = ++tt ; 
-    			for(auto u:g[i])KE[tt][u]=1;
-    		}
+    		dfs(i,0,a[i]) ;
+    		res-=a[i] ; 
     	}
-    	FOR(i,1,m)
-    	{
-    		int u = E[i].u , v = E[i].v ;	
-    		if(deg[u]<=B && deg[v]<=B)solve1(u,v) ;
-    		else if(deg[u]>B && deg[v]>B)solve2(u,v) ; 
-    		else solve3(u,v); 
-    	}
-    	cout<<res<<el;
-
+    	cout<<res/2; 
     }
 }
-
+namespace sub2
+{
+	int P[N][LO+1] ;  
+	int VAL[N][LO+1] ;
+	int h[N] ; 
+	ll res = 0 ;
+	void dfs(int u ,int p )
+	{
+		for(auto v:g[u])if(v!=p)
+		{
+			h[v] = h[u]+1 ;
+			P[v][0] = u ; 
+			VAL[v][0] = a[v] ; 
+			dfs(v,u) ;
+		}
+	}
+	int lca(int u ,int v)
+	{
+		if(h[u]<h[v])swap(u,v) ;
+		int ans = 0 ; 
+		FORD(i,LO,0)if(h[u]-M(i)>=h[v])
+		{
+			ans=gcd(ans,VAL[u][i]) ;
+			u=P[u][i] ; 
+		}
+		if(u==v)
+		{
+			ans=gcd(ans,a[u]) ; 
+			return ans; 
+		}
+		FORD(i,LO,0)
+		{
+			int nu = P[u][i] ; 
+			int nv = P[v][i] ; 
+			if(nu!=nv)
+			{
+				ans=gcd(ans,VAL[u][i]) ; 
+				ans=gcd(ans,VAL[v][i]) ; 
+				u=nu ;
+				v=nv ;
+			}
+		}
+		ans=gcd(ans,VAL[u][1]) ; 
+		ans=gcd(ans,VAL[v][0]) ;
+		return ans ;
+	}
+	void xuly()
+	{
+		dfs(1,0) ;
+		FOR(j,1,LO)FOR(i,1,n)P[i][j]=P[P[i][j-1]][j-1] , VAL[i][j] = gcd(VAL[i][j-1],VAL[P[i][j-1]][j-1]) ;
+		FOR(i,1,n)FOR(j,i+1,n)
+		{
+			res+=lca(i,j) ; 
+		}
+		cout<<res<<el; 
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -184,10 +172,13 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
+    int sub; cin>>sub  ; 
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        if(sub==1)sub1::xuly() ;
+        if(sub==2)
+        	sub2::xuly() ;  
     }
-    // cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
+    cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
