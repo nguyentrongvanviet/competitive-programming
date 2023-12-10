@@ -147,7 +147,7 @@ namespace sub1
 		way(L,R,M) ;
 		way(R,L,M) ; 
 	}
-	//
+	//...
     void xuly()
     {
     	fac[0] = 1 ;
