@@ -147,6 +147,7 @@ namespace sub1
 		way(L,R,M) ;
 		way(R,L,M) ; 
 	}
+	//
     void xuly()
     {
     	fac[0] = 1 ;
@@ -155,7 +156,8 @@ namespace sub1
     	FORD(i,n-1,0)inv_fac[i] = 1ll*inv_fac[i+1]*(i+1)%sm ; 
     	FORD(i,n,0)if(inv_fac[i]<0||fac[i]<0)
     	{
-    		cout<<i<<" "<<-1<<el ;
+    		cout<<i<<" "<<-1<<el
+    		 ;
     		return ;
     	}
     	int B = sqrt(2*m) ; 
