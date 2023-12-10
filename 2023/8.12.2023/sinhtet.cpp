@@ -13,12 +13,15 @@ ll rd(ll l , ll r )
 {
     return l+1LL*rand()*rand()%(r-l+1) ; 
 }
+const int N = 5e5+5;
+int a[N] ; 
 void create()
 {
     ofstream cout(TASK".INP");
-    int n = 5; 
+    int n = 4; 
     cout<<n<<el; 
-    FOR(i,1,n)cout<<rd(1,5)<<" ";
+    FOR(i,1,n)cout<<rd(1,n)<<" ";    
+    // FOR(i,1,n)cout<<a[i]<<" " ; 
     cout<<el;
     cout.close();
 }
@@ -38,4 +41,4 @@ signed main()
         }
         cout<<"Test "<<i<<" AC"<<"\n";
     }
-}
+}   

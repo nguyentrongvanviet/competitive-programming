@@ -191,6 +191,10 @@ namespace sub2
     }
     void xuly()
     { 
+        vi V ; 
+        FOR(i,1,n)V.pb(a[i]) ; 
+        uni(V) ;
+        // assert(SZ(V)==n) ; 
         FOR(i,1,n)a[i]+=1e9+1;
         FOR(i,1,n)assert(a[i]>0) ; 
         solve() ; 
@@ -218,8 +222,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
-        // sub2::xuly() ; 
+        // sub1::xuly() ; 
+        sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

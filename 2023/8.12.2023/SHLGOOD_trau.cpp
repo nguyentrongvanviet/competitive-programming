@@ -154,16 +154,16 @@ void preprocess
 }
 void solve() 
 {
-    // if(fopen(INPUT,"r"))
-    // {
-    //     freopen(INPUT ,"r",stdin) ;
-    //     freopen(OUTPUT,"w",stdout);
-    // }
-    // else if(fopen("text.INP","r"))
-    // {
-    //     freopen("text.INP","r",stdin) ; 
-    //     freopen("text.ANS","w",stdout) ;   
-    // }
+    if(fopen(INPUT,"r"))
+    {
+        freopen(INPUT ,"r",stdin) ;
+        freopen(OUTPUT,"w",stdout);
+    }
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.ANS","w",stdout) ;   
+    }
     ll n,ans=0;
     cin>>n;
     vll a(n),a_rev(n,0);
