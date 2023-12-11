@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "difference"
+#define TASK "REGIONS"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,90 +58,148 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m; 
-ve<vi>a; 
 
+int n , area , q;
+vi g[N] ;
+
+int tp[N] ; 
+vi id[N] ; 
 void doc()
 {
-	cin>> n >> m ;
-    a.resize(n+2,vi(m+2,0));  
-    FOR(i,1,n)FOR(j,1,m)
-    {
-    	cin>>a[i][j] ;
-    }
+	cin>> n >>area >> q ; 
+ 	FOR(i,1,n)
+ 	{
+ 		if(i>1)
+ 		{
+ 			int p ; cin>> p; 
+ 			g[p].pb(i) ; 
+ 		} 
+ 		cin>>tp[i] ;
+ 		id[tp[i]].pb(i) ; 
+ 	}   
 }
 
 namespace sub1
 {
-	int C(int x, int y)
+	const int B = 73;
+	int in[N] , out[N] ; 
+	int node = 0 ; 
+	int H[N] ; 
+	int L[3*N*(LO+1)] , R[3*N*(LO+1)] ; 
+	int ID[N] ; 
+	struct DL
 	{
-		return m*(x-1)+y; 
-	}
-	ve<pii> same[2*N] ;  
-	int pa[N],sz[N] ;
-	int goc(int u )
-	{
-		return pa[u] == u ? u : pa[u] = goc(pa[u]) ;
-	}
-	int res , res_d , res_st ;
-	void hop(int u ,int v,int d )
-	{
-		int chau = goc(u) ; 
-		int chav = goc(v) ;
-		if(chau==chav)return;
-		if(chau<chav)swap(chau,chav) ;   
-		pa[chau] = chav; 
-		sz[chav]+=sz[chau] ; 
-		if(res<sz[chav]||(res==sz[chav]&&res_d>d)||(res==sz[chav]&&res_d==d&&res_st>v))
+		int x ,y; 
+		DL(int _x=0,int _y=0)
 		{
-			res=sz[chav] ;
-			res_d = d ; 
-			res_st = chav ; 
+			x=_x ;
+			y=_y ;
 		}
+		friend DL operator+(DL a,DL b)
+		{
+			return DL(a.x+b.x,a.y+b.y) ; 
+		}
+	}; 
+	DL st[4*N*LO] ;
+	int add(int old ,int l ,int r, int pos ,DL val)
+	{
+		int cur = ++node ; 
+		if(l==r)
+		{
+			st[cur]= val ; 
+			return cur;  
+		}
+		int mid=(l+r)>>1; 
+		if(pos<=mid)
+		{
+			R[cur] = R[old] ; 
+			L[cur] = add(L[old],l,mid,pos,val) ; 
+		}
+		else 
+		{
+			L[cur] = L[old] ; ;
+			R[cur] = add(R[old],mid+1,r,pos,val) ; 
+		}
+		st[cur] = st[L[cur]]+st[R[cur]] ;
+		return cur ;
 	}
+	DL get(int id ,int l ,int r, int t ,int p)
+	{
+		if(id==0)return 0 ;
+		if(t<=l&&r<=p)return st[id] ; 
+		if(r<t||p<l)return DL(0,0); 
+		int mid=(l+r)>>1;  
+		return get(L[id],l,mid,t,p)+get(R[id],mid+1,r,t,p) ; 
+	}
+	int time_dfs = 0 ;
+	void dfs(int u )
+	{
+		in[u] = ++time_dfs ; 
+		for(auto v:g[u])
+		{
+			dfs(v) ; 
+		}
+		out[u] = ++time_dfs; 
+	}
+	vi big;
+	ll C[550][550] ; 
     void xuly()
     {
-    	vi V ; 
-    	FOR(i,1,n)FOR(j,1,m)
-    	{	
-    		if(i>1)V.pb(abs(a[i][j]-a[i-1][j])) ;
-    		if(j>1)V.pb(abs(a[i][j]-a[i][j-1])) ;
-    	}
-    	uni(V) ; 
-    	FOR(i,1,n)FOR(j,1,m)
+    	dfs(1) ; 
+    	int cnt = 0 ; 
+    	FOR(i,1,area)if(SZ(id[i])>=B)
     	{
-    		if(i>1)
+    		big.pb(i) ;
+    		ID[i]=++cnt;
+    	}
+    	FOR(i,1,area)
+    	{
+    		for(auto u : id[i])
     		{
-    			int pos = UB(all(V),abs(a[i][j]-a[i-1][j]))-V.begin() ; 
-    			same[pos].pb(mp(C(i,j),C(i-1,j))) ; 
-    		}
-    		if(j>1)
-    		{
-				int pos = UB(all(V),abs(a[i][j]-a[i][j-1]))-V.begin() ; 
-    			same[pos].pb(mp(C(i,j),C(i,j-1))); 
+	    		H[i] = add(H[i],1,2*n,in[u],DL(1,1));
+	    		H[i] = add(H[i],1,2*n,out[u],DL(0,-1)) ; 
     		}
     	}
-    	FOR(i,1,n*m)pa[i] = i ,sz[i] = 1;
-    	res=1,res_d=0,res_st=1;
-    	FOR(i,1,SZ(V))
+    	for(auto u : big)
     	{
-    		for(auto e: same[i])
+    		for(auto v :big)
     		{
-    			hop(e.fi,e.se,V[i-1]) ;
+    			for(auto x :id[u])
+    			{	
+    				C[ID[u]][ID[v]]+=get(H[v],1,2*n,in[x],out[x]).x;
+    			}	
     		}
-    		for(auto e :same[i])
+    	}
+    	while(q--)
+    	{
+    		int a ,b ; cin>> a >>b; 
+    		if(SZ(id[a])>=B&&SZ(id[b])>=B)
+    		{	
+    			cout<<C[ID[a]][ID[b]]<<el;
+    		}
+    		else	 
     		{
-    			pa[e.fi] = e.fi ;
-    			sz[e.fi] = 1 ;
-    			pa[e.se] = e.se ;
-    			sz[e.se] = 1 ; 
+    			ll res =0 ; 
+    			if(SZ(id[a])<SZ(id[b]))
+    			{
+    				for(auto u : id[a])
+    				{
+    					res+=get(H[b],1,2*n,in[u],out[u]).x; 
+    				}
+    			}	
+    			else
+    			{
+    				for(auto u :id[b])
+    				{
+    					res+=get(H[a],1,2*n,1,in[u]).y;
+    				}
+    			}
+    			cout<<res<<el;
     		}
-    	} 
-    	assert(res!=0&&res_d!=-1) ; 
-    	cout<<res<<" "<<res_d<<" "<<res_st/m+(res_st%m>0)<<" "<<(res_st%m==0?m:res_st%m)<<el;
+    	}
     }
 }
 
@@ -161,7 +219,6 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
-    int sub ; cin>>sub ; 
     FOR(i,1,test)
     {
         doc() ; 
