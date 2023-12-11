@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "boardgame"
+#define TASK "chemistry"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 0 ; 
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -58,56 +58,43 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m; 
+int n ; 
+int a[N] ; 
 
-struct Edge
-{
-    int u , v , c ;
-    bool operator<(const Edge&a)const
-    {
-        return c<a.c ;
-    }
-}; 
-Edge E[N] ;
-int pa[N] ; 
-int goc(int u)
-{
-    return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
-}
-int cnt = 0 ;
 void doc()
 {
-    cin>> n >>m ; 
-    FOR(i,1,n)FOR(j,1,m)
-    {
-        int val; cin>>val; 
-        E[++cnt]={i,j+n,val} ;
-    }
-    sort(E+1,E+cnt+1) ; 
-    FOR(i,1,n+m)pa[i] =i ;  
-    ll res = 0 ; 
-    FOR(i,1,cnt)
-    {
-        int u =E[i].u ;
-        int v =E[i].v ; 
-        int chau = goc(u) ; 
-        int chav = goc(v) ;
-        if(chau==chav)continue ;
-        pa[chau] = chav; 
-        res+=E[i].c ;
-    }
-    cout<<res<<el; 
-}
-
+    FOR(i,1,n)cin>>a[i] ; 
+}		
 namespace sub1
 {
-    void xuly()
-    {
-        
-    }
+	int s[N] ; 
+	int res = 0 ; 
+	struct DL
+	{
+		int x , y , z , ox ,oy , oz ;
+	} ; 
+	ve<DL>q ;
+	void bfs()
+	{ 
+		ve<DL>pre ; 
+		ve<DL>cur ;
+
+		FOR(i,1,n)
+		{
+			pre.pb(a[i]) ;
+		}
+		FOR(i,1,n)
+		{
+
+		}
+	}
+	void xuly()
+	{
+		bfs() ;
+	}
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -126,10 +113,16 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
+    int sub ; 
+    cin>>sub ;
     FOR(i,1,test)
     {
-        doc() ; 
-        sub1::xuly() ; 
+    	while(cin>>n)
+    	{
+    		if(n==0)break;
+    		doc() ; 
+	        sub1::xuly() ; 
+    	} 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

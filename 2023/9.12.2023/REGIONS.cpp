@@ -61,7 +61,7 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n; 
+int n , k , q ; 
 int a[N] ; 
 vi g[N] ; 
 int type[N] ; 
@@ -81,6 +81,7 @@ void doc()
 
 namespace sub1
 {
+    int in[N] , out[N] , tt = 0; 
 	void dfs(int u ,int p)
 	{
 		in[u] = ++tt ;  
@@ -91,36 +92,54 @@ namespace sub1
 		out[u] = ++tt ; 
 	}
 	vi list_in[N] , list_out[N] ; 
-	map<int,ll>ques[N] ; 
-	vi list[N] ; 
+	unordered_map<int,ll>ques[N] ; 
+	vi list[N] ;
+    int getin(int c , int l ,int r)
+    {
+        return UB(all(list_in[c]),r)-LB(all(list_in[c]),l) ; 
+    } 
+    int getout(int c , int l ,int r)
+    {
+        return UB(all(list_out[c]),r)-list_out[c].begin() ; 
+    }
     void xuly()
     {
     	dfs(1,0) ;
     	FOR(i,1,n)
     	{
-    		list[c].pb(i) ;
     		int c = type[i] ; 
-    		list_in[i].pb(in[i]) ; 
-    		list_out[i].pb(out[i]) ; 
+    		list[c].pb(i) ;
+    		list_in[c].pb(in[i]) ; 
+    		list_out[c].pb(out[i]) ; 
     	} 
     	FOR(i,1,k)sort(all(list_in[i])) ,sort(all(list_out[i])) ; 
     	while(q--)
     	{
-    		int u ,v ; cin>> u >>v ; 
+    		int u ,v ; cin>> u >> v ; 
     		if(ques[u].count(v))cout<<ques[u][v]<<el; 
     		else 
     		{
+                ll res = 0 ; 
     			if(SZ(list[u])<SZ(list[v]))
-    			{	
+    			{
+                    res = 0 ;
     				for(auto c : list[u])
     				{
-    					
+                        res+=getin(v,in[c],out[c]) ; 
     				}
+                    cout<<res<<el;
     			}
     			else
     			{
-
+                    res = 1ll*SZ(list[v])*SZ(list[u]) ; 
+                    for(auto c : list[v])
+                    {
+                        res-=SZ(list[u])-(LB(all(list_in[u]),in[c])-list_in[u].begin()) ; 
+                        res-=getout(u,1,in[c]) ;
+                    }
+                    cout<<res<<el ; 
     			}
+                ques[u][v]= res;
     		}
     	}
     }

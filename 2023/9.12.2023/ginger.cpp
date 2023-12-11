@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "boardgame"
+#define TASK "ginger"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,55 +58,99 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
 int n , m; 
-
 struct Edge
 {
-    int u , v , c ;
-    bool operator<(const Edge&a)const
-    {
-        return c<a.c ;
-    }
-}; 
-Edge E[N] ;
-int pa[N] ; 
-int goc(int u)
-{
-    return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
-}
-int cnt = 0 ;
+	int u ,v , id , w; 
+	bool operator<(const Edge&a)const
+	{
+		return w<a.w ;
+	}
+} ;
+Edge E[2*N] ;
+int alpha; 
 void doc()
 {
-    cin>> n >>m ; 
-    FOR(i,1,n)FOR(j,1,m)
-    {
-        int val; cin>>val; 
-        E[++cnt]={i,j+n,val} ;
-    }
-    sort(E+1,E+cnt+1) ; 
-    FOR(i,1,n+m)pa[i] =i ;  
-    ll res = 0 ; 
-    FOR(i,1,cnt)
-    {
-        int u =E[i].u ;
-        int v =E[i].v ; 
-        int chau = goc(u) ; 
-        int chav = goc(v) ;
-        if(chau==chav)continue ;
-        pa[chau] = chav; 
-        res+=E[i].c ;
-    }
-    cout<<res<<el; 
+	cin>> n >> m >> alpha ; 
+	FOR(i,1,m)
+	{
+		cin>>E[i].u>>E[i].v>>E[i].w; 
+		E[i].id=i;
+	}
 }
 
 namespace sub1
 {
+	int pa[N] ;
+	struct ke
+	{
+		int v , id; 
+	} ;
+	ve<ke>g[N] ;
+	int goc(int u )
+	{
+		return pa[u] == u? u : pa[u] = goc(pa[u]) ; 
+	}
+	int hop(int u ,int v)
+	{
+		int chau = goc(u) ; 
+		int chav = goc(v) ;
+		if(chau==chav)return 1 ;
+		pa[chau] =chav;
+		return 0 ;
+	}
+	int f[N] ;
+	pii pre[N] ;
+	void go(int s ,int t,int c)
+	{
+		queue<int>q; 
+		FOR(i,1,n)f[i] = 0 ; 
+		q.push(s) ;
+		f[s]=1;
+		while(!q.empty())
+		{
+			int u= q.front() ;
+			q.pop() ;
+			for(auto [v,id]:g[u])if(f[v]==0)
+			{
+				pre[v] = mp(u,id) ; 
+				f[v] = f[u]+1 ;
+				q.push(v) ;
+				if(v==t)break; 
+			}
+		}
+		cout<<sq(c)+f[t]*alpha<<el; 
+		cout<<t<<" "<<f[t]<<el;
+		while(t!=s)
+		{
+			cout<<pre[t].se<<" "; 
+			t=pre[t].fi;
+		}
+		cout<<pre[t].se<<el;
+		exit(0) ;
+	}
     void xuly()
     {
-        
+		sort(E+1,E+m+1)  ; 
+		FOR(i,1,n)pa[i] = i ; 
+
+		FOR(i,1,m)
+		{
+			if(hop(E[i].u,E[i].v))
+			{
+				pre[E[i].u].se=E[i].id;
+				go(E[i].u,E[i].v,E[i].w) ;
+			}
+			else 
+			{
+				g[E[i].u].pb({E[i].v,E[i].id}) ; 
+				g[E[i].v].pb({E[i].u,E[i].id}) ; 
+			}
+		}        
+		cout<<"Poor girl"<<el;
     }
 }
 
