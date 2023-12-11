@@ -65,7 +65,6 @@ int n , m ,k ;
 void doc()
 {
 	cin>> n >> m >> k; 
-	if(k>2)exit(0) ; 
 }
 
 namespace sub1
@@ -109,13 +108,12 @@ namespace sub1
 			int x = q.front().x ; 
 			int y = q.front().y ;
 			int d = q.front().d ;
-			int val = q.front().val ;
+			int val = q.front().val ; 
 			if(x==en_x&&y==en_y)
 			{
 				return q.front() ;
 			}
 			q.pop_front() ;
-			if(f[x][y][d]<val)continue ;
 			FORN(i,0,4)
 			{
 				int nx =x+xx[i] ; 
@@ -133,7 +131,6 @@ namespace sub1
 		return DL{-1,-1,-1,-1} ; 
 	}
 	int t = 0 ; 
-
 	void trace(int x ,int y,int d)
 	{
 		++t; 
@@ -166,7 +163,6 @@ namespace sub1
     		{
     			char x; cin>>x ;
     			assert(change[(int)x]!=-1) ; 
-    			if(change[(int)x]==-1)while(1) ; 
     			FORN(t,0,6)
     			{
     				a[i][++id] = BIT(change[(int)x],t) ;

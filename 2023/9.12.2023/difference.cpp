@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "numtable"
+#define TASK "difference"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -61,103 +61,94 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ;
-ve<vi>a ; 
-int nt[(int)1e7+5];
-int cnt = 0; 
-int ID[(int)1e7+5];
-int val[664579+5];
-void snt()
-{
-	FOR(i,2,1e7)if(nt[i]==0)
-	{	
-		nt[i] =i ; 
-		FOR(j,i,1e7/i)nt[i*j] = i; 
-		cnt++ ; 
-		val[cnt]=i;
-		ID[i] = cnt; 
-	}
-}
+int n , m; 
+ve<vi>a; 
 
-struct pt
-{
-	int x , y; 
-};
-ve<pt>pos[664579+5] ;
 void doc()
 {
-	snt() ;
-	cin>> n >> m; 
-	a.resize(n+2,vi(m+2,0)) ; 
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		cin>>a[i][j] ;
-		int cur = a[i][j] ; 
-		while(cur>1)
-		{
-			int d  = nt[cur] ;
-			pos[ID[d]].pb({i,j}) ;  
-			while(cur%d==0)cur/=d;
-		}
-	}
+	cin>> n >> m ;
+    a.resize(n+2,vi(m+2,0));  
+    FOR(i,1,n)FOR(j,1,m)
+    {
+    	cin>>a[i][j] ;
+    }
 }
 
 namespace sub1
 {
-	int pa[N],sz[N]; 
-	int C(int x ,int y)
+	int C(int x, int y)
 	{
-		return (x-1)*m+y ; 
+		return m*(x-1)+y; 
 	}
-	int goc(int u)
+	ve<pii> same[2*N] ;  
+	int pa[N],sz[N] ;
+	int goc(int u )
 	{
 		return pa[u] == u ? u : pa[u] = goc(pa[u]) ;
 	}
-	void hop(int u ,int v)
+	int res , res_d , res_st ;
+	void hop(int u ,int v,int d )
 	{
-		int chau = goc(u) ;
+		int chau = goc(u) ; 
 		int chav = goc(v) ;
-		if(chau==chav)return ; 
+		if(chau==chav)return;
+		if(chau<chav)swap(chau,chav) ;   
 		pa[chau] = chav; 
 		sz[chav]+=sz[chau] ; 
+		if(res<sz[chav]||(res==sz[chav]&&res_d>d)||(res==sz[chav]&&res_d==d&&res_st>v))
+		{
+			res=sz[chav] ;
+			res_d = d ; 
+			res_st = chav ; 
+		}
 	}
-
     void xuly()
     {
-    	FOR(i,1,n*m)sz[i]=1,pa[i]=i;
-    	int res =0 ; 
-    	FOR(i,1,cnt)
+    	vi V ; 
+    	FOR(i,1,n)FOR(j,1,m)
+    	{	
+    		if(i>1)V.pb(abs(a[i][j]-a[i-1][j])) ;
+    		if(j>1)V.pb(abs(a[i][j]-a[i][j-1])) ;
+    	}
+    	uni(V) ; 
+    	FOR(i,1,n)FOR(j,1,m)
     	{
-    		for(auto u:pos[i])
+    		if(i>1)
     		{
-    			int x=u.x; 
-    			int y=u.y;
-    			FORN(j,0,4)
-    			{
-    				int nx = x+xx[j] ;
-    				int ny = y+yy[j] ; 
-    				if(a[nx][ny]&&a[nx][ny]%val[i]==0)
-    				{
-    					hop(C(nx,ny),C(x,y)) ; 
-    				}
-    			}
+    			int pos = UB(all(V),abs(a[i][j]-a[i-1][j]))-V.begin() ; 
+    			same[pos].pb(mp(C(i,j),C(i-1,j))) ; 
     		}
-    		for(auto u :pos[i])
+    		if(j>1)
     		{
-    			int c = C(u.x,u.y) ;
-    			maxi(res,sz[C(u.x,u.y)]) ; 
-    			pa[c] = c; 
-    			sz[c] = 1; 
+				int pos = UB(all(V),abs(a[i][j]-a[i][j-1]))-V.begin() ; 
+    			same[pos].pb(mp(C(i,j),C(i,j-1))); 
     		}
     	}
-    	cout<<res<<el ;
+    	FOR(i,1,n*m)pa[i] = i ,sz[i]=1;
+    	res=1,res_d=0,res_st=1;
+    	FOR(i,1,SZ(V))
+    	{
+    		for(auto e: same[i])
+    		{
+    			hop(e.fi,e.se,V[i-1]) ;
+    		}
+    		for(auto e :same[i])
+    		{
+    			pa[e.fi] = e.fi ;
+    			sz[e.fi] =1 ;
+    			pa[e.se] = e.se ;
+    			sz[e.se] =1 ; 
+    		}
+    	} 
+    	assert(res!=0&&res_d!=-1) ; 
+    	cout<<res<<" "<<res_d<<" "<<res_st/m+(res_st%m>0)<<" "<<(res_st%m==0?m:res_st%m)<<el;
     }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
-{p
+{
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
     if(fopen(INPUT,"r"))
     {
@@ -170,7 +161,7 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
-    int sub ;cin>>sub ;
+    int sub ; cin>>sub ; 
     FOR(i,1,test)
     {
         doc() ; 
