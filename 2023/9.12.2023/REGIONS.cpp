@@ -61,143 +61,66 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-
-int n , area , q;
-vi g[N] ;
-
-int tp[N] ; 
-vi id[N] ; 
+int n; 
+int a[N] ; 
+vi g[N] ; 
+int type[N] ; 
 void doc()
 {
-	cin>> n >>area >> q ; 
- 	FOR(i,1,n)
- 	{
- 		if(i>1)
- 		{
- 			int p ; cin>> p; 
- 			g[p].pb(i) ; 
- 		} 
- 		cin>>tp[i] ;
- 		id[tp[i]].pb(i) ; 
- 	}   
+    cin>> n >> k >>q ;
+    FOR(i,1,n)
+    {
+    	if(i!=1)
+    	{
+    		int p ;cin>>p; 
+    		g[p].pb(i) ; 
+    	}
+    	cin>>type[i] ; 
+    }
 }
 
 namespace sub1
 {
-	const int B = 73;
-	int in[N] , out[N] ; 
-	int node = 0 ; 
-	int H[N] ; 
-	int L[3*N*(LO+1)] , R[3*N*(LO+1)] ; 
-	int ID[N] ; 
-	struct DL
+	void dfs(int u ,int p)
 	{
-		int x ,y; 
-		DL(int _x=0,int _y=0)
+		in[u] = ++tt ;  
+		for(auto v :g[u])if(v!=p)
 		{
-			x=_x ;
-			y=_y ;
+			dfs(v,u) ; 
 		}
-		friend DL operator+(DL a,DL b)
-		{
-			return DL(a.x+b.x,a.y+b.y) ; 
-		}
-	}; 
-	DL st[4*N*LO] ;
-	int add(int old ,int l ,int r, int pos ,DL val)
-	{
-		int cur = ++node ; 
-		if(l==r)
-		{
-			st[cur]= val ; 
-			return cur;  
-		}
-		int mid=(l+r)>>1; 
-		if(pos<=mid)
-		{
-			R[cur] = R[old] ; 
-			L[cur] = add(L[old],l,mid,pos,val) ; 
-		}
-		else 
-		{
-			L[cur] = L[old] ; ;
-			R[cur] = add(R[old],mid+1,r,pos,val) ; 
-		}
-		st[cur] = st[L[cur]]+st[R[cur]] ;
-		return cur ;
+		out[u] = ++tt ; 
 	}
-	DL get(int id ,int l ,int r, int t ,int p)
-	{
-		if(id==0)return 0 ;
-		if(t<=l&&r<=p)return st[id] ; 
-		if(r<t||p<l)return DL(0,0); 
-		int mid=(l+r)>>1;  
-		return get(L[id],l,mid,t,p)+get(R[id],mid+1,r,t,p) ; 
-	}
-	int time_dfs = 0 ;
-	void dfs(int u )
-	{
-		in[u] = ++time_dfs ; 
-		for(auto v:g[u])
-		{
-			dfs(v) ; 
-		}
-		out[u] = ++time_dfs; 
-	}
-	vi big;
-	ll C[550][550] ; 
+	vi list_in[N] , list_out[N] ; 
+	map<int,ll>ques[N] ; 
+	vi list[N] ; 
     void xuly()
     {
-    	dfs(1) ; 
-    	int cnt = 0 ; 
-    	FOR(i,1,area)if(SZ(id[i])>=B)
+    	dfs(1,0) ;
+    	FOR(i,1,n)
     	{
-    		big.pb(i) ;
-    		ID[i]=++cnt;
-    	}
-    	FOR(i,1,area)
-    	{
-    		for(auto u : id[i])
-    		{
-	    		H[i] = add(H[i],1,2*n,in[u],DL(1,1));
-	    		H[i] = add(H[i],1,2*n,out[u],DL(0,-1)) ; 
-    		}
-    	}
-    	for(auto u : big)
-    	{
-    		for(auto v :big)
-    		{
-    			for(auto x :id[u])
-    			{	
-    				C[ID[u]][ID[v]]+=get(H[v],1,2*n,in[x],out[x]).x;
-    			}	
-    		}
-    	}
+    		list[c].pb(i) ;
+    		int c = type[i] ; 
+    		list_in[i].pb(in[i]) ; 
+    		list_out[i].pb(out[i]) ; 
+    	} 
+    	FOR(i,1,k)sort(all(list_in[i])) ,sort(all(list_out[i])) ; 
     	while(q--)
     	{
-    		int a ,b ; cin>> a >>b; 
-    		if(SZ(id[a])>=B&&SZ(id[b])>=B)
-    		{	
-    			cout<<C[ID[a]][ID[b]]<<el;
-    		}
-    		else	 
+    		int u ,v ; cin>> u >>v ; 
+    		if(ques[u].count(v))cout<<ques[u][v]<<el; 
+    		else 
     		{
-    			ll res =0 ; 
-    			if(SZ(id[a])<SZ(id[b]))
-    			{
-    				for(auto u : id[a])
+    			if(SZ(list[u])<SZ(list[v]))
+    			{	
+    				for(auto c : list[u])
     				{
-    					res+=get(H[b],1,2*n,in[u],out[u]).x; 
-    				}
-    			}	
-    			else
-    			{
-    				for(auto u :id[b])
-    				{
-    					res+=get(H[a],1,2*n,1,in[u]).y;
+    					
     				}
     			}
-    			cout<<res<<el;
+    			else
+    			{
+
+    			}
     		}
     	}
     }
