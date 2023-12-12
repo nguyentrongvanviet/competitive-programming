@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "chemistry"
+#define TASK "equivalent"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ; 
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -57,83 +57,96 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 ; 
+const int N = 50+5 , oo = 2e9 , LO = 17 , CH = 26 ;
 
 
-int n ; 
-int a[N] ; 
+ll cs[5] ,sm[5] ;
 
+
+int n;
+str a[N] ;
 void doc()
 {
-    FOR(i,1,n)cin>>a[i] ; 
-}		
-namespace sub1
-{
-	bitset<M(10)>f[N][M(10)]; 
-	char res[N] ; 	
-	void xuly()
-	{
-		FOR(i,1,n)FORN(val1,0,M(10))FORN(val2,0,M(10))f[i][val1][val2] = 0;  	
-		f[0][0][0] =1  ;  
-		FOR(i,1,n)
-		{
-			FORN(val1,0,M(10))FORN(val2,0,M(10))
-			{
-				if(f[i-1][val1][val2]==1)
-				{
-					f[i][val1^a[i]][val2] = 1 ; 
-					f[i][val1][val2^a[i]] = 1 ;
-					f[i][val1][val2] = 1 ;
-				}
-			}
-		}
-		int tot = 0; 
-		FOR(i,1,n)tot^=a[i] ;
-		int ma = 0 ; 
-		int res_val1 = 0 ,res_val2 = 0 ; 
-		FORN(val1,0,M(10))FORN(val2,0,M(10))if(f[n][val1][val2])
-		{	
-			if(maxi(ma,val1+val2+(tot^val1^val2)))res_val1=val1,res_val2=val2 ;  
-		}
-		vi sf1, sf2, sf3 ; 
-		FORD(i,n,1)
-		{
-			if(f[i-1][res_val1][res_val2])
-			{
-				sf3.pb(i) ; 
-			}
-			else if(f[i-1][res_val1^a[i]][res_val2])
-			{
-				res_val1^=a[i] ; 
-				sf1.pb(i) ; 
-			}
-			else 
-			{
-				res_val2^=a[i] ;
-				sf2.pb(i) ; 
-			}
-		}
-		if(SZ(sf2)<SZ(sf3))swap(sf2,sf3) ; 
-		if(SZ(sf1)<SZ(sf2))swap(sf1,sf2) ; 
-		if(sf2.empty())
-		{
-			sf2.pb(sf1.back()) ;  
-			sf1.pk() ; 
-		}
-		if(sf3.empty())
-		{
-			sf3.pb(sf1.back()) ; 
-			sf1.pk() ; 
-		} 
-		for(auto u :sf1)res[u] = 'P' ; 
-		for(auto u :sf2)res[u] = 'V' ;
-		for(auto u :sf3)res[u] = 'H' ;
-		FOR(i,1,n)cout<<res[i];
-		cout<<el;
-	}
+    cin>> n; 
 }
 
+namespace sub1
+{
+	set<vll>s ;
+	vll cal(str &a)
+	{
+		vll hash(5,0) ; 
+		for(auto v :a)
+		{ 
+			FORN(i,0,5)
+			{
+				hash[i] = (hash[i]*cs[i] + v)%sm[i] ;   
+			}
+		}
+		return hash ; 
+	}
+	void up(str a )
+	{
+		FORN(i,1,SZ(a))
+		{
+			int cur = i ;
+			while(cur!=0 && a[cur-1]-a[cur]>1)swap(a[cur-1],a[cur]),--cur ; 
+		}
+		s.insert(cal(a)) ; 
+	}
+
+	void add(str &a )
+	{
+		FOR(i,1,SZ(a))
+		{  
+			up(a) ; 
+			a+=a[0]; 
+			a.erase(0,1) ; 
+		}
+	}
+    void xuly()
+    {
+    	FORN(i,0,5)cs[i] =rd(1,30) , sm[i] =rd(1e8+7,1e9+55) ;
+    	FOR(i,1,n)
+    	{
+    		str s; cin>> s; 
+    		add(s) ; 
+    	}
+    	cout<<SZ(s)<<el; 
+    }	
+}
+namespace sub2
+{
+	vi pos[N] ; 
+	void up(str &a )
+	{
+		for(auto v:a)
+		{
+			FOR(i,0,v-'0'+1)
+			{
+				if(maxi(pos,v.back()))
+			}
+		}
+	}
+	void add(str&a )
+	{
+		n = SZ(a) ;
+		FOR(i,1,n)
+		{
+			up(a) ;
+			a+=a[0] ;
+			a.erase(0,1) ;
+		}
+	}
+	void xuly()
+	{
+		FOR(i,1,n)
+		{
+
+		}
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -150,16 +163,10 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
-    int sub ; 
-    cin>>sub ;
     FOR(i,1,test)
     {
-    	while(cin>>n)
-    	{
-    		if(n==0)break;
-    		doc() ; 
-	        sub1::xuly() ; 
-    	} 
+        doc() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

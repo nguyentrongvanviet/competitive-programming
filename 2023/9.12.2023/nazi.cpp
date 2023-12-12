@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "chemistry"
+#define TASK "nazi"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ; 
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -58,80 +58,49 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n ; 
-int a[N] ; 
-
+int n , m , k; 
+int f[N][N] ;
+struct pt
+{
+	int x ,y ; 
+}; 
 void doc()
 {
-    FOR(i,1,n)cin>>a[i] ; 
-}		
+	cin>> n >> m >> k ;
+	FOR(i,1,n)FOR(j,1,m)f[i][j] = oo ; 
+	queue<pt>q ;
+	FOR(i,1,k)
+	{
+		int x ,y ; cin>>x>>y ;
+		q.push({x,y}); 
+		f[x][y] = 1;
+	}
+	while(!q.empty())
+	{
+		int x= q.front().x; 
+		int y= q.front().y ;
+		q.pop() ; 
+		FORN(i,0,4)
+		{
+			int nx = x+xx[i] ; 
+			int ny = y+yy[i] ; 
+			if(mini(f[nx][ny],f[x][y]+1))q.push({nx,ny}) ; 
+		}
+	}
+	int res=  0 ; 
+	FOR(i,1,n)FOR(j,1,m)maxi(res,f[i][j]) ;
+	cout<<res<<el;
+}
+
 namespace sub1
 {
-	bitset<M(10)>f[N][M(10)]; 
-	char res[N] ; 	
-	void xuly()
-	{
-		FOR(i,1,n)FORN(val1,0,M(10))FORN(val2,0,M(10))f[i][val1][val2] = 0;  	
-		f[0][0][0] =1  ;  
-		FOR(i,1,n)
-		{
-			FORN(val1,0,M(10))FORN(val2,0,M(10))
-			{
-				if(f[i-1][val1][val2]==1)
-				{
-					f[i][val1^a[i]][val2] = 1 ; 
-					f[i][val1][val2^a[i]] = 1 ;
-					f[i][val1][val2] = 1 ;
-				}
-			}
-		}
-		int tot = 0; 
-		FOR(i,1,n)tot^=a[i] ;
-		int ma = 0 ; 
-		int res_val1 = 0 ,res_val2 = 0 ; 
-		FORN(val1,0,M(10))FORN(val2,0,M(10))if(f[n][val1][val2])
-		{	
-			if(maxi(ma,val1+val2+(tot^val1^val2)))res_val1=val1,res_val2=val2 ;  
-		}
-		vi sf1, sf2, sf3 ; 
-		FORD(i,n,1)
-		{
-			if(f[i-1][res_val1][res_val2])
-			{
-				sf3.pb(i) ; 
-			}
-			else if(f[i-1][res_val1^a[i]][res_val2])
-			{
-				res_val1^=a[i] ; 
-				sf1.pb(i) ; 
-			}
-			else 
-			{
-				res_val2^=a[i] ;
-				sf2.pb(i) ; 
-			}
-		}
-		if(SZ(sf2)<SZ(sf3))swap(sf2,sf3) ; 
-		if(SZ(sf1)<SZ(sf2))swap(sf1,sf2) ; 
-		if(sf2.empty())
-		{
-			sf2.pb(sf1.back()) ;  
-			sf1.pk() ; 
-		}
-		if(sf3.empty())
-		{
-			sf3.pb(sf1.back()) ; 
-			sf1.pk() ; 
-		} 
-		for(auto u :sf1)res[u] = 'P' ; 
-		for(auto u :sf2)res[u] = 'V' ;
-		for(auto u :sf3)res[u] = 'H' ;
-		FOR(i,1,n)cout<<res[i];
-		cout<<el;
-	}
+    void xuly()
+    {
+        
+    }
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -150,16 +119,10 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
-    int sub ; 
-    cin>>sub ;
     FOR(i,1,test)
     {
-    	while(cin>>n)
-    	{
-    		if(n==0)break;
-    		doc() ; 
-	        sub1::xuly() ; 
-    	} 
+        doc() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

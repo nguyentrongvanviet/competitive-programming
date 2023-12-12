@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "chemistry"
+#define TASK "paleta"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ; 
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -57,81 +57,121 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 , cs = 331 , sm = 998244353	; 
+const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
 int n ; 
-int a[N] ; 
+int k ; 
+vi g[N] ;
 
 void doc()
 {
-    FOR(i,1,n)cin>>a[i] ; 
-}		
+    cin>> n >> k; 
+    FOR(i,1,n)
+    {
+    	int u ; cin>> u ; 
+    	if(i!=u)
+    	{
+    		g[i].pb(u) ; 
+    	}
+    }
+}
+
 namespace sub1
 {
-	bitset<M(10)>f[N][M(10)]; 
-	char res[N] ; 	
-	void xuly()
+	int id[N] , low[N] , tt = 0 ,tp[N] , tplt = 0  ; 
+	int sz[N]  ; 
+	stack<int>st ; 
+	void tarjan(int u )
 	{
-		FOR(i,1,n)FORN(val1,0,M(10))FORN(val2,0,M(10))f[i][val1][val2] = 0;  	
-		f[0][0][0] =1  ;  
-		FOR(i,1,n)
+		id[u] = low[u] = ++tt; 
+		st.push(u) ; 
+		for(auto v : g[u])
 		{
-			FORN(val1,0,M(10))FORN(val2,0,M(10))
-			{
-				if(f[i-1][val1][val2]==1)
-				{
-					f[i][val1^a[i]][val2] = 1 ; 
-					f[i][val1][val2^a[i]] = 1 ;
-					f[i][val1][val2] = 1 ;
-				}
-			}
+			if(tp[v])continue ;
+			if(id[v])mini(low[u],id[v]) ;
+			else tarjan(v),mini(low[u],low[v]) ;
 		}
-		int tot = 0; 
-		FOR(i,1,n)tot^=a[i] ;
-		int ma = 0 ; 
-		int res_val1 = 0 ,res_val2 = 0 ; 
-		FORN(val1,0,M(10))FORN(val2,0,M(10))if(f[n][val1][val2])
-		{	
-			if(maxi(ma,val1+val2+(tot^val1^val2)))res_val1=val1,res_val2=val2 ;  
-		}
-		vi sf1, sf2, sf3 ; 
-		FORD(i,n,1)
+		if(id[u]==low[u])
 		{
-			if(f[i-1][res_val1][res_val2])
+			int t ;
+			++tplt ; 
+			do
 			{
-				sf3.pb(i) ; 
-			}
-			else if(f[i-1][res_val1^a[i]][res_val2])
-			{
-				res_val1^=a[i] ; 
-				sf1.pb(i) ; 
-			}
-			else 
-			{
-				res_val2^=a[i] ;
-				sf2.pb(i) ; 
-			}
+				t=st.top();
+				st.pop() ; 
+				tp[t]=tplt;
+				sz[tplt]++; 
+			}while(t!=u);
 		}
-		if(SZ(sf2)<SZ(sf3))swap(sf2,sf3) ; 
-		if(SZ(sf1)<SZ(sf2))swap(sf1,sf2) ; 
-		if(sf2.empty())
-		{
-			sf2.pb(sf1.back()) ;  
-			sf1.pk() ; 
-		}
-		if(sf3.empty())
-		{
-			sf3.pb(sf1.back()) ; 
-			sf1.pk() ; 
-		} 
-		for(auto u :sf1)res[u] = 'P' ; 
-		for(auto u :sf2)res[u] = 'V' ;
-		for(auto u :sf3)res[u] = 'H' ;
-		FOR(i,1,n)cout<<res[i];
-		cout<<el;
 	}
+	int pa[N] ,cnt[N] , ok[N];
+	ll mu_1[N] ;
+	ll f[N][2];  
+	int goc(int u )
+	{
+		return pa[u]==u?u:pa[u]=goc(pa[u]) ; 
+	}
+	void hop(int u ,int v)
+	{
+		int chau = goc(u) ; 
+		int chav = goc(v) ; 
+		if(chau==chav)return ; 
+		if(sz[chau]>sz[chav])swap(chau,chav) ;
+		if(sz[chav]>1&&sz[chau]==1)
+		{
+			ok[chau] = 1; 
+		}
+		else if(sz[chav]==1) 
+		{
+			pa[chau] = chav; 
+			cnt[chav]+=cnt[chau] ; 
+			ok[chav]|=ok[chau] ;
+		}	
+	}
+    void xuly()
+    {
+    	mu_1[0] = 1 ; 
+    	FOR(i,1,n)
+    	{
+    		mu_1[i] = mu_1[i-1]*(k-1)%sm; 
+    	} 
+        FOR(i,1,n)if(id[i]==0)tarjan(i) ; 
+        f[1][1] = k ;
+        FOR(i,2,n)
+        {
+        	f[i][0] = (f[i-1][0]*(k-2)+f[i-1][1]*(k-1))%sm ;
+        	f[i][1] = f[i-1][0] ;
+        }
+        FOR(i,1,tplt)
+        {
+        	pa[i] = i ;
+        	cnt[i] = 1 ; 
+        	ok[i] = (sz[i]>1); 
+        }
+        FOR(i,1,n)for(auto j:g[i])
+        {
+        	if(tp[i]!=tp[j])
+        	{
+        		hop(tp[i],tp[j]) ; 
+        	}
+        }
+        ll res = 1; 
+        FOR(i,1,tplt)if(pa[i]==i)
+        {
+        	if(sz[i]>1)
+        	{
+        		(res*=f[sz[i]][0])%=sm ; 
+        	}	
+        	else if(ok[i])
+        	{
+        		(res*=mu_1[cnt[i]])%=sm;
+        	}
+        	else (res*=k*mu_1[cnt[i]-1]%sm)%=sm;
+        }
+        cout<<res<<el;  
+    }	
 }
 
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -150,16 +190,11 @@ signed main()
         freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
-    int sub ; 
-    cin>>sub ;
+    int sub ;cin>>sub ; 
     FOR(i,1,test)
     {
-    	while(cin>>n)
-    	{
-    		if(n==0)break;
-    		doc() ; 
-	        sub1::xuly() ; 
-    	} 
+        doc() ; 
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
