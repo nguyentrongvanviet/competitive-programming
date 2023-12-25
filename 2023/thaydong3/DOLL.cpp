@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "d13runroadct3"
+#define TASK "DOLL"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -63,134 +63,82 @@ const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ;
 
 int n; 
 int a[N] ;
-int T ; 
-vi g[N] ; 
+
 void doc()
 {
-    cin>> n >>T ; 
-    FOR(i,1,n)cin>>a[i] ; 
-    FOR(i,1,n-1)
+    cin>> n; 
+    FOR(i,1,n)
     {
-    	int u ,v ;cin>> u >>v ;
-    	if(a[u]>T||a[v]>T)continue ;
-    	g[u].pb(v) ;
-    	g[v].pb(u) ;
+    	cin>>a[i] ; 
     }
+
 }
 
 namespace sub1
 {
-	const int N = 2e2+5 ;
-	int ma[N][N] , dis[N][N] ; 
-	void dfs(int u ,int p ,int root)
-	{
-		for(auto v:g[u])if(v!=p)
-		{
-			dis[root][v] = dis[root][u]+1 ;
-			ma[root][v] = max(ma[root][u],a[v]) ; 
-			dfs(v,u,root) ;
-		}
-	}
+	int f[N] ; 
+	int tmp[N] ;
     void xuly()
     {
+        set<int>s; 
         FOR(i,1,n)
         {
-        	ma[i][i] = a[i] ; 
-        	dis[i][i] = 0 ;
-        	dfs(i,0,i) ; 
-        }
-        ll res = 0;
-        FOR(i,1,n)FOR(j,i+1,n)FOR(k,j+1,n)
-        {
-        	if(max({ma[i][j],ma[j][k],ma[k][i]})==T)
+        	s.insert(a[i]) ; 
+        	int cnt = 0 ; 
+        	for(auto v:s)
         	{
-        		(res+=dis[i][j]+dis[j][k]+dis[k][i])%=sm ; 
+        		tmp[++cnt] = v;  
         	}
+        	FOR(i,1,cnt)
+        	{
+        		f[i] = 1; 
+        		if(tmp[i-1]+1!=tmp[i])f[i]=f[i-1]+1; 
+        		else f[i] =f[i-2]+1; 
+        	}
+        	cout<<f[cnt]<<" ";
         }
-        cout<<res<<el;
     }
 }
-namespace sub3
+namespace sub2
 {
-	ll f[N][3][2] , sl[N][3][2] ;
-	ll res = 0 ; 
-	void add(ll &a , ll b)
+	const int MAX = 500000; 
+	int exist[MAX+4];
+	int pa[MAX+5] ; 
+	int sz[MAX+5] ; 
+	int goc(int u)
 	{
-		(a+=b)%=sm ; 
+		return pa[u] ==u ? u : pa[u] = goc(pa[u]) ; 
 	}
-	int dd[N] ; 
-	void dfs(int u ,int p)
-	{
-		dd[u] = 1 ;
-		ve<vll>Pre(3,vll(2,0)) ;
-		ve<vll>SlPre(3,vll(2,0)) ;  
-		ve<vll>Cur(3,vll(2,0)) ; 
-		ve<vll>SlCur(3,vll(2,0)) ; 
-		if(a[u]==T)SlCur[1][1]=SlPre[1][1] = 1; 
-		else SlCur[1][0]=SlPre[1][0] = 1; 
-		for(auto v:g[u])if(v!=p)
-		{
-			dfs(v,u) ;
-			if(a[u]==T)
-			{
-				add(f[v][1][1],f[v][1][0]) ; 
-				add(sl[v][1][1],sl[v][1][0]) ; 
-				f[v][1][0] = 0 ; 
-				sl[v][1][0] = 0 ; 
-				add(f[v][2][1],f[v][2][0]) ; 
-				add(sl[v][2][1],sl[v][2][0]) ;
-				f[v][2][0] = 0 ;
-				sl[v][2][0] = 0 ;
-			}
-			// 1 0 
-			add(Cur[1][0],f[v][1][0]+sl[v][1][0]) ;
-			add(SlCur[1][0],sl[v][1][0]) ; 
-
-			// 1 1 
-			add(Cur[1][1],f[v][1][1]+sl[v][1][1]) ; 
-			add(SlCur[1][1],sl[v][1][1]) ;
-			
-			// 2 0 
-			add(Cur[2][0],f[v][2][0]+sl[v][2][0]) ;
-			add(SlCur[2][0],sl[v][2][0]) ;
-			add(Cur[2][0],(f[v][1][0]+sl[v][1][0])*SlPre[1][0]%sm+Pre[1][0]*sl[v][1][0]%sm) ; 
-			add(SlCur[2][0],sl[v][1][0]*SlPre[1][0]%sm) ;
-
-			// 2 1 
-			add(Cur[2][1],f[v][2][1]+sl[v][2][1]) ; 
-			add(SlCur[2][1],sl[v][2][1]) ; 
-			
-			add(Cur[2][1],(f[v][1][1]+sl[v][1][1])*SlPre[1][1]%sm+Pre[1][1]*sl[v][1][1]%sm) ;
-			add(SlCur[2][1],sl[v][1][1]*SlPre[1][1]%sm) ;
-			
-			add(Cur[2][1],(f[v][1][0]+sl[v][1][0])*SlPre[1][1]%sm+Pre[1][1]*sl[v][1][0]%sm) ;  
-			add(SlCur[2][1],sl[v][1][0]*SlPre[1][1]%sm); 
-			
-			add(Cur[2][1],(f[v][1][1]+sl[v][1][1])*SlPre[1][0]%sm+Pre[1][0]*sl[v][1][1]%sm) ; 
-			add(SlCur[2][1],sl[v][1][1]*SlPre[1][0]%sm) ;
-
-			FOR(sz1,1,2)FOR(ok1,0,1)FOR(sz2,3-sz1,3-sz1)FOR(ok2,0,1)if(ok1|ok2)
-			{
-				add(res,(f[v][sz1][ok1]+sl[v][sz1][ok1])*SlPre[sz2][ok2]%sm+sl[v][sz1][ok1]*Pre[sz2][ok2]%sm);
-			}
-
-			FOR(sl,1,2)FOR(ok,0,1)Pre[sl][ok]=Cur[sl][ok],SlPre[sl][ok]=SlCur[sl][ok] ;
-		}	
-		FOR(sz,1,2)FOR(ok,0,1)f[u][sz][ok]=Cur[sz][ok],sl[u][sz][ok]=SlCur[sz][ok];
-		// cout<<"NODE "<<u<<el;
-		// FOR(sz,1,2)FOR(ok,0,1)
-		// {
-		// 	cout<<"SZ : "<<sz<<" OK : "<<ok<<" f : "<<f[u][sz][ok]<<" sl : "<<sl[u][sz][ok]<<el;
-		// }
-		// cout<<res<<el;
-	} 
+	int ANS = 0 ; 
 	void xuly()
 	{
-		FOR(i,1,n)if(dd[i]==0&&a[i]==T)
+		FOR(i,1,MAX)pa[i] = i ,sz[i] = 0 ; 
+
+		FOR(i,1,n)
 		{
-			dfs(i,0) ; 
+			if(exist[a[i]]==0)
+			{
+				pa[a[i]] = a[i] ; 
+				sz[a[i]] = 1; 
+				exist[a[i]] = 1 ;
+				if(exist[a[i]-1])
+				{
+					int chau = goc(a[i]-1) ; 
+					ANS-=(sz[chau]+1)/2 ;
+					pa[a[i]] = chau ; 
+					sz[chau]++ ;
+				}
+				if(exist[a[i]+1])
+				{
+					int chav = goc(a[i]+1) ; 
+					ANS-=(sz[chav]+1)/2 ;
+					sz[chav]+=sz[goc(a[i])] ; 	
+					pa[goc(a[i])]=chav ;
+				}
+				ANS+=(sz[goc(a[i])]+1)/2;
+			}
+			cout<<ANS<<" ";
 		}
-		cout<<res*2%sm<<el;
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -199,7 +147,7 @@ signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
     if(fopen(INPUT,"r"))
-    { 
+    {
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
@@ -212,9 +160,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // if(n<=2e2)sub1::xuly() ;
-        // else 
-        	sub3::xuly() ;  
+        // sub1::xuly() ;
+        sub2::xuly() ;  
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
