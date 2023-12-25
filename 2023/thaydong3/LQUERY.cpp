@@ -67,25 +67,25 @@ struct Query
 	int type , l ,r , val; 
 }Q[N] ;
 int a[N] ; 
-int LEN ; 
 void doc()
 {
     cin>> n >>q ;
     FOR(i,1,n)cin>>a[i] ; 
-    LEN = n ;
     FOR(i,1,q)
     {
-    	int type ;cin>>type ; 
-    	Q[i].type= type ;
-    	if(type==1)cin>>Q[i].val,++LEN; 
-    	else if(type==2){}
-    	else if(type==3)cin>>Q[i].val; 
-    	else cin>>Q[i].l>>Q[i].r>>Q[i].val;
+    	int type , l, r, val; 
+    	cin>>type ;
+    	if(type==1)cin>>val;  
+    	if(type==2){}
+    	if(type==3)cin>>val; 
+    	if(type>3)cin>>l>>r>>val; 
+    	Q[i] = {type,l,r,val} ;
     }
 }
 
 namespace sub2
 {
+	const int N = 1e6+5 ; 
 	struct node
 	{
 		node *child[2]; 
@@ -105,11 +105,11 @@ namespace sub2
 		FORD(i,LO,0)
 		{
 			int j=BIT(val,i) ; 
-			if(cur->child[j]==NULL)cur->child[j] = new node() ; 
-			cur->child[j^1]=old->child[j^1];
+			if(cur->child[j]==0)cur->child[j] = new node() ; 
+			if(old!=0)cur->child[j^1]=old->child[j^1];
 			cur=cur->child[j] ; 
-			old=old->child[j] ;
-			cur->cnt++;
+			if(old!=0)old=old->child[j] ;
+			cur->cnt = 1 +(old==0?0:old->cnt) ;
 		}
 		return tmp ; 
 	}		
@@ -121,18 +121,18 @@ namespace sub2
 		FORD(i,LO,0)
 		{	
 			int j = BIT(val,i) ;
-			int now = (cur->child[j^1]==NULL?0:cur->child[j^1]->cnt) ;
-			int pas = (pre->child[j^1]==NULL?0:pre->child[j^1]->cnt) ;
+			int now = (cur->child[j^1]?cur->child[j^1]->cnt:0) ;
+			int pas = (pre&&pre->child[j^1]?pre->child[j^1]->cnt:0) ;
 			if(now-pas)
 			{
 				ans|=M(i) ;
 				cur = cur->child[j^1] ;
-				pre = pre->child[j^1] ;
+				if(pre)pre = pre->child[j^1] ;
 			}
 			else
 			{
 				cur = cur->child[j] ; 
-				pre = pre->child[j] ; 
+				if(pre)pre = pre->child[j] ; 
 			}
 		}
 		return ans; 
@@ -143,19 +143,19 @@ namespace sub2
 		node* cur = H[r];
 		FORD(i,LO,0)
 		{
-			int c = BIT(sum_xor,i) ; 
+			if(cur==0)break;
+			int j = BIT(sum_xor,i) ; 
 			if(BIT(val,i))
 			{
-				ans+=(cur->child[c]==NULL?0:cur->child[c]->cnt) ; 
-				cur=cur->child[c^1];
+				ans+=(cur->child[j]?cur->child[j]->cnt:0) ; 
+				cur=cur->child[j^1];
 			}	
 			else
 			{
-				cur=cur->child[c] ;
+				cur=cur->child[j] ;
 			}
-			if(cur==NULL)break;
 		}
-		ans+=(cur==NULL?0:cur->cnt) ;
+		ans+=(cur?cur->cnt:0) ;
 		return ans; 
 	}
 	int KTH(int l, int r ,int val)
@@ -165,20 +165,21 @@ namespace sub2
 		node* pre = H[l-1] ;
 		FORD(i,LO,0)
 		{
-			int c = BIT(sum_xor,i) ;
-			int now = (cur->child[c]==NULL?0:cur->child[c]->cnt) ;
-			int pas = (pre==NULL || pre->child[c]==NULL?0:pre->child[c]->cnt) ; 
+			if(!cur)break;
+			int j = BIT(sum_xor,i) ;
+			int now = (cur->child[j]?cur->child[j]->cnt:0) ;
+			int pas = (pre && pre->child[j]?pre->child[j]->cnt:0) ; 
 			if(now-pas>=val)
 			{
-				cur=cur->child[c] ;  
-				if(pre!=NULL)pre=pre->child[c] ;
+				cur=cur->child[j] ;  
+				if(pre)pre=pre->child[j] ;
 			}
 			else
 			{
 				val-=now-pas;
 				ans|=M(i) ;
-				cur=cur->child[c^1] ;
-				if(pre!=NULL)pre=pre->child[c^1] ;
+				cur=cur->child[j^1] ;
+				if(pre)pre=pre->child[j^1] ;
 			}
 		}
 		return ans; 
@@ -200,26 +201,27 @@ namespace sub2
 			if(T==1)
 			{	
 				++cur; 
-				H[cur] = up(H[cur-1],val^sum_xor) ; 
+				val^=sum_xor ; 
+				H[cur] = up(H[cur-1],val) ; 
 			}
-			if(T==2)
+			else if(T==2)
 			{
 				--cur; 
 			}
-			if(T==3)
+			else if(T==3)
 			{
 				sum_xor^=val; 
 			}
-			if(T==4)
+			else if(T==4)
 			{
 				val^=sum_xor ;
 				cout<<MAX(l,r,val)<<el;
 			}
-			if(T==5)
+			else if(T==5)
 			{
 				cout<<COUNT(r,val) - COUNT(l-1,val)<<el;
 			}
-			if(T==6)
+			else if(T==6)
 			{
 				cout<<KTH(l,r,val)<<el;
 			}
