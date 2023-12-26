@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "LQUERY"
+#define TASK "SWAP"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -46,7 +46,7 @@ ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
-ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
+ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);} 
 #define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
 #define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
 
@@ -61,77 +61,55 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 5e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n, q; 
-struct Query
-{
-	int type , l ,r , val; 
-}Q[N] ;
+int n ;
 int a[N] ; 
-int LEN ; 
+
 void doc()
 {
-    cin>> n >>q ;
+    cin>> n; 
     FOR(i,1,n)cin>>a[i] ; 
-    LEN = n ;
-    FOR(i,1,q)
-    {
-    	int type ;cin>>type ; 
-    	Q[i].type= type ;
-    	if(type==1)cin>>Q[i].val,++LEN; 
-    	else if(type==2){}
-    	else if(type==3)cin>>Q[i].val; 
-    	else cin>>Q[i].l>>Q[i].r>>Q[i].val;
-    }
 }
 
 namespace sub1
 {
+	int bit[N] ;
+	int L[N] , R[N] ;  
+	void up(int pos , int val)
+	{
+		for(int i = pos;i;i-=i&-i)bit[i]+=val;
+	}
+	int get(int pos)
+	{
+		int ans = 0 ;
+		for(int i = pos;i<=n;i+=i&-i)ans+=bit[i];
+		return ans ; 
+	}
     void xuly()
     {
-    	FOR(i,1,q)
+    	FOR(i,1,n)
     	{
-    		int type = Q[i].type; 
-    		if(type==1)
-    		{
-    			++n ;
-    			a[n] = Q[i].val;
-    		} 
-	    	else if(type==2)--n;
-	    	else if(type==3)
-	    	{
-				FOR(pos,1,n)a[pos]=(a[pos]^Q[i].val) ;
-	    	}
-	    	else
-	    	{
-	    		int l =Q[i].l; 
-	    		int r = Q[i].r ;
-	    		int val = Q[i].val; 
-	    		if(type==4)
-	    		{
-	    			int res =0 ; 
-	    			FOR(pos,l,r)
-	    			{
-	    				maxi(res,a[pos]^val) ; 
-	    			}
-	    			cout<<res<<el;
-	    		}
-	    		if(type==5)
-	    		{
-	    			int res = 0 ;
-	    			FOR(pos,l,r)res+=(a[pos]<=val) ; 
-	    			cout<<res<<el;
-	    		}
-	    		if(type==6)
-	    		{ 
-	    			vi  V; 
-	    			FOR(pos,l,r)
-	    			{
-	    				V.pb(a[pos]) ; 
-	    			}
-	    			sort(all(V)) ;
-	    			cout<<V[val-1]<<el;
-	    		}
-	    	}
+    		L[i] = get(a[i]) ; 
+    		up(a[i],1) ; 
+    	}
+    	FOR(i,1,n)bit[i] = 0 ; 
+    	FORD(i,n,1)
+    	{
+    		R[i] = get(a[i]) ; 
+    		up(a[i],1) ; 
+    	}
+    	ll res = 0 ;
+    	FOR(i,1,n)res+=R[i] ; 
+    	vi V ; 
+    	FOR(i,1,n)if(a[i]!=n)
+    	{
+    		V.pb(-R[i]+L[i]) ;
+    	}
+    	sort(all(V)) ; 
+    	cout<<res<<" ";
+        FOR(i,1,n-1)
+    	{
+    		res+=V[i-1] ; 
+    		cout<<res<<" ";
     	}
     }
 }
@@ -149,14 +127,13 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.ANS","w",stdout) ;   
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        if(max(n,q)<=1e3)sub1::xuly() ; 
-        // sub2::xuly() ;
+        sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

@@ -89,12 +89,7 @@ namespace sub2
 	struct node
 	{
 		node *child[2]; 
-		int cnt ; 
-		node()
-		{
-			memset(child,0,sizeof child) ;
-			cnt = 0 ;
-		}
+		int cnt =0 ;
 	} ;
 	node* H[N] ;
 	int sum_xor = 0 ;
@@ -105,11 +100,11 @@ namespace sub2
 		FORD(i,LO,0)
 		{
 			int j=BIT(val,i) ; 
-			if(cur->child[j]==0)cur->child[j] = new node() ; 
-			if(old!=0)cur->child[j^1]=old->child[j^1];
+			cur->child[j] = new node() ; 
+			if(old)cur->child[j^1]=old->child[j^1];
 			cur=cur->child[j] ; 
-			if(old!=0)old=old->child[j] ;
-			cur->cnt = 1 +(old==0?0:old->cnt) ;
+			if(old)old=old->child[j] ;
+			cur->cnt = 1 +(old?old->cnt:0) ;
 		}
 		return tmp ; 
 	}		
@@ -228,6 +223,143 @@ namespace sub2
 		}
 	}
 }
+namespace sub3
+{
+	const int N = 1e6+5 ; 
+	int H[N] ;
+	int T[N*LO][2] ;
+	int cnt[N*LO] ;
+	int sum_xor = 0 ;
+	int node = 0 ;
+	int up(int old , int val)
+	{
+		int cur = ++node;  
+		int r= cur ;
+		FORD(i,LO,0)
+		{
+			int j=BIT(val,i) ; 
+			if(T[r][j]==0)T[r][j] = ++node; 
+			T[r][j^1] = T[old][j^1];
+			r=T[r][j] ; 
+			old=T[old][j] ; 
+			cnt[r] = cnt[old] + 1 ; 
+		}
+		return cur ;
+	}		
+	int MAX(int l ,int r, int val)
+	{
+		int ans = 0 ; 
+		int cur = H[r] ; 
+		int pre = H[l-1] ; 
+		FORD(i,LO,0)
+		{	
+			int j = BIT(val,i) ;
+			int now = cnt[T[cur][j^1]] ;
+			int pas = cnt[T[pre][j^1]] ; 
+			if(now-pas)
+			{
+				ans|=M(i) ;
+				cur = T[cur][j^1] ;
+				pre = T[pre][j^1] ; 
+			}
+			else
+			{
+				cur = T[cur][j] ; 
+				pre = T[pre][j] ; 
+			}
+		}
+		return ans; 
+	}
+	int COUNT(int r ,int val)
+	{
+		int ans = 0 ; 
+		int cur = H[r] ;
+		FORD(i,LO,0)
+		{
+			if(cur==0)break;
+			int j = BIT(sum_xor,i) ; 
+			if(BIT(val,i))
+			{
+				ans+=cnt[T[cur][j]]; 
+				cur=T[cur][j^1];
+			}	
+			else
+			{
+				cur=T[cur][j] ;
+			}
+		}
+		ans+=cnt[cur] ; 
+		return ans; 
+	}
+	int KTH(int l, int r ,int val)
+	{
+		int ans = 0; 
+		int cur = H[r] ;
+		int pre = H[l-1] ; 
+		FORD(i,LO,0)
+		{
+			int j = BIT(sum_xor,i) ;
+			int now = cnt[T[cur][j]] ; 
+			int pas = cnt[T[pre][j]]; 
+			if(now-pas>=val)
+			{
+				cur=T[cur][j] ;  
+				pre=T[pre][j] ; 
+			}
+			else
+			{
+				val-=now-pas;
+				ans|=M(i) ;
+				cur=T[cur][j^1] ;
+				pre=T[pre][j^1] ; 
+			}
+		}
+		return ans; 
+	}
+	void xuly()
+	{
+		int cur = 0 ; 
+		FOR(i,1,n)
+		{
+			++cur; 
+			H[cur] = up(H[cur-1],a[i]) ; 
+		}
+		FOR(i,1,q)
+		{
+			int T = Q[i].type ; 
+			int l= Q[i].l; 
+			int r =Q[i].r ;
+			int val =Q[i].val; 
+			if(T==1)
+			{	
+				++cur; 
+				val^=sum_xor ; 
+				H[cur] = up(H[cur-1],val) ; 
+			}
+			else if(T==2)
+			{
+				--cur; 
+			}
+			else if(T==3)
+			{
+				sum_xor^=val; 
+			}
+			else if(T==4)
+			{
+				val^=sum_xor ;
+				cout<<MAX(l,r,val)<<el;
+			}
+			else if(T==5)
+			{
+				cout<<COUNT(r,val) - COUNT(l-1,val)<<el;
+			}
+			else if(T==6)
+			{
+				cout<<KTH(l,r,val)<<el;
+			}
+		}
+	}
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -248,7 +380,8 @@ signed main()
     {
         doc() ; 
         // sub1::xuly() ; 
-        sub2::xuly() ;
+        // sub2::xuly() ;
+        sub3::xuly();
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
