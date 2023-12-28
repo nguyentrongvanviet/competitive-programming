@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "DANHCO"
+#define TASK "BSTR"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -60,179 +60,143 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-ll n  ;
-int m , k ;
-struct pt
+int n , q ; 
+int a[N] ; 
+struct query
 {
-	int x ,y; 
-}a[N] ; 
+	int id , k ;
+};
+ve<query>Q[N] ; 
 
 void doc()
 {
-    cin>> n >> m >> k; 
-    FOR(i,1,k)
+	str S ; 
+    cin>> S; 	
+    n = SZ(S) ;
+    FOR(i,1,n)
     {
-    	cin>>a[i].x>>a[i].y ;
-
+    	a[i] = S[i-1]-'0' ; 
+    }
+    cin>>q; 
+    FOR(i,1,q)
+    {
+    	int len , k; cin>>len>>k ;
+    	Q[len].pb({i,k}) ; 
     }
 }
 
 namespace sub1
 {
-	int f[N][52] ;
-	int dd[N][52] ;
-	void add(int &a ,int b)
+	char res[N] ;
+	vi pos[10] ;
+	void solve(int len)
 	{
-		a+=b;
-		if(a>=sm)a-=sm; 
-	}
-	bool in(int x ,int y)
-	{
-		return 1<=x&&x<=n&&1<=y&&y<=m ; 
+		FOR(i,0,9)pos[i].clear() ; 
+		FORD(i,n,1)
+		{
+			pos[a[i]].pb(i) ; 
+		}
+		int cur = 0 ;
+		str ans ; 
+		FOR(i,1,len)
+		{
+			FORD(j,9,0)
+			{
+				while(!pos[j].empty()&&pos[j].back()<=cur)
+				{
+					pos[j].pk();
+				}
+				if(!pos[j].empty()&&n-pos[j].back()+1>=len-i+1)
+				{
+					ans+=char(j+'0') ;
+					cur=pos[j].back() ;
+					pos[j].pk() ;
+					break;
+				}
+			}
+		}
+		for(auto x: Q[len])
+		{
+			int id = x.id ; 
+			int k = x.k ;
+			res[id] = ans[k-1] ;
+		}
 	}
     void xuly()
     {
-    	FOR(i,1,k)
+    	FOR(i,1,n)
     	{
-    		dd[a[i].x][a[i].y] = 1; 
+    		solve(i) ; 
     	}
-    	FOR(i,1,m)f[1][i] = (dd[1][i]==0) ; 	
-    	FOR(i,2,n)
-    	{
-    		FOR(j,1,m)if(dd[i][j]==0)
-    		{
-    			FOR(x,-2,-1)FOR(y,-2,2)
-    			{
-    				if(abs(x)+abs(y)==3)
-    				{
-    					int nx = i+x; 
-    					int ny = j+y;
-    					if(in(nx,ny))add(f[i][j],f[nx][ny]) ;
-    				}
-    			}
-    		}
-    	}
-    	int res = 0;
-    	FOR(i,1,m)
-    	{
-    		add(res,f[n][i]) ; 
-    	}
-    	cout<<res<<el;
+    	FOR(i,1,q)cout<<res[i]<<el;
     }
 }
 namespace sub2
 {
-	struct MT
+	struct DL
 	{
-		int n , m; 
-		ve<vll>mt ;
-		MT(int _n= 0 ,int _m = 0 )
+		int ma , pos ; 
+		friend DL operator+(DL a , DL b )
 		{
-			n=_n ;
-			m=_m ;
-			mt=ve<vll>(n+2,vll(m+2,0)) ; 
+			if(a.ma>b.ma)return a ;
+			if(a.ma<b.ma)return b ;
+			return {a.ma,min(a.pos,b.pos)} ; 
 		}
-		friend MT operator * (MT a , MT b )
+	}; 
+	DL st[N][LO+1] ;
+	void build_rmq()
+	{
+		FOR(i,1,n)st[i][0] = {a[i],i} ;
+		FOR(j,1,LO)FOR(i,1,n-M(j)+1)
 		{
-			int n = a.n; 
-			int m = b.m; 
-			MT ans(n,m) ;
-			FOR(i,1,n)FOR(j,1,m)
-			{
-				FOR(k,1,a.m)(ans.mt[i][j]+=a.mt[i][k]*b.mt[k][j]%sm)%=sm;
-			}
-			return ans ;
+			st[i][j] = st[i][j-1]+st[i+M(j-1)][j-1]; 
 		}
-	} ;
-	MT pw(MT a , ll n)
-	{
-		if(n==1)return a ;
-		MT b = pw(a,n/2) ;
-		if(n&1)return b*b*a ;
-		return b*b ;
 	}
-	int dd[3][55] ;
-	vi cam[55] ; 
-	bool in(int x ,int y)
+	DL get(int l , int r)
 	{
-		return 1<=x&&x<=n&&1<=y&&y<=m ; 
+		int k= lg(r-l+1) ; 
+		return st[l][k]+st[r-M(k)+1][k] ; 
+	}	
+	int bit[N] ;
+	void up(int id)
+	{
+		for(int i=id;i<=n;i+=i&-i)bit[i]++ ;
 	}
+	int kth(int k)
+	{
+		int pos = 0 ;
+		int cur = 0 ; 
+		FORD(j,LO,0)if(pos+M(j)<=n&&cur+bit[pos+M(j)]<k)
+		{
+			pos+=M(j) ; 
+			cur+=bit[pos] ; 
+		}
+		return pos+1;
+	}
+	int res[N] ;
 	void xuly()
 	{
-		vll V ;
+		build_rmq() ;
+		ve<pii>range ; 
+		range.pb({1,n}) ;
 		FOR(i,1,n)
 		{
-			if(a[i].x<=2)
+			int l = range.back().fi ; 
+			int r = range.back().se ;
+			range.pk() ; 
+			DL ans= get(l,r) ;
+			int pos = ans.pos ; 
+			up(pos) ; 
+			for(auto x : Q[i])
 			{
-				dd[a[i].x][a[i].y]=1;
+				int id =x.id; 
+				int k = x.k ; 
+				res[id] = a[kth(k)]; 
 			}
-			else V.pb(a[i].x) ; 
+			if(l<=pos-1)range.pb({l,pos-1}) ;
+			if(pos+1<=r)range.pb({pos+1,r}) ; 
 		}
-		if(n!=2)V.pb(n) ;
-		uni(V) ;
-		FOR(i,1,n)if(a[i].x>2)
-		{
-			int pos = LB(all(V),a[i].x)-V.begin() ; 
-			cam[pos].pb(a[i].y) ;
-		}
-		MT a(1,2*m) ;
-		// build ma tran khoi nguyen 
-		FOR(i,1,m)
-		{
-			a.mt[1][i]  = (dd[1][i]==0) ; 
-		}
-		FOR(i,1,m)if(dd[2][i]==0)
-		{		
-			FOR(c,-2,2)if(abs(c)==2&&1<=i+c && i+c<=m)
-			{
-				(a.mt[1][i+m]+=a.mt[1][i+c])%=sm ;
-			}
-		}
-		FOR(i,1,2*m)cout<<a.mt[1][i]<<" ";
-		cout<<el;
-		// build ma tran quan he   
-		MT b(2*m,2*m) ;
-		FOR(i,1,m)
-		{
-			b.mt[i+m][i] = 1; 
-		}
-		FOR(j,1,m)
-		{
-			FOR(x,-2,-1)
-			{
-				FOR(y,-2,2)if(abs(x)+abs(y)==3)
-				{
-					if(1<=j+y&&j+y<=m)
-					{
-						b.mt[j+y+(x==-1?m:0)][j+m]=1;
-					}
-				}
-			}
-		}
-		ll pre = 2;
-		FORN(i,0,SZ(V))
-		{
-			a=(a*pw(b,V[i]-pre)) ; 
-			for(auto pos : cam[i])
-			{
-				a.mt[1][pos+m]=0;
-			}
-			pre = V[i] ;
-		}
-		ll res = 0; 
-		FOR(i,1,m)
-		{
-			(res+=a.mt[1][i+m])%=sm ; 
-		}
-		// FOR(i,1,m)
-		// {
-		// 	cout<<a.mt[1][i]<<" ";
-		// }
-		// cout<<el; 
-		// FOR(i,1,m)cout<<a.mt[1][i+m]<<" ";
-		// cout<<el;
-		cout<<res<<el;
+		FOR(i,1,q)cout<<res[i]<<el;
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -248,14 +212,14 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.ANS","w",stdout) ;   
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
-        // sub2::xuly() ;
+        // sub1::xuly() ; 
+        sub2::xuly() ; 
     }
-    // cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
+    cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

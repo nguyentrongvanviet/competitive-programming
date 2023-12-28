@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "chameleon"
+#define TASK "text"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -60,196 +60,79 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
 int n , m; 
-vi g[N] ; 
-ll A , B , C; 
 struct Edge
 {
-	int u ,v ; 
-}E[N] ;
+	int id , u , v, w ;
+	bool operator<(const Edge&a)const
+	{
+		return w<a.w ;
+	}
+}E[N] ;  
 void doc()
 {
-	cin>> n >> m >>A>>B>>C;
-	FOR(i,1,m)
-	{
-		int u , v ; cin>> u >>v ;
-		g[u].pb(v) ; 
-		g[v].pb(u) ; 
-		E[i] = {u,v} ;
-	}
+    cin>> m >> n; 
+    FOR(i,1,m)
+    {
+    	int u ,v ,w ;cin>> u >>v >> w ; 
+    	E[i] = {i,u,v,w} ;
+    }
 }
 
 namespace sub1
 {
-	ll res = 0 ; 
-	int dd[N] ; 
-	bool dfs(int u ,int need ,int camu ,int camv)
+	int pa[N] ; 
+	int goc(int u)
 	{
-		if(u==need)return 1; 
-		dd[u] = 1 ;
-		for(auto v:g[u])if(!(u==camu&&v==camv)&&!(u==camv&&v==camu))
-		{
-			if(dd[v]==0)
-			{
-				if(dfs(v,need,camu,camv))return 1; 
-			}
-		}
-		return 0; 
+		return pa[u] == u ? u : pa[u] = goc(pa[u]) ; 
 	}
-	bool cal(int u ,int need ,int cam)
+	bool hop(int u ,int v)
 	{
-		if(u==need)return 1; 
-		dd[u] = 1 ;
-		for(auto v:g[u])if(v!=cam)
-		{
-			if(dd[v]==0)
-			{
-				if(cal(v,need,cam))return 1; 
-			}
-		}
-		return 0; 
-
-	}
-	void solve(int u ,int v)
-	{
-		int spec_edge = 0 ; 
-		FOR(i,1,m)
-		{
-			spec_edge+=(dfs(u,v,E[i].u,E[i].v)==0) ;
-			FOR(x,1,n)dd[x]=0; 
-		}
-		int spec_node = 2;
-		FOR(i,1,n)if(i!=u&&i!=v)
-		{
-			spec_node+=(cal(u,v,i)==0);
-			FOR(x,1,n)dd[x]=0; 
-		}
-
-	}
-    void xuly()
-    { 
-    	FOR(i,1,n)FOR(j,i+1,n)
-    	{
-    		solve(i,j) ; 
-    	}
-    	cout<<res<<el;
-    }
-}
-namespace sub2
-{
-	int id[N] , low[N] , id[N] , SZ[N] , tp[N] ;
-	stack<int>st;
-	int tt = 0 , tplt = 0; 	
-	void dfs(int u ,int p)
-	{
-		id[u] = low[u] = ++tt; 
-		st.push(u) ;
-		for(auto v:g[u])if(v!=p)
-		{
-			if(id[v])mini(low[u],id[v]) ;
-			else dfs(v,u) , mini(low[u],low[v]) ;
-		}		
-		if(id[u]==low[u])
-		{
-			++tplt; 
-			int t; 
-			do
-			{
-				t=st.top() ;
-				st.pop() ; 
-				tp[t] = tplt; 
-				SZ[tplt]++;
-			}while(t!=u) ;	
-		}
+		int chau = goc(u) ;
+		int chav = goc(v) ;
+		if(chau==chav)return 0 ;
+		pa[chau] = chav; 
+		return 1;
 	}
 	struct ke
 	{
-		int tp , v ; 
-	} ;
-	ve<ke>g[N] ;
-	int sz[N] ;
-	void cal_sz(int u ,int p)
+		int v ,id ; 
+	}; 
+	ve<ke>g[N] ; 
+	void dfs(int u ,int p)
 	{
-		for(auto x:adj[u])
-		{
-			int v= x.v ;
-			if(dd[v]||v==p)continue ;
-			cal_sz(v,u) ;
-			sz[u]+=sz[v] ;
-		}
-	}
-	int cen(int u ,int p ,int n)
-	{
-		for(auto x:adj[u])
-		{
-			int v=x.tp; 
-			if(dd[v]||v==p||sz[v]<=n/2)continue ; 
-			return cen(v,u,n) ;
-		}
-		return u; 
-	}
-	int dd[N] ;
-	int h[N] ;
-	ll tot , sum , cnt ;
-	void build(int tp ,int u ,int p , int root ,int h ,int c )
-	{
-		res+= h * SZ[tp]
-		for(auto x:adj[u])
-		{
-			int v = x.v ;
-			if(dd[v]||v==p)continue ;
-			h[v] = h[u] + 1 ;
-			build(v,u,root) ;
-		}
-	}
-	void solve(int u)
-	{ 			
-		dd[u] =1 ;
-		sum = 0 ;
-		for(auto x:adj[u])
-		{
-			int tp = x.tp ;
-			int v = x.v ; 
-			if(dd[tp])continue;
-			build(tp,v,u,v) ;
-		}
-		for(auto x:adj[u])
-		{
-			int st = x.st ;
-			f[st] = 0 ;
-		}
-		for(auto x:adj[u])
+		for(auto x:g[u])
 		{
 			int v=x.v; 
-			if(dd[v])continue ;
-			cal_sz(v,u) ;
-			solve(cen(v,u,sz[v])) ;
+			int id = x.id ; 
+			if(v==p)continue ;
+			cout<<id<<" ";
+			dfs(v,u) ; 
 		}
-	}	
-	void xuly()
-	{
-		dfs(1,0) ; 
-		FOR(i,1,m)
-		{
-			int u= E[i].u ;
-			int v= E[i].v; 
-			if(tp[u]!=tp[v])
-			{
-				adj[tp[u]].pb({tp[v],u}) ;
-				adj[tp[v]].pb({tp[u],v}) ;
-			}
-		}
-		cal_sz(1,0) ;
-		assert(sz[1]==n) ;
-		solve(cen(1,0,n)) ;
-		FOR(i,1,tplt)
-		{
-			// (res+=sz[i]*(sz[i-1])/2*2*)
-		}
-		cout<<res<<el;
 	}
+    void xuly()
+    {
+    	sort(E+1,E+m+1) ;
+    	FOR(i,1,n)pa[i] = i ;
+    	int cnt = 0 ; 
+    	FOR(i,1,m)
+    	{
+    		if(hop(E[i].u,E[i].v))
+    		{
+    			cnt++ ; 
+    			g[E[i].u].pb({E[i].v,E[i].id}) ;
+    			g[E[i].v].pb({E[i].u,E[i].id}) ;
+    		}
+    	}
+    	if(cnt!=n-1)
+    	{
+    		return void(cout<<-1<<el) ; 
+    	}
+    	cout<<cnt<<el;
+    	dfs(1,0) ;  
+    }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()

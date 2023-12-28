@@ -31,13 +31,13 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("DANHCO""_trau.exe");
-        system("DANHCO"".exe"); 
-        if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
-        {   
-            cout<<"Test "<<i<<" WA"<<"\n";
-            return  0 ; 
-        }
-        cout<<"Test "<<i<<" AC"<<"\n";
+        // system("DANHCO""_trau.exe");
+        system("money"".exe"); 
+        // if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
+        // {   
+        //     cout<<"Test "<<i<<" WA"<<"\n";
+        //     return  0 ; 
+        // }
+        // cout<<"Test "<<i<<" AC"<<"\n";
     }
 }

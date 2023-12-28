@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "chameleon"
+#define TASK "BSTR"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -60,194 +60,143 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-int n , m; 
-vi g[N] ; 
-ll A , B , C; 
-struct Edge
+int n , q ; 
+int a[N] ; 
+struct query
 {
-	int u ,v ; 
-}E[N] ;
+	int id , k ;
+};
+ve<query>Q[N] ; 
+
 void doc()
 {
-	cin>> n >> m >>A>>B>>C;
-	FOR(i,1,m)
-	{
-		int u , v ; cin>> u >>v ;
-		g[u].pb(v) ; 
-		g[v].pb(u) ; 
-		E[i] = {u,v} ;
-	}
+	str S ; 
+    cin>> S; 	
+    n = SZ(S) ;
+    FOR(i,1,n)
+    {
+    	a[i] = S[i-1]-'0' ; 
+    }
+    cin>>q; 
+    FOR(i,1,q)
+    {
+    	int len , k; cin>>len>>k ;
+    	Q[len].pb({i,k}) ; 
+    }
 }
 
 namespace sub1
 {
-	ll res = 0 ; 
-	int dd[N] ; 
-	bool dfs(int u ,int need ,int camu ,int camv)
+	char res[N] ;
+	vi pos[10] ;
+	void solve(int len)
 	{
-		if(u==need)return 1; 
-		dd[u] = 1 ;
-		for(auto v:g[u])if(!(u==camu&&v==camv)&&!(u==camv&&v==camu))
+		FOR(i,0,9)pos[i].clear() ; 
+		FORD(i,n,1)
 		{
-			if(dd[v]==0)
+			pos[a[i]].pb(i) ; 
+		}
+		int cur = 0 ;
+		str ans ; 
+		FOR(i,1,len)
+		{
+			FORD(j,9,0)
 			{
-				if(dfs(v,need,camu,camv))return 1; 
+				while(!pos[j].empty()&&pos[j].back()<=cur)
+				{
+					pos[j].pk();
+				}
+				if(!pos[j].empty()&&n-pos[j].back()+1>=len-i+1)
+				{
+					ans+=char(j+'0') ;
+					cur=pos[j].back() ;
+					pos[j].pk() ;
+					break;
+				}
 			}
 		}
-		return 0; 
-	}
-	bool cal(int u ,int need ,int cam)
-	{
-		if(u==need)return 1; 
-		dd[u] = 1 ;
-		for(auto v:g[u])if(v!=cam)
+		for(auto x: Q[len])
 		{
-			if(dd[v]==0)
-			{
-				if(cal(v,need,cam))return 1; 
-			}
+			int id = x.id ; 
+			int k = x.k ;
+			res[id] = ans[k-1] ;
 		}
-		return 0; 
-
-	}
-	void solve(int u ,int v)
-	{
-		int spec_edge = 0 ; 
-		FOR(i,1,m)
-		{
-			spec_edge+=(dfs(u,v,E[i].u,E[i].v)==0) ;
-			FOR(x,1,n)dd[x]=0; 
-		}
-		int spec_node = 2;
-		FOR(i,1,n)if(i!=u&&i!=v)
-		{
-			spec_node+=(cal(u,v,i)==0);
-			FOR(x,1,n)dd[x]=0; 
-		}
-
 	}
     void xuly()
-    { 
-    	FOR(i,1,n)FOR(j,i+1,n)
+    {
+    	FOR(i,1,n)
     	{
-    		solve(i,j) ; 
+    		solve(i) ; 
     	}
-    	cout<<res<<el;
+    	FOR(i,1,q)cout<<res[i]<<el;
     }
 }
 namespace sub2
 {
-	int id[N] , low[N] , id[N] , SZ[N] , tp[N] ;
-	stack<int>st;
-	int tt = 0 , tplt = 0; 	
-	void dfs(int u ,int p)
+	struct DL
 	{
-		id[u] = low[u] = ++tt; 
-		st.push(u) ;
-		for(auto v:g[u])if(v!=p)
+		int ma , pos ; 
+		friend DL operator+(DL a , DL b )
 		{
-			if(id[v])mini(low[u],id[v]) ;
-			else dfs(v,u) , mini(low[u],low[v]) ;
-		}		
-		if(id[u]==low[u])
+			if(a.ma>b.ma)return a ;
+			if(a.ma<b.ma)return b ;
+			return {a.ma,min(a.pos,b.pos)} ; 
+		}
+	}; 
+	DL st[N][LO+1] ;
+	void build_rmq()
+	{
+		FOR(i,1,n)st[i][0] = {a[i],i} ;
+		FOR(j,1,LO)FOR(i,1,n-M(j)+1)
 		{
-			++tplt; 
-			int t; 
-			do
-			{
-				t=st.top() ;
-				st.pop() ; 
-				tp[t] = tplt; 
-				SZ[tplt]++;
-			}while(t!=u) ;	
+			st[i][j] = st[i][j-1]+st[i+M(j-1)][j-1]; 
 		}
 	}
-	struct ke
+	DL get(int l , int r)
 	{
-		int tp , v ; 
-	} ;
-	ve<ke>g[N] ;
-	int sz[N] ;
-	void cal_sz(int u ,int p)
-	{
-		for(auto x:adj[u])
-		{
-			int v= x.v ;
-			if(dd[v]||v==p)continue ;
-			cal_sz(v,u) ;
-			sz[u]+=sz[v] ;
-		}
-	}
-	int cen(int u ,int p ,int n)
-	{
-		for(auto x:adj[u])
-		{
-			int v=x.tp; 
-			if(dd[v]||v==p||sz[v]<=n/2)continue ; 
-			return cen(v,u,n) ;
-		}
-		return u; 
-	}
-	int dd[N] ;
-	int h[N] ;
-	ll tot , sum , cnt ;
-	void build(int tp ,int u ,int p , int root ,int h ,int c )
-	{
-		res+= h * SZ[tp]
-		for(auto x:adj[u])
-		{
-			int v = x.v ;
-			if(dd[v]||v==p)continue ;
-			h[v] = h[u] + 1 ;
-			build(v,u,root) ;
-		}
-	}
-	void solve(int u)
-	{ 			
-		dd[u] =1 ;
-		sum = 0 ;
-		for(auto x:adj[u])
-		{
-			int tp = x.tp ;
-			int v = x.v ; 
-			if(dd[tp])continue;
-			build(tp,v,u,v) ;
-		}
-		for(auto x:adj[u])
-		{
-			int st = x.st ;
-			f[st] = 0 ;
-		}
-		for(auto x:adj[u])
-		{
-			int v=x.v; 
-			if(dd[v])continue ;
-			cal_sz(v,u) ;
-			solve(cen(v,u,sz[v])) ;
-		}
+		int k= lg(r-l+1) ; 
+		return st[l][k]+st[r-M(k)+1][k] ; 
 	}	
+	int bit[N] ;
+	void up(int id)
+	{
+		for(int i=id;i<=n;i+=i&-i)bit[i]++ ;
+	}
+	int kth(int k)
+	{
+		int pos = 0 ;
+		int cur = 0 ; 
+		FORD(j,LO,0)if(pos+M(j)<=n&&cur+bit[pos+M(j)]<k)
+		{
+			pos+=M(j) ; 
+			cur+=bit[pos] ; 
+		}
+		return pos+1;
+	}
+	int res[N] ;
 	void xuly()
 	{
-		dfs(1,0) ; 
-		FOR(i,1,m)
+		build_rmq() ;
+		ve<pii>range ; 
+		range.pb({1,n}) ;
+		FOR(i,1,n)
 		{
-			int u= E[i].u ;
-			int v= E[i].v; 
-			if(tp[u]!=tp[v])
+			int l = range.back().fi ; 
+			int r = range.back().se ;
+			range.pk() ; 
+			DL ans= get(l,r) ;
+			int pos = ans.pos ; 
+			up(pos) ; 
+			for(auto x : Q[i])
 			{
-				adj[tp[u]].pb({tp[v],u}) ;
-				adj[tp[v]].pb({tp[u],v}) ;
+				int id =x.id; 
+				int k = x.k ; 
+				res[id] = a[kth(k)]; 
 			}
+			if(l<=pos-1)range.pb({l,pos-1}) ;
+			if(pos+1<=r)range.pb({pos+1,r}) ; 
 		}
-		cal_sz(1,0) ;
-		assert(sz[1]==n) ;
-		solve(cen(1,0,n)) ;
-		FOR(i,1,tplt)
-		{
-			// (res+=sz[i]*(sz[i-1])/2*2*)
-		}
-		cout<<res<<el;
+		FOR(i,1,q)cout<<res[i]<<el;
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -263,13 +212,14 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        freopen("text.ANS","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
         sub1::xuly() ; 
+        // sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

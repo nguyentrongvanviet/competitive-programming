@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "GRFLRS"
+#define TASK "FROG"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -58,115 +58,66 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 3e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n , m ,q , k; 
-struct pt
-{
-	int x ,y ;
-};
-pt a[N] ,b[N];
+int n , d ;  
+int a[N] , b[N] ; 
+
 void doc()
 {
-	cin>> n >> m >>q  >>k ;
-	FOR(i,1,q)
-	{
-		cin>>a[i].x>>a[i].y ;
-	}
-	FOR(i,1,k)
-	{
-		cin>>b[i].x>>b[i].y ;
-	}
+    cin>>  n >>d ; 
+    FOR(i,1,n)cin>>a[i] ; 
+    FOR(i,1,n)cin>>b[i] ; 
 }
 
 namespace sub1
-{ 
-	const int N = 3e3+5; 	
-	int s[N][N] ; 
-	int  get(int x ,int y, int u ,int v)
-	{
-		return s[u][v]-s[u][y-1]-s[x-1][v]+s[x-1][y-1]; 
-	}
-	int dd[N][N] ;
+{
+	const int N =2e2+5;
+	ll f[N][N] ;
     void xuly()
     {
-    	FOR(i,1,q)
-    	{
-    		FOR(x,a[i].x,n)FOR(y,a[i].y,m)if(s[x][y]==0)s[x][y]+=1;
-    	}
-    	FOR(i,1,k)
-    	{
-    		FOR(x,1,b[i].x)FOR(y,1,b[i].y)if(dd[x][y]!=2)dd[x][y]=2,s[x][y]+=2;
-    	}
-    	FOR(i,1,n)
-    	{
-    		// prt(s[i],m) ;
-    	}
-    	FOR(i,1,n)FOR(j,1,m)
-    	{
-    		s[i][j] += s[i-1][j]+s[i][j-1]-s[i-1][j-1];
-    	}
-    	int res = 0; 
-    	FOR(i,1,n)FOR(j,1,m)FOR(u,i,n)FOR(v,j,m)
-    	{
-    		if(get(i,j,u,v)==(u-i+1)*(v-j+1)*3)res++ ;
-    	}
-    	cout<<res<<el;
+    	FOR(i,0,n)FOR(j,0,n)f[i][j] = -inf ;
+    	f[1][1] = a[1]+b[1]; 
+        FOR(i,1,n)
+        {
+        	FOR(j,1,n)if(abs(i-j)<=d)
+        	{
+        		FOR(k,1,i-1)maxi(f[i][j],f[k][j]+a[i]) ; 
+        		FOR(k,1,j-1)maxi(f[i][j],f[i][k]+b[j]) ; 
+        	}
+        }
+        cout<<f[n][n]<<el;
     }
 }
 namespace sub2
 {
-	int L[N] , R[N] ; 
-	ll pw(ll a, ll n)
-	{
-		if(n==0)return 1; 
-		ll b = pw(a,n/2) ;
-		if(n&1)return b*b%sm*a%sm;
-		return b*b%sm;
-	}
+	const int  N= 2e3+5 ;
+	ll f[N][N] ; 
+	ll ma[N] ; 
 	void xuly()
-	{
-		FOR(i,0,n+1)L[i] = m+1;
-		FOR(i,1,q)
+	{	
+		FOR(i,1,n)FOR(j,1,n)
 		{
-			mini(L[a[i].x],a[i].y) ;
+			f[i][j] = -inf ; 
 		}
+		f[1][1] = a[1]+b[1] ;
+		FOR(i,1,n)ma[i] = -inf ;
 		FOR(i,1,n)
 		{
-			mini(L[i],L[i-1]) ;
-		}
-		FOR(i,1,k)
-		{
-			maxi(R[b[i].x],b[i].y) ; 	
-		}
-		FORD(i,n,1)maxi(R[i],R[i+1]) ;	
-		deque<int>q; 
-		ll res = 0; 
-		ll tmp = 0 ; 
-		ll sum = 0 ; 
-		// prt(L,n) ;
-		// prt(R,n) ;
-		FOR(i,1,n)
-		{
-			while(!q.empty()&&q.front()<R[i])
+			ll cur = -inf ;
+			FOR(j,1,n)
 			{
-				q.pop_front() ;
-			}
-			if(L[i]<=R[i])
-			{
-				q.pb(L[i]) ;
-				(sum+=2*L[i]-3+sm)%=sm; 
-				(tmp+=1ll*(L[i]-1)*(L[i]-2)%sm)%=sm;
-				(res+=1ll*SZ(q)*sq(R[i])%sm-1ll*R[i]*sum%sm+tmp+sm)%=sm;
-			}
-			else 
-			{
-				while(!q.empty())q.pk() ;
-				tmp=sum=0;
-			}
+				if(abs(i-j)<=d)
+				{
+					maxi(f[i][j],cur+b[j]) ; 
+					maxi(f[i][j],ma[j]+a[i]); 
+				}
+				maxi(cur,f[i][j]) ; 
+				maxi(ma[j],f[i][j]) ;
+			}	
 		}
-		cout<<res*pw(2,sm-2)%sm<<el;	
+		cout<<f[n][n];
 	}
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
@@ -182,14 +133,14 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.ANS","w",stdout) ;   
+        freopen("text.OUT","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-      	if(max(n,m)<=100)sub1::xuly() ;
-        // sub2::xuly() ; 
+        if(n<=200)sub1::xuly() ; 
+        else if(n<=2e3)sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
