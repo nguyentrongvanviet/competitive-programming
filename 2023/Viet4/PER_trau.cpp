@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "PER"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -47,8 +47,8 @@ ll sq(ll a){return a*a;}
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
-#define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
-#define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
+#define prt(a,n) {FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;}
+#define prv(a) {for(auto _v:a)cout<<_v<<" "; cout<<el;} 
 
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
@@ -58,130 +58,89 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 19 , CH = 26 ; 
 
 
-int n ; 
-ll k ;
-int a[N] ; 
+int n , q ; 
+int a[N] , b[N] ; 
+
 void doc()
 {
-	cin>>n>>k;
-	FOR(i,1,n) 
-	{
-		cin>>a[i];
-	}
+  	cin>> n >> q;
+  	FOR(i,1,n)cin>>a[i] ; 
+  	FOR(i,1,n)cin>>b[i] ;   
 }
 
-namespace sub12
+namespace sub1
 {
-	int f[5001];
-	int tms = 0;
-	vi val;
-	void add(int &a, int b)
-	{
-		a+=b; 
-		if(a>=sm)a-=sm; 
-	}
-	void xuly()
-	{
-		FOR(i,1,n) val.pb(a[i]);
-		sort(all(val));
-		val.resize(unique(all(val)) - val.begin());
-		f[0] =1 ;
-		tms = 0;
-		for(auto u : val)
-		{
-			FORD(i,k,1)
-			{	
-				for(int cnt = 1 ;cnt * u <= i;cnt++) 
-				add(f[i] , f[i - cnt * u]);
-			} 
-		}
-		cout<<f[k] ; 
-	}
+	int dd[N] ; 
+    void xuly()
+    {
+       	while(q--)
+       	{
+       		int x, y , u , v; cin>> x>>y >> u >>v ; 
+       		FOR(i,x,y)dd[a[i]]=1;
+       		int res = 0 ; 
+       		FOR(i,u,v)res+=dd[b[i]];
+       		FOR(i,x,y)dd[a[i]] = 0 ;
+       		cout<<res<<el;
+       	}
+    }	
 }
-namespace sub3
+namespace sub2
 {
-	void xuly()
+	int H[N] , L[N*LO] , R[N*LO] ;
+	int st[N*LO] ; 
+	int node = 0 ;
+	int up(int old ,int l ,int r ,int pos )
 	{
-		if(a[1]>=sqrt(k))
+		int cur= ++node; 
+		if(l==r)
 		{
-			int res = 0 ; 
-			FOR(i,0,k/a[1])
-			{
-				if((k-a[1]*i)%a[2]==0)res++;
-			}
-			cout<<res<<el;
+			st[cur] = 1 ; 
+			return cur ;
+		}
+		int mid = (l+r)>>1 ;;
+		if(pos<=mid)
+		{
+			R[cur] = R[old] ; 
+			L[cur] = up(L[old],l,mid,pos)  ; 
 		}
 		else
 		{
-			int st = -1 ; 
-			int en = -1 ;
-			FOR(i,0,k/a[2])
-			{	
-				if(a[2]*i%a[1] == k%a[1] )
-				{
-					if(st==-1)st=i ;
-					else if(en==-1)en=i ;
-				}
-			}		
-			if(st==-1&&en==-1)
-			{
-				cout<<0<<el;
-			}
-			else
-			{
-				if(en==-1)cout<<1<<el;
-				else 
-				{
-					cout<<(k/a[2]-st)/(en-st)+1<<el;
-				}	
-			}
+			L[cur] = L[old] ;
+			R[cur] = up(R[old],mid+1,r,pos) ; 
 		}
-	}	
-}
-namespace sub4
-{
-	const int N = 105 ;
-	void add(int &a ,int b)
-	{
-		a+=b ;
-		if(a>=sm)a-=sm ; 
+		st[cur] = st[L[cur]]+st[R[cur]] ;
+		return cur; 
 	}
-	int f[60][N] ;
-	int way[N] ; 
-	int S = 0 ; 
-	int tinh(int id , int pre)
+	int get(int id , int l ,int r ,int t ,int p )
 	{
-		if(id==-1)
-		{
-			return pre==0 ;
-		}
-		int &val = f[id][pre] ;
-		if(val!=-1)return val ;
-		val = 0 ;
-		FOR(i,0,S)
-		{
-			int cl = (pre<<1) + BIT(k,id)-i ;
-			if(0<=cl&&cl<=S)add(val,1ll*tinh(id-1,cl)*way[i]%sm) ;
-		} 
-		return val ;
+		if(t<=l&&r<=p)return st[id] ; 
+		if(r<t||p<l)return 0 ;
+		int mid = (l+r)>>1; 
+		return get(L[id],l,mid,t,p) + get(R[id],mid+1,r,t,p) ;
 	}
+	int pos[N] ;
 	void xuly()
 	{
-		FOR(i,1,n)S+=a[i] ; 
-		way[0] = 1; 
 		FOR(i,1,n)
 		{
-			FORD(j,S,0)if(j>=a[i])add(way[j],way[j-a[i]]) ;
+			pos[b[i]] = i ; 
 		}
-		FORD(i,59,0)FOR(j,0,S)f[i][j] = -1 ;
-		int res = tinh(59,0) ;
-		cout<<res<<el;
+		FOR(i,1,n)
+		{
+			H[i] =  up(H[i-1],1,n,pos[a[i]]) ; 
+		}
+		while(q--)
+		{
+			int x ,y , u ,v  ;
+			cin>>x>>y>>u>>v;
+			int res = get(H[y],1,n,u,v)  - get(H[x-1],1,n,u,v) ; 
+			cout<<res<<el;
+		}
 	}
 }
-
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -195,17 +154,15 @@ signed main()
     else if(fopen("text.INP","r"))
     {
         freopen("text.INP","r",stdin) ; 
-        freopen("text.OUT","w",stdout) ;   
+        freopen("text.ANS","w",stdout) ;   
     }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
         doc() ; 
-        if(k<=1ll*5e3)sub12::xuly() ; 
-        else 
-        if(n==2)sub3::xuly() ;
-        else
-         sub4::xuly() ; 
+        sub1::xuly() ; 
+
+        // sub2::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

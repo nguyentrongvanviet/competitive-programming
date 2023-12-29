@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "CAVE"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -47,8 +47,8 @@ ll sq(ll a){return a*a;}
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
-#define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
-#define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
+#define prt(a,n) {FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;}
+#define prv(a) {for(auto _v:a)cout<<_v<<" "; cout<<el;} 
 
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
@@ -61,127 +61,90 @@ const ll inf = 1e18 , cs = 331 , sm = 1e9+7;
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 
-int n ; 
-ll k ;
-int a[N] ; 
+int n; 
+ll a[N] ; 
+int type[N] ;
+vi g[N] ;
+
 void doc()
 {
-	cin>>n>>k;
-	FOR(i,1,n) 
-	{
-		cin>>a[i];
-	}
+    cin>> n ;
+    FOR(i,1,n)cin>>a[i] ;
+    FOR(i,1,n)cin>>type[i] ;
+    FOR(i,1,n-1)
+    {
+    	int u ,v;cin >> u >>v ;
+    	g[u].pb(v) ; 
+    	g[v].pb(u) ; 
+    } 
 }
 
-namespace sub12
+namespace sub1
 {
-	int f[5001];
-	int tms = 0;
-	vi val;
-	void add(int &a, int b)
+	ll res = -inf ;
+	void dfs(int u ,int p ,ll val)
 	{
-		a+=b; 
-		if(a>=sm)a-=sm; 
-	}
-	void xuly()
-	{
-		FOR(i,1,n) val.pb(a[i]);
-		sort(all(val));
-		val.resize(unique(all(val)) - val.begin());
-		f[0] =1 ;
-		tms = 0;
-		for(auto u : val)
+		val+=a[u] ;
+		if(type[u]>1)maxi(res,val) ;
+		for(auto v:g[u])if(v!=p)
 		{
-			FORD(i,k,1)
-			{	
-				for(int cnt = 1 ;cnt * u <= i;cnt++) 
-				add(f[i] , f[i - cnt * u]);
-			} 
+			dfs(v,u,val) ;
 		}
-		cout<<f[k] ; 
 	}
+    void xuly()
+    {
+    	FOR(i,1,n)if(type[i]==1||type[i]==3)
+    	{
+    		dfs(i,0,0) ;
+    	}
+    	cout<<res<<el;
+    }
 }
-namespace sub3
+namespace sub2
 {
-	void xuly()
+	ll f[N][3] ;
+	ll res=-inf ; 
+	void dfs(int u ,int p)
 	{
-		if(a[1]>=sqrt(k))
+		for(auto v:g[u])if(v!=p)
 		{
-			int res = 0 ; 
-			FOR(i,0,k/a[1])
-			{
-				if((k-a[1]*i)%a[2]==0)res++;
-			}
-			cout<<res<<el;
+			dfs(v,u) ;
+			maxi(res,f[u][1]+a[u]+f[v][2]) ; 
+			maxi(res,f[u][2]+a[u]+f[v][1]) ;
+			maxi(f[u][1],f[v][1]) ; 
+			maxi(f[u][2],f[v][2]) ; 
+		}		
+		if(f[u][1]!=-inf)f[u][1]+=a[u] ;
+		if(f[u][2]!=-inf)f[u][2]+=a[u] ;
+		if(type[u]==1)
+		{
+			maxi(res,f[u][2]) ; 
+			maxi(f[u][1],a[u]) ; 
 		}
-		else
+		if(type[u]==2)
 		{
-			int st = -1 ; 
-			int en = -1 ;
-			FOR(i,0,k/a[2])
-			{	
-				if(a[2]*i%a[1] == k%a[1] )
-				{
-					if(st==-1)st=i ;
-					else if(en==-1)en=i ;
-				}
-			}		
-			if(st==-1&&en==-1)
-			{
-				cout<<0<<el;
-			}
-			else
-			{
-				if(en==-1)cout<<1<<el;
-				else 
-				{
-					cout<<(k/a[2]-st)/(en-st)+1<<el;
-				}	
-			}
+			maxi(res,f[u][1]) ;
+			maxi(f[u][2],a[u]) ;
 		}
-	}	
-}
-namespace sub4
-{
-	const int N = 105 ;
-	void add(int &a ,int b)
-	{
-		a+=b ;
-		if(a>=sm)a-=sm ; 
-	}
-	int f[60][N] ;
-	int way[N] ; 
-	int S = 0 ; 
-	int tinh(int id , int pre)
-	{
-		if(id==-1)
+		if(type[u]==3)
 		{
-			return pre==0 ;
+			maxi(res,f[u][1]);
+			maxi(res,f[u][2]);
+			maxi(f[u][1],a[u]) ; 
+			maxi(f[u][2],a[u]) ; 
 		}
-		int &val = f[id][pre] ;
-		if(val!=-1)return val ;
-		val = 0 ;
-		FOR(i,0,S)
-		{
-			int cl = (pre<<1) + BIT(k,id)-i ;
-			if(0<=cl&&cl<=S)add(val,1ll*tinh(id-1,cl)*way[i]%sm) ;
-		} 
-		return val ;
 	}
 	void xuly()
 	{
-		FOR(i,1,n)S+=a[i] ; 
-		way[0] = 1; 
-		FOR(i,1,n)
+		FOR(i,1,n)if(type[i]==3)
 		{
-			FORD(j,S,0)if(j>=a[i])add(way[j],way[j-a[i]]) ;
+			maxi(res,a[i]) ;
 		}
-		FORD(i,59,0)FOR(j,0,S)f[i][j] = -1 ;
-		int res = tinh(59,0) ;
+		FOR(i,1,n)f[i][1] = f[i][2] = -inf;
+		dfs(1,0) ; 
 		cout<<res<<el;
 	}
 }
-
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -201,11 +164,8 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        if(k<=1ll*5e3)sub12::xuly() ; 
-        else 
-        if(n==2)sub3::xuly() ;
-        else
-         sub4::xuly() ; 
+        // sub1::xuly() ; 
+        sub2::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }
