@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "PAINT"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
@@ -60,94 +60,85 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n; 
-struct pt
-{
-    ll x ,y ;
-    pt(ll _x=0 , ll _y= 0)
-    {
-        x=_x,y=_y ;
-    }
-    pt operator - (pt a )
-    {
-        return pt{x-a.x,y-a.y} ;
-    }
-    ll operator * (pt a )
-    {
-        return x*a.y-y*a.x ;
-    }
-} ;
-ve<pt> a ;
 
-#define eb emplace_back 
+int W , R , B , K , M ;
+
 void doc()
-{
-    cin>> n; 
-    FOR(i,1,n)
-    {
-        ll x,y ; cin>>x>>y;
-        a.eb(x,y) ;
-    }
+{   
+	cin>>W>>R>>B>>K>>M ; 
 }
 
 namespace sub1
 {
-    bool cmp1(pt a , pt b )
-    {
-        return a.y<b.y||(a.y==b.y&&a.x<b.x) ; 
-    }    
-    pt goc ; 
-    db dis(pt a , pt b)
-    {
-        return sqrt(sq(a.x-b.x)+sq(a.y-b.y)) ; 
-    }
-    ll ccw(pt a, pt b , pt c)
-    {
-        return (b-a)*(c-b) ; 
-    }
-    bool cmp2(pt a, pt b)
-    {   
-        if(ccw(goc,a,b)==0)
-        {
-            return dis(goc,a)<dis(goc,b) ; 
-        }
-        return ccw(goc,a,b)>0 ; 
-    }
-    ve<pt> convexhull(ve<pt>& P )
-    {
-        ve<pt>hull ; 
-        sort(all(P),cmp1) ;
-        goc = P[0] ;
-        sort(P.begin()+1,P.end(),cmp2) ; 
-        P.pb(goc) ;   
-        FORN(i,0,SZ(P))
-        {
-            while(SZ(hull)>=2 && ccw(hull[SZ(hull)-2],hull.back(),P[i])<=0)
-            {
-                hull.pk() ;
-            }
-            hull.pb(P[i]) ; 
-        }
-        hull.pk() ;
-        return hull; 
-    }
+	const int N = 305 ;
+	int f[N*2][N][N][2] ;
+	void add(int &a ,int b)
+	{
+		a+=b;
+		if(a>=sm)a-=sm;
+	}
+	int dp[2][2*N][N];
+	ll fac[2*N] , inv_fac[2*N] ;
+	ll C(int k ,int n)
+	{
+		return fac[n] * inv_fac[k]%sm * inv_fac[n-k]%sm ;
+	}
+	ll pw(ll a,  ll n)
+	{
+		if(n==0)return 1 ;
+		ll b = pw(a,n/2) ;
+		if(n&1)return b*b%sm*a%sm;
+		return b*b%sm;
+	}
     void xuly()
     {
-        ve<pt>res= convexhull(a) ;
-        cout<<SZ(res)<<el; 
-        ll area = 0 ; 
-        FORN(i,1,SZ(res))
-        {
-            area+=res[i-1]*res[i]  ; 
-        }
-        area+=res.back()*res[0] ;
-        area=abs(area) ; 
-        if(area%2==0)cout<<area/2<<".0"<<el;
-        else cout<<area/2<<".5"<<el;
-        for(auto p :res)
-        {
-            cout<<p.x<<" "<<p.y<<el;
-        }
+    	FOR(i,0,R)f[0][i][0][0] = 1 ; 
+    	FOR(i,0,B)f[0][0][i][1] = 1 ; 
+    	FOR(cnt,1,R+B-1)
+    	{		
+    		FOR(i,1,R)FOR(j,1,B)
+    		{
+    			add(f[cnt][i][j][0],f[cnt-1][i-1][j][1]) ;
+    			add(f[cnt][i][j][0],f[cnt][i-1][j][0]) ;
+
+    			add(f[cnt][i][j][1],f[cnt-1][i][j-1][0]) ; 
+    			add(f[cnt][i][j][1],f[cnt][i][j-1][1]) ;
+    		}
+    	}
+    	dp[0][0][0] = 1 ; 
+    	dp[1][0][0] = 1 ;
+    	FOR(i,1,R+B+1)
+    	{
+    		FOR(j,0,W)
+    		{
+    			FOR(k,1,min(j,K-1))
+    			{	
+    				add(dp[0][i][j], dp[0][i-1][j-k]) ;
+    				add(dp[1][i][j], dp[1][i-1][j-k]) ;
+    			}
+    			add(dp[0][i][j],dp[0][i-1][j]) ; 
+    		}
+    	}
+    	fac[0] = 1;
+    	FOR(i,1,600)fac[i] = fac[i-1]*i%sm; 
+    	inv_fac[600] = pw(fac[600],sm-2) ; 
+    	FORD(i,599,0)
+    	{
+    		inv_fac[i] = inv_fac[i+1]*(i+1)%sm ;
+    	}
+    	int res = 0 ;
+    	FOR(cnt,M,R+B-1)
+    	{	
+    		int del = cnt-M ;
+    		int tot = 0 ; 
+    		FOR(j,0,W)
+    		{
+				int tmp = 1ll*C(del,cnt)*dp[1][del][j]%sm*dp[0][R+B+1-cnt][W-j]%sm; 
+				add(tot,tmp) ;
+    		}
+    		add(res,1ll*tot*(f[cnt][R][B][1]+f[cnt][R][B][0])%sm);
+    	}
+    	cout<<res<<el;
     }
 }
 
