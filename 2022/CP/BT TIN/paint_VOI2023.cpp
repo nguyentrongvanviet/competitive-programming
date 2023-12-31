@@ -14,7 +14,6 @@ int test = 1 ;
 
 #include<bits/stdc++.h>
 using namespace std; 
-#define int long long 
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
