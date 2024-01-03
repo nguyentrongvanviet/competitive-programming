@@ -16,28 +16,32 @@ ll rd(ll l , ll r )
 void create()
 {
     ofstream cout(TASK".INP");
-    int n =200 ; 
-    cout<<n<<" "<<rd(1,100)<<el; 
+    int n= 100 ,  q=5 ;
+    cout<<n<<" "<<q<<el; 
     FOR(i,1,n)
     {
-    	int type =rd(1,2) ;
-    	if(type==1)
-    	{
-    		cout<<rd(-1e9,0)<<" ";
-    	}
-    	else cout<<rd(0,1e9)<<" ";
-    }
-    cout<<el; 
-    FOR(i,1,n)
-    {
-    	int type =rd(1,2) ;
-    	if(type==1)
-    	{
-    		cout<<rd(-1e9,0)<<" ";
-    	}
-    	else cout<<rd(0,1e9)<<" ";
+    	cout<<rd(2,10)<<" ";
     }
     cout<<el;
+    FOR(i,1,n-1)
+    {
+        cout<<i<<" "<<rd(i+1,n)<<el;
+    }
+    FOR(i,1,q)
+    {
+    	int type =rd(1,2) ;
+        type=2; 
+        // type=1;
+    	cout<<type<<" ";
+		int l =rd(1,n-5) ;
+		int r = rd(l+1,n) ;
+        cout<<l<<" "<<r<<el;
+    	if(type==1)
+    	{
+    		cout<<rd(1,10)<<el;
+    	}
+        else cout<<el;
+    }
     cout.close();
 }
 
@@ -47,8 +51,8 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("FROG""_trau.exe");
-        system("FROG"".exe"); 
+        system("GCDIX""_trau.exe");
+        system("GCDIX"".exe"); 
         if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
         {   
             cout<<"Test "<<i<<" WA"<<"\n";

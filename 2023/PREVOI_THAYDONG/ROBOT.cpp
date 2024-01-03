@@ -5,7 +5,7 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "ROBOT"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 

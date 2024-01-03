@@ -1,10 +1,11 @@
 #define TASK  "text"
 #include<bits/stdc++.h>
-const int T  = 1000 ; 
+const int T  = 100 ; 
 using namespace std; 
 #define ll long long 
 #define db double 
 #define el '\n'
+#define mp make_pair 
 #define FOR(i,a,b) for(int i=(int)(a);i<=(int)(b);i++)
 #define FORD(i,a,b) for(int i=(int)(a);i>=(int)(b);i--)
 #define FORN(i,a,b) for(int i=(int)(a);i<(int)(b);i++)
@@ -13,40 +14,34 @@ ll rd(ll l , ll r )
 {
     return l+1LL*rand()*rand()%(r-l+1) ; 
 }
-const int MAX = 5e5;
 void create()
 {
     ofstream cout(TASK".INP");
-    int n = 1e3 , q= 1e3 ; 
-    cout<<n<<" "<<q<<el; 
-    FOR(i,1,n)
+    int n = 100 , m = 110;
+    int A = rd(1,1e9) ;
+    int B =rd(1,1e9) ;
+    int C =rd(1,2) ; 
+    cout<<n<<" "<<m<<" "<<A<<" "<<B<<" "<<C<<el;
+    map<pair<int,int>,int>dd;
+    FOR(i,1,n-1)
     {
-    	cout<<rd(0,MAX)<<" ";
+    	int u = i ;
+    	int v= rd(i+1,n) ;
+    	cout<<u<<" "<<v<<el;
     }
-    cout<<el;
-    int pos = n; 	
-    FOR(i,1,q)
+    FOR(i,1,m-(n-1))
     {
-    	int type =rd(1,6); 
-    	if(pos==1&&type==2)type=1 ;
-    	cout<<type<<" ";
-    	if(type==1)
+    	while(1)
     	{
-    		cout<<rd(1,MAX)<<el;
-    	}
-    	if(type==2)
-    	{
-            --pos;
-    		cout<<el ;
-    	}
-    	if(type==3)cout<<rd(1,MAX)<<el;
-    	if(type>3)
-    	{
-    		int l =rd(1,pos) ;
-    		int r = rd(l,pos)  ;
-    		cout<<l<<" "<<r<<" ";
-    		if(type==6)cout<<rd(1,r-l+1)<<el;
-    		else cout<<rd(0,MAX)<<el;
+	    	int u= rd(1,n) ;
+	    	int v =rd(1,n) ;
+    		if(u>v)swap(u,v) ; 
+    		if(u!=v&&dd.count(mp(u,v))==0)
+    		{
+    			dd[mp(u,v)]=1;
+    			cout<<u<<" "<<v<<el;
+    			break;
+    		}
     	}
     }
     cout.close();
@@ -58,8 +53,8 @@ signed main()
     FOR(i,1,T)
     {
         create(); 
-        system("LQUERY""_trau.exe");
-        system("LQUERY"".exe"); 
+        system(TASK"_trau.exe");
+        system(TASK".exe"); 
         if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
         {   
             cout<<"Test "<<i<<" WA"<<"\n";
