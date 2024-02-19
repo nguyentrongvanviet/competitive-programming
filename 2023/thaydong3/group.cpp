@@ -197,7 +197,6 @@ namespace sub2
 	map<int,int>exist[N] ;
 	void check()
 	{
-		kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
 	}
 	void xuly()
 	{
