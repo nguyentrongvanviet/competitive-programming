@@ -44,7 +44,7 @@ struct Suffix_automaton
 	// state  
 	Suffix_automaton()
 	{
-		sz= 0 ; 
+		sz = 0 ; 
 		len[0] = 0  ; 
 		link[0] = -1 ;
 		last  = 0 ;  
