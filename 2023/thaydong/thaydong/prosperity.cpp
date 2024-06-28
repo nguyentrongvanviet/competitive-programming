@@ -9,12 +9,13 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
 using namespace std; 
 
+#define int long long 
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -34,14 +35,12 @@ using namespace std;
 #define    FORD(i,a,b)  for(int i=(int)(a);i>=(int)(b);i--)
 #define    FORN(i,a,b)  for(int i=(int)(a);i<(int)(b);i++)
 #define         all(a)  a.begin(),a.end()  
+#define           btpc  __builtin_popcountll
 #define             LB  lower_bound
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
-#define           btpc  __builtin_popcountll
-#define            ctz  __builtin_ctzll 
 ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
@@ -58,111 +57,131 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 3e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
-{
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
-	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
-	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+
+int n , q; 
+vi g[N] ; 
+int a[N] ;
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
+    cin>> n >>q ;
+    FOR(i,1,n)cin>>a[i] ; 
+    FOR(i,1,n-1)
     {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
-    }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
-    FOR(i,1,n)
-    {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
+    	int u ,v ; cin>>u>>v  ;
+    	g[u].pb(v) ; 
+    	g[v].pb(u) ; 
     }
 }
 
 namespace sub1
 {
-	int f[N][N] ; 
+	int l[N] , r[N] ; 
+	int pa[N] ; 
+	int tt = 0 ; 
+	ll st[(1<<20)+5] , lazy[(1<<20)+5] ;
+	int tmp[N]; 
+	void dolazy(int id, int l, int r)
+	{
+		st[id]+=1ll*(r-l+1)*lazy[id] ; 
+		if(l!=r)
+		{
+			lazy[id<<1]+=lazy[id] ; 
+			lazy[id<<1|1]+=lazy[id] ; 
+		}
+		lazy[id] = 0; 
+	}
+	void up(int id ,int l ,int r, int t, int p ,int val)
+	{
+		if(lazy[id])dolazy(id,l,r) ; 
+		if(t<=l&&r<=p)
+		{
+			lazy[id]+=val; 
+			dolazy(id,l,r) ;
+			return ; 
+		}
+		if(r<t||p<l)return ; 
+		int mid = (l+r)>>1 ;
+		up(id<<1,l,mid,t,p,val) ; 
+		up(id<<1|1,mid+1,r,t,p,val) ; 
+		st[id] = st[id<<1]+st[id<<1|1] ; 
+	}
+	ll get(int id ,int l, int r, int t, int p)
+	{
+		if(lazy[id])dolazy(id,l,r) ; 
+		if(t<=l&&r<=p)return st[id] ; 
+		if(r<t||p<l)return 0; 
+		int mid = (l+r)>>1 ;
+		return get(id<<1,l,mid,t,p) + get(id<<1|1,mid+1,r,t,p) ; 
+	}
+	int pos[N] ; 
+	void build(int id, int l ,int r)
+	{
+		if(l==r)
+		{
+			st[id] =tmp[l] ;
+			return ; 
+		}
+		int mid =(l+r)>>1; 
+		build(id<<1,l,mid) ; 
+		build(id<<1|1,mid+1,r) ; 
+		st[id]=  st[id<<1]+st[id<<1|1] ; 
+	}
+	void bfs()
+	{
+		queue<int>q; 
+		q.push(1) ; 
+		while(!q.empty())
+		{
+			int u = q.front() ;
+			q.pop() ; 
+			pos[u]=++tt; 
+			for(auto v: g[u])if(v!=pa[u])
+			{
+				pa[v] = u ;
+				q.push(v) ; 
+			}
+		}
+	}
     void xuly()
     {
-		FOR(i,1,n)FOR(j,1,n)
-		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
-		}
-    }
+    	bfs() ;  
+    	FOR(i,1,n)tmp[pos[i]] = a[i] ;  
+    	build(1,1,n) ; 
+    	FOR(u,1,n)
+    	{
+    		l[u] = oo , r[u] = 0 ; 
+    		for(auto v :g[u])if(pa[u]!=v)
+	    	{
+	    		mini(l[u],pos[v]) ;
+	    		maxi(r[u],pos[v]) ; 
+	    	}
+	    }
+    	FOR(i,1,q)
+    	{
+    		int TYPE ; cin>>TYPE  ; 
+    		if(TYPE==1)
+    		{
+    			int u ,val ; cin>>u>>val; 
+    			up(1,1,n,pos[u],pos[u],2*val);
+    			if(r[u])up(1,1,n,l[u],r[u],val);
+    			if(u>1)up(1,1,n,pos[pa[u]],pos[pa[u]],val) ;
+    		}			
+    		else	
+    		{
+    			int u ; cin>> u; 
+    			ll res = get(1,1,n,pos[u],pos[u])+(r[u]==0?0:get(1,1,n,l[u],r[u]))+(u==1?0:get(1,1,n,pos[pa[u]],pos[pa[u]])) ; 
+    			cout<<res<<el;
+    		}
+    	}
+    }		
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
-
-	}
+namespace subtrau
+{   
+    void xuly()
+    {   
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 

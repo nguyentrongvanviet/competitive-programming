@@ -5,10 +5,9 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
-#define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
-
+#define TASK "input"
+#define INPUT TASK".txt" 
+#define OUTPUT TASK".txt"
 bool mtt = 0 ;
 int test = 1 ;  
 
@@ -57,29 +56,40 @@ int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 20 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n; 
-int f[N] ; 
-
+int n , k ; 
+ll cost[N+1][N+1] ; 
 void doc()
 {
-    cin>>n  ;
-    FOR(i,1,n)
-    {
-        f[i] = oo ; 
-        FOR(j,1,min(i,5))
-        {
-            mini(f[i] , f[i-j]+1) ; 
-        }
-    }
-    cout<<f[n] ; 
+    cin>> n >> k ;     
+    for(int i=1;i<=n;i++)for(int j=1;j<=n;j++)cin>>cost[i][j] ; 
 }
 
 namespace sub1
 {
+    long long f[1<<N] ;
+    ll tinh(int msk )
+    {
+        if(__builtin_popcount(msk)==k)return 0 ; 
+        if(f[msk]!=inf)return f[msk] ; 
+        for(int i=1;i<=n;i++)if((msk>>(i-1)&1)==1)
+        {
+            for(int j=1;j<=n;j++)if((msk>>(j-1)&1)==1 x)if(i!=j)
+            {
+                f[msk] = min(f[msk] , tinh(msk^(1<<(i-1))) + cost[i][j]) ; 
+            }
+        }
+        return f[msk] ; 
+    }
     void xuly()
     {
+        for(int i=0;i<(1<<n);i++)
+        {
+            f[i] = inf ; 
+        }
+        ll res = tinh((1<<n)-1) ; 
+        cout<<res<<endl; 
     }
 }
 
@@ -88,11 +98,8 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-    // if(fopen(INPUT,"r"))
-    // {
-    //     freopen(INPUT ,"r",stdin);
-    //     freopen(OUTPUT,"w",stdout);
-    // }
+    // freopen("input.txt","r",stdin) ;
+    // freopen("output.txt","w",stdout) ; 
     if(mtt)cin>>test;
 
     FOR(i,1,test)

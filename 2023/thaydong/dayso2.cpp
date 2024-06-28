@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -34,14 +34,12 @@ using namespace std;
 #define    FORD(i,a,b)  for(int i=(int)(a);i>=(int)(b);i--)
 #define    FORN(i,a,b)  for(int i=(int)(a);i<(int)(b);i++)
 #define         all(a)  a.begin(),a.end()  
+#define           btpc  __builtin_popcountll
 #define             LB  lower_bound
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
-#define           btpc  __builtin_popcountll
-#define            ctz  __builtin_ctzll 
 ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
@@ -58,111 +56,95 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
-{
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
-	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
-	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+
+int n ;
+int a[N] ; 
+vi V ; 
+map<int,ll>HASH; 
+map<ll,vll>TYPE ;
+vll sum ; 
+ll s[N] , H[N] ;
+int pos[N] ;  
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
+    cin>>n ; 
+    V.pb(0);
+    FOR(i,1,n)cin>>a[i],V.pb(a[i]);
+    uni(V) ; 
+    for(auto v : V)
     {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
+    	HASH[v] = rd(0,1e18); 
     }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
+    H[0] = 0;
+    TYPE[0].pb(0);
+    sum.pb(0) ; 
     FOR(i,1,n)
     {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
+    	H[i] = H[i-1]^HASH[a[i]] ;
+    	s[i] = s[i-1]+a[i] ;
+    	sum.pb(s[i]);
+    	TYPE[H[i]].pb(s[i]);
     }
+    uni(sum) ; 
 }
 
 namespace sub1
 {
-	int f[N][N] ; 
+	int bit[N];
+	void up(int id ,int val)
+	{
+		for(int i=id;i<=n+1;i+=i&-i)bit[i]+=val; 
+	}
+	int get(int id)
+	{
+		int ans = 0 ;
+		for(int i=id;i;i-=i&-i)ans+=bit[i] ; 
+		return ans ; 
+	}
     void xuly()
     {
-		FOR(i,1,n)FOR(j,1,n)
-		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
-		}
+    	ll res = 0 ;
+    	for(auto x : TYPE)
+    	{
+    		vll tmp =x.se ;
+    		for(auto v : tmp)
+    		{
+    			int t = UB(all(sum),v)-sum.begin();
+    			res+=get(t-1);
+    			up(t,1) ; 
+    		}
+    		for(auto v : tmp)
+    		{
+    			int t = UB(all(sum),v)-sum.begin();
+    			up(t,-1) ;	
+    		}
+    	}
+    	cout<<res<<el;
     }
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
-
-	}
+namespace subtrau
+{   
+    void xuly()
+    {
+    	int res  = 0 ;
+    	FOR(i,1,n)
+    	{
+    		map<int,int>cnt ;
+    		int le = 0 ;  
+    		ll sum = 0 ;
+    		FOR(j,i,n)
+	    	{
+	    		cnt[a[j]]++ ; 
+	    		if(cnt[a[j]]&1)le++ ;
+	    		else le-- ;
+	    		sum+=a[j] ; 
+	    		if(le==0&&sum>0)res++ ; 
+	    	}
+	    }   
+	    cout<<res; 
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
@@ -179,6 +161,7 @@ signed main()
     {
         doc() ; 
         sub1::xuly() ; 
+        // subtrau::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
 }

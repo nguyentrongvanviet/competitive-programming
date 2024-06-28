@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -34,136 +34,99 @@ using namespace std;
 #define    FORD(i,a,b)  for(int i=(int)(a);i>=(int)(b);i--)
 #define    FORN(i,a,b)  for(int i=(int)(a);i<(int)(b);i++)
 #define         all(a)  a.begin(),a.end()  
+#define           btpc  __builtin_popcountll
 #define             LB  lower_bound
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
-#define          SZ(_)  (int)(_.size())
-#define           btpc  __builtin_popcountll
-#define            ctz  __builtin_ctzll 
+
 ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
-ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
-#define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
-#define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
+ll rd(ll l , ll r ){return l+1LL*rand()*rand()*rand()%(r-l+1);}
+
+#define prt(a,n) FOR(i,1,n)cout<<a[i]<<" ";cout<<el;
+#define prv(a) for(auto v:a)cout<<v<<" "; cout<<el; 
 
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
 tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 
-int xx[] = {0,-1,0,1} ; 
-int yy[] = {-1,0,1,0} ;
+int xx[] = {0,0,-1,0,1}; 
+int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
+int n , k;   
+struct Edge
 {
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
-	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
-	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+    int u ,v ,w ; 
+}E[N] ; 
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
+    cin>> n >> k ;  
+    FOR(i,1,n-1)
     {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
-    }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
-    FOR(i,1,n)
-    {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
+        int u ,v , w ; cin>> u >> v >> w; 
+        E[i] = {u,v,w} ; 
     }
 }
 
 namespace sub1
 {
-	int f[N][N] ; 
+    int dd[N] ;
+    vi g[N] ;  
+    int cur,h_cur ; 
+    void dfs(int u ,int p ,int h )
+    {
+        dd[u] = 1;  
+        if(h>h_cur)h_cur=h,cur=u  ;
+        for(auto v:g[u])if(v!=p)dfs(v,u,h+1) ; 
+    }
+    bool check(int val)
+    {
+        FOR(i,1,n)g[i].clear() ; 
+        FOR(i,1,val)
+        {
+            auto [u,v,w] = E[i] ; 
+            g[u].pb(v) ; 
+            g[v].pb(u) ; 
+        }
+        FOR(i,1,n)dd[i] = 0 ; 
+        FOR(i,1,n)
+        {
+            if(dd[i]==0)
+            {
+                cur=0,h_cur = 0 ; 
+                dfs(i,0,0) ;
+                int c =cur ; 
+                cur = 0 , h_cur = 0 ; 
+                dfs(c,0,0) ;
+                if(h_cur>=k-1)return 1; 
+            } 
+        }
+        return 0 ; 
+    }
     void xuly()
     {
-		FOR(i,1,n)FOR(j,1,n)
-		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
-		}
+        if(k==1)return void(cout<<0<<el); 
+        sort(E+1,E+n,[](Edge a , Edge b){return a.w<b.w;}) ; 
+        int l =1 ; 
+        int r = n-1 ; 
+        int ans = 0 ; 
+        while(l<=r)
+        {
+            int mid = (l+r)>>1 ;
+            if(check(mid))ans=mid,r=mid-1 ;
+            else l=mid+1 ; 
+        }
+        if(ans==0)return void(cout<<-1<<endl); 
+        cout<<E[ans].w+100<<endl;
     }
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
 
-	}
-}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -171,14 +134,15 @@ signed main()
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
     if(fopen(INPUT,"r"))
     {
-        freopen(INPUT ,"r",stdin) ;
+        freopen(INPUT ,"r",stdin);
         freopen(OUTPUT,"w",stdout);
     }
-    if(mtt)cin>>  test;
+    if(mtt)cin>>test;
+
     FOR(i,1,test)
     {
         doc() ; 
         sub1::xuly() ; 
     }
-    cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
+    // cerr<<el<<"Love KA : " << clock() <<"ms"<<el;
 }

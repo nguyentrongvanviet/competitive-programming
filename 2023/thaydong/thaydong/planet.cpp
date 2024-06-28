@@ -5,11 +5,11 @@
 *            Hometown :  Quang Ngai , Viet Nam .               *
 * Khanh An is my lover :) the more I code  , the nearer I am   *
 ****************************************************************/
-#define TASK "text"
+#define TASK "planet"
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -34,14 +34,12 @@ using namespace std;
 #define    FORD(i,a,b)  for(int i=(int)(a);i>=(int)(b);i--)
 #define    FORN(i,a,b)  for(int i=(int)(a);i<(int)(b);i++)
 #define         all(a)  a.begin(),a.end()  
+#define           btpc  __builtin_popcountll
 #define             LB  lower_bound
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
-#define           btpc  __builtin_popcountll
-#define            ctz  __builtin_ctzll 
 ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
@@ -58,111 +56,75 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
-{
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
-	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
-	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+
+int n;  
+int a[N] ;
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
-    {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
-    }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
-    FOR(i,1,n)
-    {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
-    }
+    cin>> n; 
+    FOR(i,1,n)cin>>a[i] ; 
 }
 
 namespace sub1
 {
-	int f[N][N] ; 
+	int f[N] , s[N] ; 
+	ll res = 0 ;
+	int st[N][LO+2] ; 
+	void rmq()
+	{
+		FOR(i,1,n)
+		{
+			st[i][0] = a[i] ; 
+		}
+		FOR(j,1,lg(n))
+		{
+			FOR(i,1,n-(1<<j)+1)st[i][j] = gcd(st[i][j-1],st[i+(1<<(j-1))][j-1]) ; 
+		}
+	}
+	int get(int l ,int r)
+	{
+		int k = lg(r-l+1) ;
+		return gcd(st[l][k],st[r-(1<<k)+1][k]) ; 
+	}
+	void solve()
+	{
+		FOR(j,0,lg(n))
+		{
+			st[1][j] = gcd(st[1][j],a[1]) ; 
+		} 
+		s[0] = 1 ;  
+		int it =1 ; 
+		FOR(i,1,n)
+		{
+			f[i] = 0; 
+			while(get(it,i)==1)++it; 
+			f[i] = (s[i-1]-(it-2<0?0:s[it-2])+sm)%sm;
+			s[i] = (s[i-1]+f[i])%sm ; 
+		}
+	}
     void xuly()
     {
-		FOR(i,1,n)FOR(j,1,n)
-		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
-		}
+    	rmq() ; 
+    	solve() ;
+    	int res=f[n];  
+    	FORD(st,n,2)
+    	{
+    		int pre=a[1] ; 
+    		a[1]=gcd(a[1],a[st]) ; 
+    		if(a[1]==1)break; 
+    		if(a[1]!=pre)pre=a[1],solve() ; 
+    		(res+=f[st-1])%=sm ; 
+    	}
+    	cout<<res<<el; 
     }
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
-
-	}
+namespace subtrau
+{   
+    void xuly()
+    {   
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 

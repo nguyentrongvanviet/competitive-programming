@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -34,14 +34,12 @@ using namespace std;
 #define    FORD(i,a,b)  for(int i=(int)(a);i>=(int)(b);i--)
 #define    FORN(i,a,b)  for(int i=(int)(a);i<(int)(b);i++)
 #define         all(a)  a.begin(),a.end()  
+#define           btpc  __builtin_popcountll
 #define             LB  lower_bound
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
-#define           btpc  __builtin_popcountll
-#define            ctz  __builtin_ctzll 
 ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
@@ -58,111 +56,103 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e3+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
+
+
+int n ,  m , TIEN , KC ; 
+int a[N] ; 
+struct ke
 {
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
-	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
-	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+	int v; ll w ; 
+} ; 
+ve<ke>g[N]; 
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
-    {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
-    }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
-    FOR(i,1,n)
-    {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
-    }
+	cin>> n >> m >>TIEN>>KC; 
+	FOR(i,1,n)cin>>a[i] ;     
+	FOR(i,1,m)
+	{
+		int u ,v  ; 
+		ll w ;cin>>u>>v>>w ;
+		g[u].pb({v,w}) ;
+	}
 }
 
 namespace sub1
 {
-	int f[N][N] ; 
+	struct DL
+	{
+		ll kc , tien ; 
+		bool operator<(const DL&a)const
+		{
+			return kc>a.kc||(kc==a.kc&&tien>a.tien) ; 
+		}
+		bool operator>(const DL&a)const
+		{
+			return kc<a.kc||(kc==a.kc&&tien<a.tien) ; 
+		}
+	}; 
+	struct BG
+	{
+		int u , ma ;	
+		DL tmp; 
+	}; 
+	struct cmp
+	{
+		bool operator()(const BG&a ,const BG&b)const
+		{
+			return a.tmp>b.tmp ; 
+		}
+	}; 
+	DL f[N][N] ;
+	ll dij()
+	{
+		priority_queue<BG,ve<BG>,cmp>q ; 
+		FOR(i,1,n)FOR(j,1,n)f[i][j] = {-1,-1} ; 
+		q.push({1,1,f[1][1]=DL{KC,TIEN}});
+		while(!q.empty())
+		{
+			int u =q.top().u ; 
+			int ma = q.top().ma; 
+			ll kc = q.top().tmp.kc ;
+			ll tien = q.top().tmp.tien;  
+			q.pop() ; 
+			if(f[u][ma]<DL{kc,tien})continue ; 
+			for(auto x:g[u])
+			{
+				int v= x.v; 
+				int w= x.w; 
+				int nma = (a[ma]<a[v]?v:ma) ; 
+				if(tien>=w)
+				{
+					if(mini(f[v][nma],DL{kc,tien-w}))q.push({v,nma,f[v][nma]}) ; 
+				}
+				else
+				{
+					w-=tien; 
+					ll use =  w/a[ma]+(w%a[ma]!=0) ; 
+					if(kc>=use)
+					{
+						if(mini(f[v][nma],{kc-use,use*a[ma]-w}))q.push({v,nma,f[v][nma]}) ; 
+					}
+				}
+			}
+		}
+		ll res =-1; 
+		FOR(i,1,n)maxi(res,f[n][i].kc) ; 
+		return res; 
+	} 
     void xuly()
     {
-		FOR(i,1,n)FOR(j,1,n)
-		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
-		}
+    	cout<<dij() ;     
     }
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
-
-	}
+namespace subtrau
+{   
+    void xuly()
+    {   
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 

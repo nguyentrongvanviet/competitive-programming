@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -38,7 +38,7 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
+#define        M(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
 #define           btpc  __builtin_popcountll
 #define            ctz  __builtin_ctzll 
@@ -47,123 +47,89 @@ ll sq(ll a){return a*a;}
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 ll rd(ll l , ll r ){return l+1LL*rand()*rand()%(r-l+1);}
-#define prt(a,n) FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;
-#define prv(a) for(auto _v:a)cout<<_v<<" "; cout<<el; 
-
-tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
-tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
+#define prt(a,n) {FOR(_i,1,n)cout<<a[_i]<<" ";cout<<el;}
+#define prv(a) {for(auto _v:a)cout<<_v<<" "; cout<<el;} 
 
 int xx[] = {0,-1,0,1} ; 
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
-{
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
-	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
-	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
+tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;} 
+
+void add(ll& a , ll b){a+=b;if(a>=sm)a-=sm;}
+void sub(ll& a , ll b){a-=b;if(a<0)a+=sm;}
+
+int n , q ; 
+ll a[N] , s[N] ; 
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
-    {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
-    }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
-    FOR(i,1,n)
-    {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
-    }
-}
+	cin>> n  >> q ; 
+	FOR(i,1,n)cin>>a[i] ; 
+	FOR(i,1,n)s[i] = s[i-1]+a[i] ; 
+}	
 
 namespace sub1
 {
-	int f[N][N] ; 
+	struct DL
+	{
+		int far ;
+		ll val;
+		friend DL operator + (DL a , DL b)
+		{
+			if(a.far==n+1)return a;
+			int far = b.far ; 
+			ll val = a.val+b.val; 
+			return DL{far,val} ; 
+		}
+	}st[N][LO+1] ;
+	void build_rmq() 
+	{
+		stack<int>List ; 
+		FORD(i,n,1)
+		{
+			while(!List.empty()&&a[List.top()]<=a[i])List.pop() ; 
+			if(List.empty())st[i][0] = {n+1,a[i]*(n-i)-(s[n]-s[i])} ;
+			else st[i][0] = {List.top(),a[i]*(List.top()-1-i)-(s[List.top()-1]-s[i])};
+			List.push(i) ;
+		}
+		FOR(j,1,LO)FOR(i,1,n)st[i][j] = {n+1,oo} ; 
+		FOR(j,1,LO)
+		{
+			FOR(i,1,n-M(j)+1)
+			{
+				st[i][j] = st[i][j-1]+st[st[i][j-1].far][j-1];
+			}
+		}	
+	}
+	ll solve(int l , int r)
+	{
+		ll res = 0 ;
+		FORD(i,LO,0)
+		{
+			if(st[l][i].far<=r)
+			{
+				res+=st[l][i].val; 
+				l=st[l][i].far; 
+			}
+		}
+		if(l<r)res+=a[l]*(r-l)-(s[r]-s[l]);
+		return res; 
+	}
     void xuly()
     {
-		FOR(i,1,n)FOR(j,1,n)
-		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
-		}
+    	build_rmq() ; 
+    	while(q--)
+    	{
+    		int l ,r ; cin>> l >> r ; 
+    		cout<<solve(l,r)<<el; 
+    	}
     }
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
 
-	}
-}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -174,10 +140,15 @@ signed main()
         freopen(INPUT ,"r",stdin) ;
         freopen(OUTPUT,"w",stdout);
     }
+    else if(fopen("text.INP","r"))
+    {
+        freopen("text.INP","r",stdin) ; 
+        freopen("text.OUT","w",stdout) ;   
+    }
     if(mtt)cin>>  test;
     FOR(i,1,test)
     {
-        doc() ; 
+        doc() ;  
         sub1::xuly() ; 
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;

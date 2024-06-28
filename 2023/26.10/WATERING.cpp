@@ -90,42 +90,22 @@ void doc()
 
 namespace sub1
 {
+    const int N = 2e3+5 ; 
+    
+    int f[N][N] ; 
     void xuly()
     {
-    	db ma = -oo ;
-    	int st = 1 ; 
-    	FOR(i,1,n)
-    	{
-    		if(a[i].L<=0)maxi(ma,a[i].R);
-    		else 
-    		{
-    			st=i ;
-    			break;
-    		}  
-    	}
-    	int res = 1; 
-    	db nma = ma; 
-    	if(ma<0)return void(cout<<-1<<el);
-    	a[++n] =  {L,L} ; 
-    	FOR(i,st,n)
-    	{
-    		if(ma<a[i].L&&abs(ma-a[i].L)>EPS)
-    		{
-    			res++ ; 
-    			ma=nma; 
-    		}
-    		if(ma>=a[i].L)
-    		{
-    			maxi(nma,a[i].R) ;
-    		}
-    		else return void(cout<<-1<<el) ;
-    	}
-    	if(ma>=L)cout<<res<<el; 
-    	else if(nma>=L)cout<<res+1<<el; 
-    	else cout<<-1<<el;
+    	
     }
 }
+namespace sub2
+{
+    int f[N][N][N] ; 
+    void xuly()
+    {
 
+    }
+}
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()

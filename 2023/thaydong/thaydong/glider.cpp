@@ -9,12 +9,13 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
 using namespace std; 
 
+#define int long long 
 #define             ll  long long 
 #define             db  double 
 #define             ve  vector 
@@ -34,14 +35,12 @@ using namespace std;
 #define    FORD(i,a,b)  for(int i=(int)(a);i>=(int)(b);i--)
 #define    FORN(i,a,b)  for(int i=(int)(a);i<(int)(b);i++)
 #define         all(a)  a.begin(),a.end()  
+#define           btpc  __builtin_popcountll
 #define             LB  lower_bound
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
-#define        Mask(i)  (1ll<<(i))
 #define          SZ(_)  (int)(_.size())
-#define           btpc  __builtin_popcountll
-#define            ctz  __builtin_ctzll 
 ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
@@ -58,111 +57,92 @@ int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-ll I ;
-ll K ; 
-int n; 
-struct MT
+
+int n;
+struct X
 {
-	int n , m; 
-	ve<vll>mt ;
-	// minh luon khai bao vector 
-	MT(int _n ,int _m)
+	int h  ,p ; 
+	bool operator<(const X&a)const
 	{
-		n=_n ; 
-		m=_m ; 
-		mt=ve<vll>(n+1,vll(m+1,0)) ; 
+		return h<a.h ;
 	}
-	// constructor 
-}; 
-MT mul(MT A , MT B)
-{
-	int n = A.n ; 
-	int m = B.m ;
-	MT C(n,m) ; 
-	// k = A.m = B.n ;  
-	FOR(i,1,n)FOR(j,1,m)
-	{
-		FOR(k,1,A.m)
-		{
-			(C.mt[i][j]+=A.mt[i][k]*B.mt[k][j]%K)%=K;
-		}
-	}
-	return C; 
-}
-MT pw(MT a , ll n)
-{
-	if(n==1)return a; 
-	MT b = pw(a,n/2) ; 
-	if(n&1)return mul(mul(b,b),a) ; 
-	return mul(b,b) ;
-}
-ll fib[N] ;
-ll s[N] ;
+}  ;  
+X a[N] ; 
+
 void doc()
 {
-	cin>> n >> I >> K; 
-	// tao ma tran khoi nguyen A 
-    MT A(1,2) ; 
-    A.mt[1][1] = 0 ;
-    A.mt[1][2] = 1 ;
-    // tao ma tran quan he  
-    MT B(2,2) ; 
-    B.mt[1][1] = 0 ; 
-    B.mt[1][2] = 1 ; 
-    B.mt[2][1] = 1 ; 
-    B.mt[2][2] = 1 ;   
-    MT res = mul(A,pw(B,I)) ;
-    fib[1] = res.mt[1][1] ; 
-    fib[2] = res.mt[1][2] ;  
-    FOR(i,3,n)
-    {
-    	fib[i] = (fib[i-1]+fib[i-2])%K;
-    }
-    map<ll,int>last;  
-    s[0] = 0 ;
-    last[s[0]] = 0; 
-    FOR(i,1,n)
-    {
-    	s[i] = (s[i-1]+fib[i])%K ; 
-    	if(last.count(s[i]))
-    	{
-    		int j =last[s[i]] ; 
-    		cout<<i-j<<" ";
-    		FOR(res,j+1,i)
-    		{
-    			cout<<res+I-1<<" ";
-    		}
-    		cout<<el;
-    		return ; 
-    	}
-    	else
-    	{
-    		last[s[i]] = i ; 
-    	}
-    }
+	cin>> n; 
+	FOR(i,1,n)
+	{
+		cin>>a[i].h>>a[i].p ; 
+	}
+	sort(a+1,a+n+1) ; 
 }
 
 namespace sub1
 {
-	int f[N][N] ; 
-    void xuly()
-    {
-		FOR(i,1,n)FOR(j,1,n)
+	struct ke
+	{	
+		int v ,w ; 
+	} ;
+	ve<ke>g[N] ;
+	struct DL
+	{
+		int u ;
+		ll val ; 
+	}; 
+	struct cmp
+	{
+		bool operator()(const DL&a ,const DL&b)
 		{
-			f[i][j] = f[i-1][j-1]+f[i][j-1] ; 
-
+			return a.val>b.val; 
 		}
+	}; 
+	ll f[N] ; 
+	void dij(int s , ll f[] )
+	{
+		priority_queue<DL,ve<DL>,cmp>q; 
+		FOR(i,1,n)f[i] = inf ; 
+		q.push({s,f[s]=0}) ;
+		while(!q.empty())
+		{
+			int u = q.top().u ; 
+			ll val =q.top().val ;  
+			q.pop() ; 
+			if(f[u]<val)continue ; 
+			for(auto x:g[u])
+			{
+				int v = x.v ; 
+				int w = x.w ; 
+				if(mini(f[v],f[u]+w))q.push({v,f[v]=f[u]+w}) ;  
+			}
+		}
+	}
+    void xuly()
+    {   
+    	ll res = 0; 
+    	FOR(i,1,n)res+=a[i].p ; 
+    	FOR(i,1,n)
+    	{
+    		int u = UB(a+i+1,a+n+1,a[i].h+a[i].p,[&](int val ,X a  ){return val<a.h;})-a ;
+    		if(u<=n)
+    		{
+    			g[i].pb({u,a[u].h-a[i].h-a[i].p}) ;
+    		} 
+    		if(i<u-1)g[i].pb({u-1,0}) ;
+    		if(i)g[i].pb({i-1,0}) ;  
+    	}
+    	dij(1,f) ; 
+    	cout<<res+f[n] ;
     }
 }
-namespace sub2
-{
-	int f[N]; 
-	void xuly()
-	{
-
-	}
+namespace subtrau
+{   
+    void xuly()
+    {   
+    }
 }
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
