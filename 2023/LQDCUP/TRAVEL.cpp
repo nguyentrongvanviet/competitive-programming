@@ -76,7 +76,7 @@ struct ke
 ve<ke>g[N] ; 
 void doc()
 {
-    cin>> n >> q >>W ; 
+    cin>> n >> q ;
     FOR(i,1,n-1)
     {
     	cin>>E[i].u>>E[i].v>>E[i].w; 
@@ -101,8 +101,6 @@ namespace sub1
         while(q--)
         {
         	ll d , e; cin>>d>>e; 
-        	d=(d+last)%(n-1) ; 
-        	e=(e+last)%W ;
         	E[d+1].w=e ; 
         	FOR(i,1,n)g[i].clear() ; 
         	FOR(i,1,n-1)
@@ -385,11 +383,6 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        // if(max(n,q)<=5000)sub1::xuly() ; 
-    	// else 
-    	// if(check2())sub2::xuly() ; 
-    	// else 
-    	// sub3::xuly();
     	subfull::xuly() ;
     }
     cerr<<el<<"Love KA very much !!! " << clock() <<"ms"<<el;
