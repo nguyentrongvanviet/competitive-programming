@@ -1,63 +1,34 @@
-#define TASK "text"
-#define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
-#include<bits/stdc++.h>
-using namespace std; 
-bool multitest = false;
-#define ll long long 
-#define db double 
-#define pii pair<int,int> 
-#define pll pair<ll,ll>
-#define vi vector<int>
-#define vll vector<ll> 
-#define ve vector 
-#define str string 
-#define pb push_back 
-#define pk pop_back 
-#define el '\n'
-#define mp make_pair 
-#define fi first 
-#define se second  
-#define FOR(i,a,b) for(int i=(int)(a);i<=(int)(b);i++)
-#define FORD(i,a,b) for(int i=(int)(a);i>=(int)(b);i--)
-#define FORN(i,a,b) for(int i=(int)(a);i<(int)(b);i++)
-#define all(a) a.begin(),a.end() 
-#define btpc(a) __builtin_popcount(a)  
-ll sq(ll a){return a*a;}  
-ll gcd(ll a, ll b){return b ==0 ? a: gcd(b,a%b);} 
-ll lcm(ll a, ll b){return a/gcd(a,b)*b;}
-int xx[] = {0,0,-1,0,1}; 
-int yy[] = {0,-1,0,1,0};
-
-const int N = 2e5+5  , oo = 2e9  ; 
-const ll inf = 1e17, cs = 330, sm = 1e9+7; 
-const db PI = acos(-1) , EPS = 1e-9 ; 
-
-
-void doc()
+int st[4*N];
+void build(int id, int l, int r)
 {
-
+	if(l==r)
+	{
+	    st[id] = a[l] ;
+	    return ; 
+	} 
+	int mid=(l+r)>>1; 
+	build(id<<1,l,mid); 
+	build(id<<1|1,mid+1,r) ; 
+	st[id] = min(st[id<<1],st[id<<1|1]) ; 
 }
-
-void xuly()
+void up(int id, int l ,int r ,int  pos , int val)
 {
-
-}
-
-signed main()
-{
-    ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0); 
-    if(fopen(INPUT,"r"))
+    if(l==r&&l==pos)
     {
-        freopen(INPUT ,"r",stdin);
-        freopen(OUTPUT,"w",stdout);
-    }
-    int test =1;
-    if(multitest)cin>>test;
-    FOR(i,1,test)
-    {
-        doc() ; 
-        xuly() ; 
-    }
-    cerr<<el<<"Time: "<<clock()<<"ms"<<el;
+	    st[id] = val; 
+	    return ; 
+    }    
+    if(r<pos||pos<l)return ; 
+    int mid = (l+r)>>1 ;
+    up(id<<1,l,mid,pos,val) ; 
+    up(id<<1|1,mid+1,r,pos,val);
+    st[id] = min(st[id<<1],st[id<<1|1]) ;  
 }
+int get(int id, int l, int r ,int t, int p)
+{
+    if(t<=l&&r<=p)return st[id] ;
+    if(r<t||p<l)return oo ; 
+    int mid = (l+r)>>1 ;
+    return min(get(id<<1,l,mid,t,p),get(id<<1+1,mid+1,r,t,p)) ;
+} 
+ 
