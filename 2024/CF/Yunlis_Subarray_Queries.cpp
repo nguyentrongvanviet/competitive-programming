@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 1 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -59,43 +59,73 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , m ; 
+int n , k , q; 
+int a[N] ; 
 
 void doc()
 {
-    cin>> n >> m; 
+    cin>> n >> k >>q ; 
+    FOR(i,1,n)cin>>a[i],a[i]-=i ;
 }
+
 namespace sub1
 {
-    const int N = 1e7+5 ;
-    int E[N] ; 
-    void up(int l, int r )
+    int res[N] ;
+    struct DL
     {
-        l+=1e7 ; 
-        r+=1e7 ; 
-        E[l]++; 
-        E[r+1]-- ; 
-    } 
+        int val , sl; 
+    } ; 
+    struct cmp
+    {
+        bool operator()( DL a ,  DL b) 
+        {   
+            return a.sl>b.sl||(a.sl==b.sl&&a.val<b.val) ;
+        }
+    };
+    map<int,int>sl ;
+    set<DL,cmp>S ; 
+    void add(int val)
+    {
+        S.erase({val,sl[val]}); 
+        S.insert({val,++sl[val]}) ; 
+    }
+    void del(int val)
+    {
+        S.erase({val,sl[val]}) ; 
+        S.insert({val,--sl[val]}) ; 
+    }
+    struct Query
+    {
+        int l ,r ;
+    } ; 
+    Query Q[N] ; 
     void xuly()
     {
-        ll res = 0 ;
-        for(int b=1;b<=n;b++)
+        FOR(i,1,q)
         {
-            ll l = max(0ll,sq(b)-m) ; 
-            ll r = sq(b)-1 ;
-            res+=2*(r-l+1) ;  
-            ll nl = ceil(sqrt(l)) ; 
-            ll nr = sqrt(r) ; 
-            res-=2*(nr-nl+1) ; 
-            up(-b-nr,-b-nl);
-            up(-b+nl,-b+nr);
+            cin>>Q[i].l>>Q[i].r ; 
         }
-        for(int i=1;i<=1e7;i++)
+        FOR(i,1,n)
         {
-            E[i]+=E[i-1] ; 
+            S.insert(DL{a[i],sl[a[i]] = 0}) ; 
         }
-        for(int i=0;i<=1e7;i++)res+=(E[i]>0);
-        cout<<res ; 
+        FOR(i,1,k)
+        {
+            add(a[i]) ; 
+        }
+        res[k] = k-(*S.begin()).sl;
+        FOR(i,k+1,n)
+        {t
+            del(a[i-k]) ;
+            add(a[i]) ;
+            res[i] = k-(*S.begin()).sl ; 
+        }
+        FOR(i,1,q)
+        {
+            cout<<res[Q[i].r]<<el;
+        }
+        S.clear() ; 
+        sl.clear() ;
     }
 }
 

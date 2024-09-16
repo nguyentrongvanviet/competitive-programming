@@ -138,10 +138,6 @@ namespace sub1
         }
         sort(all(P)) ;
         vector<pt> H = Hull(P) ; 
-        // for(auto x : H)
-        // {
-        //     cout<<x.x<<" "<<x.y <<el; 
-        // }
         ll res = 0 ; 
         for(int i=1;i<SZ(H);i++)
         {
