@@ -7,7 +7,7 @@
 ****************************************************************/
 #define TASK "text"
 #define INPUT TASK".INP" 
-#define OUTPUT TASK".OUT"
+#define OUTPUT TASK".ANS"
 
 bool mtt = 0 ;
 int test = 1 ;  
@@ -57,29 +57,110 @@ int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 998244353; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-ll pw(ll a, ll n)
+int n , k ;
+struct Edge
 {
-    if(n==0) return 1;
-    ll b = pw(a,n/2); 
-    if(n&1)return b*b%sm*a%sm;
-    return b*b%sm ;
-}
+    int u ,v ; 
+}E[N] ;
+vi g[N] ; 
 void doc()
-{    
-    cout<<pw(62,(1<<23));
+{
+    cin>> n >> k; 
+    FOR(i,1,n-1)
+    {
+        cin>>E[i].u>>E[i].v ;
+    }
 }
 
 namespace sub1
 {
+    const int N =2e3+5; 
+    int C[N][N] ; 
     void xuly()
     {
-
+        FOR(i,1,n)
+        {
+            FOR(j,1,n)
+            {
+                C[i][j] = 1e9 ; 
+            }
+            C[i][i] = 0 ; 
+        }
+        FOR(i,1,n-1)
+        {
+            C[E[i].u][E[i].v]=1 ;
+            C[E[i].v][E[i].u]=1 ; 
+        }
+        FOR(k,1,n)
+        {
+            FOR(i,1,n)FOR(j,1,n)
+            {
+                mini(C[i][j],C[i][k]+C[k][j]) ; 
+            }
+        }
+        vector<int>res(n,0) ; 
+        FOR(i,1,n)FOR(j,1,n)
+        {
+            res[C[i][j]]++ ; 
+        }
+        FORN(i,0,n)cout<<res[i]<<" ";
+    }   
+}
+namespace sub2
+{
+    int P[N][LO+3] ;
+    int h[N] ; 
+    void dfs(int u ,int p)
+    {
+        for(auto v :g[u])if(v!=p)
+        {
+            h[v]=h[u]+1; 
+            P[v][0] = u  ; 
+            FOR(i,1,LO)P[v][i]=P[P[v][i-1]][i-1]; 
+            dfs(v,u) ; 
+        }
+    }
+    int lca(int u ,int v)
+    {
+        int dis = 0 ;
+        if(h[u]<h[v])swap(u,v) ;  
+        FORD(i,LO,0)if(h[u]-(1<<i)>=h[v])dis+=(1<<i),u=P[u][i] ;
+        if(u==v)return dis ; 
+        FORD(i,LO,0)
+        {
+            int nu = P[u][i] ; 
+            int nv = P[v][i] ; 
+            if(nu!=nv)
+            {
+                dis+=2*(1<<i) ; 
+                u=nu ; 
+                v=nv ; 
+            }
+        }
+        dis+=2 ; 
+        return dis ; 
+    }
+    void xuly()
+    {
+        FOR(i,1,n-1)
+        {
+            g[E[i].u].pb(E[i].v) ;
+            g[E[i].v].pb(E[i].u) ; 
+        }
+        dfs(1,0) ;
+        vector<int>res(n); 
+        FOR(i,1,n)
+        {
+            FOR(j,1,n)
+            {
+                res[lca(i,j)]++ ; 
+            }
+        }
+        FORN(i,0,n)cout<<res[i]<<" ";
     }
 }
-
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -95,7 +176,10 @@ signed main()
     FOR(i,1,test)
     {
         doc() ; 
-        sub1::xuly() ; 
+        sub2::xuly() ; 
+        // cout<<el;
+        // if(sqrt(k)<=n)sub2::xuly() ; 
+        // sub3::xuly() ;  
     }
     cerr<<el<<"Love KA : " << clock() <<"ms"<<el;
 }

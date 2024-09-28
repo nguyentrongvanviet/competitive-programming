@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 1 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -44,7 +44,6 @@ ll lg(ll a){return __lg(a);}
 ll sq(ll a){return a*a;}  
 ll gcd(ll a,ll b){return __gcd(a,b);} 
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
-ll rd(ll l , ll r ){return l+1LL*rand()*rand()*rand()%(r-l+1);}
 
 #define prt(a,n) FOR(i,1,n)cout<<a[i]<<" ";cout<<el;
 #define prv(a) for(auto v:a)cout<<v<<" "; cout<<el; 
@@ -56,20 +55,59 @@ int xx[] = {0,0,-1,0,1};
 int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = 998244353; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
+const int N = 1e6+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-ll pw(ll a, ll n)
+int n ; 
+struct pt 
+{ 
+    long long x ,y; 
+    pt operator-(pt a )
+    {
+        return pt{x-a.x,y-a.y}; 
+    }
+    long long operator * (pt a )
+    {
+        return x*a.y-y*a.x ; 
+    }
+}a[N] ;
+ll ccw(pt a ,pt b , pt c)
 {
-    if(n==0) return 1;
-    ll b = pw(a,n/2); 
-    if(n&1)return b*b%sm*a%sm;
-    return b*b%sm ;
+    return (b-a)*(c-a) ;
+}   
+ll rd(ll l , ll r )
+{
+    return l+1LL*rand()*rand()%(r-l+1) ; 
 }
 void doc()
-{    
-    cout<<pw(62,(1<<23));
+{
+    cin>> n; 
+    FOR(i,1,n)cin>>a[i].x>>a[i].y ; 
+    int test = 100 ;
+    int res = 0 ; 
+    while(test--)
+    {
+        int u = rd(1,n)  ;
+        int v= rd(1,n) ; 
+        while(u==v)
+        {
+            v = rd(1,n) ; 
+        }
+        int tmp = 0 ;  
+        FOR(i,1,n)
+        {
+            if(ccw(a[u],a[v],a[i])==0)++tmp ; 
+        }
+        maxi(res,tmp)  ;  
+    }
+    if(res>=n/4)
+    {
+        cout<<n-res<<el; 
+    }
+    else{
+        cout<<n<<el;
+
+    }
 }
 
 namespace sub1
@@ -94,6 +132,7 @@ signed main()
 
     FOR(i,1,test)
     {
+        cout<<"Case #"<<i<<": ";
         doc() ; 
         sub1::xuly() ; 
     }

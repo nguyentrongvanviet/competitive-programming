@@ -57,147 +57,134 @@ int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 6e5+5 ;
 
-int n , k , q; 
-int a[N] ; 
-
-void doc()
+int numnode , numedge , numquery ;
+struct Edge
 {
-    cin>> n >> k >>q ; 
-    FOR(i,1,n)cin>>a[i],a[i]-=i ;
+    int u ,v ; 
+}edge[N] ; 
+void doc()
+{    
+    cin>> numnode >> numedge >> numquery ; 
+    FOR(i,1,numedge)
+    {
+        cin>>edge[i].u>>edge[i].v ; 
+    }
 }
 
 namespace sub1
 {
-    int c[N] ;
+    int pa[N] ;
+    vector<int>g[N] ; 
+    int res[N] ; 
+    int root(int u )
+    {
+        return pa[u] == u ? u : pa[u] = root(pa[u]) ; 
+    }
+    void merge(int u ,int v,int id )
+    {
+        int chau = root(u) ; 
+        int chav = root(v) ; 
+        numnode++ ;
+        pa[numnode] = numnode; 
+        res[numnode] = id; 
+        pa[chau] = pa[chav] = numnode ; 
+        g[numnode].push_back(chau) ; 
+        if(chau!=chav)g[numnode].push_back(chav) ; 
+    }
+    int time_dfs = 0 , tt=0 ; 
+    int in[N], at[N] , a[N] , pos[N] ; 
+    void dfs(int u )
+    {
+        in[u]=++time_dfs ; 
+        at[time_dfs] = u ;
+
+        a[++tt] = time_dfs ;  
+        pos[time_dfs] = tt ;
+        for(auto v:g[u])
+        {
+            dfs(v) ;
+            a[++tt] = in[u] ; 
+        }
+    }
     struct DL
     {
-        int val , sl; 
+        int mi , ma ;
+        DL(int _mi = 0 ,int _ma = 0)
+        {
+            mi = _mi ; 
+            ma = _ma ; 
+        }
+        friend DL operator + (DL a , DL b)
+        {
+            return DL(min(a.mi,b.mi),max(a.ma,b.ma)) ; 
+        }
     } ; 
-    struct cmp
+    struct RMQ 
     {
-        bool operator()( DL a ,  DL b) 
-        {   
-            return a.sl>b.sl||(a.sl==b.sl&&a.val<b.val) ;
+        vector<vector<DL>>st ; 
+        int n ; 
+        int LO ; 
+        RMQ(int *a , int n )
+        {
+            LO = lg(n) ; 
+            st.resize(n+1,vector<DL>(LO+1)) ;
+            FOR(i,1,n)
+            {
+                st[i][0] = {a[i],a[i]} ;
+            }
+            FOR(j,1,LO)
+            {
+                FOR(i,1,n-(1<<j)+1)st[i][j] = st[i][j-1] + st[i+(1<<j-1)][j-1] ;
+            }
+        }
+        int get_min(int l, int r)
+        {
+            int k = lg(r-l+1) ; 
+            return min(st[l][k].mi,st[r-(1<<k)+1][k].mi) ;
+        }
+        int get_max(int l ,int r )
+        {
+            int k = lg(r-l+1) ;
+            return max(st[l][k].ma,st[r-(1<<k)+1][k].ma) ; 
         }
     };
-    map<int,int>sl ;
-    set<DL,cmp>S ; 
-    void add(int val)
+    void xuly() 
     {
-        S.erase({val,sl[val]}); 
-        S.insert({val,++sl[val]}) ; 
-    }
-    void del(int val)
-    {
-        S.erase({val,sl[val]}) ; 
-        S.insert({val,--sl[val]}) ; 
-    }
-    struct Query
-    {
-        int r , id ; 
-    } ; 
-    vector<Query> Q[N] ; 
-    struct BG
-    {
-        ll sum  ; 
-        int mi , ma ; 
-        BG(ll _sum =0,int _mi=n+1,int _ma = -1 )
+        FOR(i,1,numnode) pa[i] = i ; 
+        FOR(i,1,numedge)
         {
-            sum=_sum ; 
-            mi=_mi ; 
-            ma=_ma ; 
+            int u =edge[i].u ; 
+            int v =edge[i].v ;
+            merge(u,v,i) ; 
         }
-        friend BG operator + (BG a , BG b )
+        dfs(numnode) ;
+        RMQ IN=RMQ(in,numnode) ;
+        RMQ LCA_A=RMQ(a,tt) ;
+        // prt(in,numnode)
+        // prt(a,tt)
+        FOR(i,1,numquery)
         {
-            return BG(a.sum+b.sum,min(a.mi,b.mi),max(a.ma,b.ma)); 
+            int l, r ; 
+            cin>> l >>r ; 
+            int L = pos[IN.get_min(l,r)] ;
+            int R = pos[IN.get_max(l,r)] ;
+            // cout<<L<<" "<<R<<el;
+            // cout<<LCA_A.get_min(L,R)<<el;
+            cout<<res[at[LCA_A.get_min(L,R)]]<<" ";
+            // cout<<at[LCA_A.get_min(L,R)]<<" ";
         }
-    } ; 
-    BG st[4*N] ;
-    ll lazy[4*N] ; 
-    ll res[N] ; 
-    void dolazy(int id,int l, int r)
-    {
-        if(lazy[id]==-1)return ; 
-        st[id]=BG(lazy[id]*(r-l+1),lazy[id],lazy[id]);
-        if(l!=r)
+        cout<<'\n';
+        time_dfs = tt = 0;  
+        FOR(i,1,numnode)
         {
-            lazy[id<<1] = lazy[id] ; 
-            lazy[id<<1|1] = lazy[id] ; 
+            res[i] = 0 ;
+            g[i].clear() ; 
         }
-        lazy[id] = -1 ;
-    } 
-    void up(int id, int l, int r, int t, int p , int val)
-    {
-        dolazy(id,l,r) ; 
-        if(r<t||p<l)return; 
-        if(t<=l&&r<=p)
-        {   
-            if(st[id].mi>=val)
-            {
-                lazy[id] = val ;
-                dolazy(id,l,r)  ;
-                return  ; 
-            }
-            if(st[id].ma<=val)return ;
-        }   
-        int mid = (l+r)>>1 ;
-        up(id<<1,l,mid,t,p,val) ;
-        up(id<<1|1,mid+1,r,t,p,val) ;
-        st[id] = st[id<<1]+st[id<<1|1] ; 
-    } 
-    ll get(int id, int l ,int r ,int t ,int p)
-    {
-        dolazy(id,l,r) ;
-        if(r<t||p<l)return 0; 
-        if(t<=l&&r<=p)return st[id].sum ;
-        int mid =(l+r)>>1; 
-        return get(id<<1,l,mid,t,p) + get(id<<1|1,mid+1,r,t,p) ;
-    }
-    void xuly()
-    {
-        FOR(i,1,n)
-        {
-            S.insert(DL{a[i],sl[a[i]] = 0}) ; 
-        }
-        FOR(i,1,k)
-        {
-            add(a[i]) ; 
-        }
-        c[1] = k-(*S.begin()).sl;
-        FOR(i,k+1,n)
-        {
-            del(a[i-k]) ;
-            add(a[i]) ;
-            c[i-k+1] = k-(*S.begin()).sl ; 
-        }
-        S.clear() ; 
-        sl.clear() ;
-        FOR(i,1,q)
-        {
-            int l , r ; cin>>l>>r ;
-            Q[l].push_back({r,i}) ;  
-        }
-        FOR(id,1,4*n)
-        {
-            lazy[id] = -1 ;
-            st[id]=BG() ; 
-        }
-        FORD(i,n-k+1,1)
-        {   
-            up(1,1,n,i+1,n-k+1,c[i]) ;
-            up(1,1,n,i,i,c[i]) ;
-            for(auto [r,id]:Q[i])
-            {
-                res[id] = get(1,1,n,i,r-k+1) ; 
-            }
-        }
-        FOR(i,1,q)cout<<res[i]<<'\n' ; 
-        FOR(i,1,n)Q[i].clear() ; 
-
     }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()

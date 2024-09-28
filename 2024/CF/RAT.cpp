@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -57,147 +57,139 @@ int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 1e2+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , k , q; 
-int a[N] ; 
+int n; 
+int iscave[N] ;
+int rat[N][N],cat[N][N] ;
 
 void doc()
 {
-    cin>> n >> k >>q ; 
-    FOR(i,1,n)cin>>a[i],a[i]-=i ;
+    cin>> n; 
+    FOR(i,1,n)cin>>iscave[i]; 
+    FOR(i,1,n)
+    {
+        FOR(j,1,n)
+        {
+            cin>>rat[i][j] ; 
+        }
+    }
 }
-
 namespace sub1
 {
-    int c[N] ;
     struct DL
     {
-        int val , sl; 
+        int u , v , is_rat , dis ; 
     } ; 
     struct cmp
     {
-        bool operator()( DL a ,  DL b) 
-        {   
-            return a.sl>b.sl||(a.sl==b.sl&&a.val<b.val) ;
-        }
-    };
-    map<int,int>sl ;
-    set<DL,cmp>S ; 
-    void add(int val)
-    {
-        S.erase({val,sl[val]}); 
-        S.insert({val,++sl[val]}) ; 
-    }
-    void del(int val)
-    {
-        S.erase({val,sl[val]}) ; 
-        S.insert({val,--sl[val]}) ; 
-    }
-    struct Query
-    {
-        int r , id ; 
-    } ; 
-    vector<Query> Q[N] ; 
-    struct BG
-    {
-        ll sum  ; 
-        int mi , ma ; 
-        BG(ll _sum =0,int _mi=n+1,int _ma = -1 )
+        bool operator()(const DL&a , const DL&b)const
         {
-            sum=_sum ; 
-            mi=_mi ; 
-            ma=_ma ; 
+            return a.dis>b.dis ; 
         }
-        friend BG operator + (BG a , BG b )
-        {
-            return BG(a.sum+b.sum,min(a.mi,b.mi),max(a.ma,b.ma)); 
-        }
-    } ; 
-    BG st[4*N] ;
-    ll lazy[4*N] ; 
-    ll res[N] ; 
-    void dolazy(int id,int l, int r)
-    {
-        if(lazy[id]==-1)return ; 
-        st[id]=BG(lazy[id]*(r-l+1),lazy[id],lazy[id]);
-        if(l!=r)
-        {
-            lazy[id<<1] = lazy[id] ; 
-            lazy[id<<1|1] = lazy[id] ; 
-        }
-        lazy[id] = -1 ;
-    } 
-    void up(int id, int l, int r, int t, int p , int val)
-    {
-        dolazy(id,l,r) ; 
-        if(r<t||p<l)return; 
-        if(t<=l&&r<=p)
-        {   
-            if(st[id].mi>=val)
-            {
-                lazy[id] = val ;
-                dolazy(id,l,r)  ;
-                return  ; 
-            }
-            if(st[id].ma<=val)return ;
-        }   
-        int mid = (l+r)>>1 ;
-        up(id<<1,l,mid,t,p,val) ;
-        up(id<<1|1,mid+1,r,t,p,val) ;
-        st[id] = st[id<<1]+st[id<<1|1] ; 
-    } 
-    ll get(int id, int l ,int r ,int t ,int p)
-    {
-        dolazy(id,l,r) ;
-        if(r<t||p<l)return 0; 
-        if(t<=l&&r<=p)return st[id].sum ;
-        int mid =(l+r)>>1; 
-        return get(id<<1,l,mid,t,p) + get(id<<1|1,mid+1,r,t,p) ;
-    }
+    }; 
+    int f[N][N][2]; 
+    int sl[N][N] ; 
+    int ke[N] ;
     void xuly()
     {
         FOR(i,1,n)
         {
-            S.insert(DL{a[i],sl[a[i]] = 0}) ; 
-        }
-        FOR(i,1,k)
-        {
-            add(a[i]) ; 
-        }
-        c[1] = k-(*S.begin()).sl;
-        FOR(i,k+1,n)
-        {
-            del(a[i-k]) ;
-            add(a[i]) ;
-            c[i-k+1] = k-(*S.begin()).sl ; 
-        }
-        S.clear() ; 
-        sl.clear() ;
-        FOR(i,1,q)
-        {
-            int l , r ; cin>>l>>r ;
-            Q[l].push_back({r,i}) ;  
-        }
-        FOR(id,1,4*n)
-        {
-            lazy[id] = -1 ;
-            st[id]=BG() ; 
-        }
-        FORD(i,n-k+1,1)
-        {   
-            up(1,1,n,i+1,n-k+1,c[i]) ;
-            up(1,1,n,i,i,c[i]) ;
-            for(auto [r,id]:Q[i])
+            int ok = 0 ; 
+            FOR(j,1,n)if(rat[i][j])
             {
-                res[id] = get(1,1,n,i,r-k+1) ; 
+                FOR(k,1,n)
+                {
+                    cat[i][k]|=rat[j][k] ;
+                    ok+=cat[i][k];
+                }
+            }
+            if(ok==0)cat[i][i] = 1; 
+        }
+        FOR(i,1,n)
+        {
+            FOR(j,1,n)
+            {
+                if(rat[i][j])
+                {
+                    ke[i]++ ;
+                }
+            }
+            if(ke[i]==0)
+            {
+                ke[i] = 1; 
+                rat[i][i] = 1 ;
             }
         }
-        FOR(i,1,q)cout<<res[i]<<'\n' ; 
-        FOR(i,1,n)Q[i].clear() ; 
-
+        FOR(i,1,n)FOR(j,1,n)
+        {
+            sl[i][j] = ke[i] ; 
+        }
+        priority_queue<DL,vector<DL>,cmp> q;
+        FOR(i,1,n)FOR(j,1,n)
+        {
+            f[i][j][0] = f[i][j][1] = -1 ; 
+        } 
+        FOR(i,1,n)
+        {
+            if(iscave[i])
+            {
+                FOR(j,1,n)
+                {
+                    f[i][j][0] = oo ; 
+                    q.push({i,j,0,f[i][i][0]}) ; 
+                }
+            }   
+            else
+            {
+                f[i][i][0] = 0 ;
+                q.push({i,i,0,f[i][i][0]}) ;
+            }
+        }   
+        while(!q.empty())
+        {
+            auto [u,v,ok,val] = q.top() ;
+            // cout<<u<<" "<<v<<" "<<ok<<" "<<val<<el; 
+            q.pop() ; 
+            if(f[u][v][ok]!=val)continue ;
+            if(ok==0)
+            {
+                FOR(t,1,n)if(cat[t][v]&&f[u][t][1]==-1)
+                {
+                    q.push({u,t,1,f[u][t][1]=min(oo,val+1)}) ; 
+                }
+            }
+            else
+            {
+                FOR(t,1,n)if(rat[t][u]&&f[t][v][0]==-1)
+                {
+                    sl[t][v]--;
+                    if(sl[t][v]==0||val==oo)
+                    {
+                        q.push({t,v,0,f[t][v][0]=min(val+1,oo)});
+                    }
+                }
+            }
+        }
+        FOR(i,1,n)
+        {
+            FOR(j,1,n)
+            {
+                // cout<<f[i][j][0]<<" ";
+                if(f[i][j][0]==oo||f[i][j][0]==-1)
+                {
+                    cout<<-1<<" ";
+                }
+                else
+                {
+                    cout<<f[i][j][0]/2<<" ";
+                }
+            }
+            cout<<el;
+        }
     }
 }
+
 /*  DON'T BELIEVE LOVE WILL INSPIRE YOU ->  TRAIN HARDER ->  YOU WILL GET THE LOVE YOU WANT !!*/
 
 signed main()
@@ -209,7 +201,6 @@ signed main()
         freopen(OUTPUT,"w",stdout);
     }
     if(mtt)cin>>test;
-
     FOR(i,1,test)
     {
         doc() ; 
