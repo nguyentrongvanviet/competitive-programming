@@ -12,13 +12,13 @@ using namespace std;
 #define fi first 
 #define se second  
 #define all(a) a.begin(),a.end()
-const int N =40+5 ,  oo = 2e9 ;
+const int N =20+5 ,  oo = 2e9 ;
 const ll sm = 1e9+7,cs=330 ,inf = 1e17;
 
 int n ; 
-ll m ; 
-ll a[N]  ,b[N]; 
-unordered_map<ll,int>sl; 
+int m ; 
+int a[N]  ,b[N]; 
+map<int,int>sl; 
 void doc()
 {
  	cin>> n >> m;
@@ -31,38 +31,34 @@ void doc()
  	{
  		cin>>b[i] ; 
  	}
- 	ll res=0 ; 
- 	for(int i= 1;i<(1<<mid);i++)
+	ll res = 0 ; 
+ 	sl[0] = 1; 
+	int len = (1<<mid) ; 
+	int s ; 
+	for(int i= 1;i<len;i++)
  	{
- 		ll s= 0  ;
- 		for(int j=0 ;j<mid;j++)
- 		{
- 			if(i>>j&1)
- 			{
- 				s+=a[j+1]; 
- 			}
- 		}
- 		if(s==m)res++ ;
- 		else sl[s]++;
+ 		s= 0  ;
+		for(int msk = i ; msk;msk-=msk&-msk)
+		{
+			s+=a[__builtin_ctz(msk)+1];
+			if(s>m)break;
+		}
+ 		if(s<=m) sl[s]++;
  	}
- 	for(int i=1 ;i<(1<<(n-mid));i++)
+	len = (1<<(n-mid)) ;
+ 	for(int i=0;i<len;i++)
  	{
- 		ll s=0  ; 
- 		for(int j=0  ;j<n-mid;j++)
- 		{
- 			if(i>>j&1)
- 			{
- 				s+=b[j+1] ; 
- 			}
- 		}
- 		if(s==m)res++ ;
- 		else 
- 		{
- 			if(sl.find(m-s)!=sl.end()) 
- 			{
- 				res+=sl[m-s];
- 			}
- 		}
+		s= 0 ; 
+		for(int msk=i;msk;msk-=msk&-msk)
+		{
+			s+=b[__builtin_ctz(msk)+1] ; 
+			if(s>m)break;
+		}
+		if(s>m)continue;
+		if(sl.find(m-s)!=sl.end()) 
+		{
+			res+=sl[m-s];
+		}
  	}
  	cout<<res;
 }

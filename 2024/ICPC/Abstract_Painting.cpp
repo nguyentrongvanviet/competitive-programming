@@ -69,7 +69,7 @@ ll pw(ll a, ll n)
 
 void doc()
 {
-    int n , m;    
+    int n , m ;   
     cin>> n >> m ; 
     ll res = 18*pw(6,n-1)%sm*pw(6,m-1)%sm*pw(pw(2,n-1),m-1)%sm;
     cout<<res<<el;
@@ -80,7 +80,8 @@ namespace sub1
 {
     void xuly()
     {
-
+        cin>> n; 
+        
     }
 }
 
