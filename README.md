@@ -1,1 +1,10 @@
-This is list of solved problem of my journey in CP contains in a lots of website especially tinhoclk.com , codeforces , codechef , dmoj , vnoj . 
+Lists of solution and implementation of Competitive programming from multiple online judges 
+tinhoclk.com 
+Codeforces 
+Codechef
+DMOJ 
+VNOJ 
+CSES 
+LeetCode
+...
+Hope you can find the thing you want here :)
