@@ -1,4 +1,4 @@
-/***************************************************************
+/   ***************************************************************
 *             Author : Nguyen Trong Van Viet                   *
 *                        Age : 17                              *
 *      School : 12T2 Le Khiet High School for the Gifted       *
@@ -9,11 +9,11 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 1 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
-using namespace std; 
+using namespace std 
 
 #define             ll  long long 
 #define             db  double 
@@ -59,23 +59,24 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+    int n; 
 
 
 void doc()
 {
-    int n = 5e3; 
-    int sum = 0 ; 
-    for(int i=1;i<=n;i++)
+    int l ,r , L , R ; 
+    cin>> l >>r >> L >>R ;  
+    if(r<L||R<l)
+    
+        cout<<1<<el;
+    }
+    else
     {
-        for(int j=i;j<=n;j++)
-        {
-            for(int k =i;k<=j;k++)
-            {
-                sum++ ; 
-            }
-        }
-    }    
-    cout<<sum<<el; 
+        int tr = max(l,L) ; 
+        int ph = min(r,R) ;
+        int res=ph-tr+(l!=L)+(r!=R) ; 
+        cout<<res<<el; 
+    }
 }
 
 namespace sub1
@@ -91,7 +92,11 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-
+    if(fopen(INPUT,"r"))
+    {
+        freopen(INPUT ,"r",stdin);
+        freopen(OUTPUT,"w",stdout);
+    }
     if(mtt)cin>>test;
 
     FOR(i,1,test)

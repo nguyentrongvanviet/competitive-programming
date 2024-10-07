@@ -1,2 +1,2 @@
-a = [0]  
-print(a[1]) 
+x = int(input()) 
+print(x*0.24)  

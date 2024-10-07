@@ -1,6 +1,2 @@
-ng long pow(long long a ,  long long b)
-{
-    long long res=1 ;
-    for(int i=1;i<=b;i++)res*=a ;
-    return res ;
-}
+
+        for(int j=1;j<=i/2-(i%2==0);j++)

@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 0 ;
+bool mtt = 1  ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -59,30 +59,46 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-
+int n; 
+int x0[N] , x1[N] ; 
 void doc()
 {
-    int n = 5e3; 
-    int sum = 0 ; 
-    for(int i=1;i<=n;i++)
+    cin>> n  ; 
+    FOR(i,1,n)
     {
-        for(int j=i;j<=n;j++)
+        int x, y; cin>>x>>y ; 
+        if(y == 0)
         {
-            for(int k =i;k<=j;k++)
-            {
-                sum++ ; 
-            }
+            x0[x] = 1 ;
         }
+        else x1[x]= 1 ; 
     }    
-    cout<<sum<<el; 
 }
 
 namespace sub1
 {
     void xuly()
     {
-
+        int sum = 0   ; 
+        for(int i =0;i<=n;i++)
+        {
+            sum+=x0[i]+x1[i] ; 
+        }
+        long long res = 0 ; 
+        for(int i=0;i<=n;i++)
+        {
+            if(x0[i]&&x1[i])
+            {
+                res+=sum-2 ; 
+            }
+            if(i)
+            {
+                if(x0[i]&&x1[i+1]&&x1[i-1])res++ ; 
+                if(x1[i]&&x0[i-1]&&x0[i+1])res++ ; 
+            }
+        }
+        cout<<res<<el;
+        FOR(i,0,n)x0[i] = x1[i] = 0  ; 
     }
 }
 
@@ -91,7 +107,6 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-
     if(mtt)cin>>test;
 
     FOR(i,1,test)

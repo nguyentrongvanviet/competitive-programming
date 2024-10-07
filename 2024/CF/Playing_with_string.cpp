@@ -57,25 +57,55 @@ int yy[] = {0,-1,0,1,0};
 
 const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
-const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
+const int N = 5e3+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
+str s ;
+int n; 
+int mex(vector<int>&a)
+{
+    sort(all(a)) ; 
+    a.resize(unique(all(a))-a.begin()) ; 
+    for(int i=0;i<a.size();i++)if(a[i]!=i)return i ; 
+    return a.size() ; 
+}
 
-
+int f[N][N] ; 
+int solve(int l ,int r )
+{
+    if(f[l][r]!=-1)return f[l][r] ; 
+    if(l==r)
+    {
+        return f[l][r] = 0 ; 
+    }
+    vector<int>val; 
+    for(int i=l+1;i<=r-1;i++)
+    {
+        if(s[i-1]==s[i+1])
+        {
+            val.pb(solve(l,i-1)^solve(i+1,r)) ; 
+        }
+    }
+    return f[l][r] = mex(val) ; 
+}
 void doc()
 {
-    int n = 5e3; 
-    int sum = 0 ; 
-    for(int i=1;i<=n;i++)
+    cin>>s; 
+    n = s.size() ;
+    s="#"+s+"$"; 
+    for(int i=1;i<=n;i++)for(int j=i;j<=n;j++)f[i][j] = -1 ; 
+    if(solve(1,n))
     {
-        for(int j=i;j<=n;j++)
+        cout<<"First"<<el; 
+        FOR(i,2,n-1)
         {
-            for(int k =i;k<=j;k++)
+            if(s[i+1]==s[i-1]&&(f[1][i-1]^f[i+1][n])==0)
             {
-                sum++ ; 
+                cout<<i;
+                break; 
             }
         }
-    }    
-    cout<<sum<<el; 
+    }
+    else cout<<"Second"<<el;
 }
 
 namespace sub1
@@ -91,7 +121,6 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-
     if(mtt)cin>>test;
 
     FOR(i,1,test)

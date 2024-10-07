@@ -59,23 +59,58 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
+ll fac[N] , inv_fac[N] ; 
+int n; 
+ll pw(ll a , ll n)
+{
+    if(n==0)return 1; 
+    ll b = pw(a,n/2) ;
+    if(n&1)return b*b%sm*a%sm ;
+    return b*b%sm; 
+}
+ll f[N];
+vector<int>g[N] ; 
+int sz[N] ; 
+ll C(int k ,int n)
+{
+    return fac[n]*inv_fac[k]%sm*inv_fac[n-k]%sm;
+} 
+void dfs(int u )
+{
+    f[u] = 1; 
+    for(auto v:g[u])
+    {
+        dfs(v) ;
+        (f[u]*=f[v]*C(sz[u],sz[v]+sz[u])%sm)%=sm; 
+        sz[u]+=sz[v]; 
+    }
+    sz[u]++ ; 
+}
+class Solution {
+public:
+    int waysToBuildRooms(vector<int>& prevRoom) {
+        n = prevRoom.size() ; 
+        fac[0] = 1; 
+        for(int i=1;i<=n;i++)
+        {
+            fac[i] = fac[i-1]*i%sm; 
+        }
+        inv_fac[n] = pw(fac[n],sm-2) ; 
+        for(int i=n-1;i>=0;i--)inv_fac[i]=inv_fac[i+1]*(i+1)%sm; 
+        for(int i=1;i<n;i++)
+        {
+            g[prevRoom[i]].push_back(i) ; 
+        }
+        dfs(0) ; 
+        return f[0] ;
+    }
+};
 
 void doc()
 {
-    int n = 5e3; 
-    int sum = 0 ; 
-    for(int i=1;i<=n;i++)
-    {
-        for(int j=i;j<=n;j++)
-        {
-            for(int k =i;k<=j;k++)
-            {
-                sum++ ; 
-            }
-        }
-    }    
-    cout<<sum<<el; 
+    Solution A ; 
+    vector<int>B ={-1,0,0,1,2};
+    cout<<A.waysToBuildRooms(B) ; 
 }
 
 namespace sub1
@@ -91,7 +126,11 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-
+    if(fopen(INPUT,"r"))
+    {
+        freopen(INPUT ,"r",stdin);
+        freopen(OUTPUT,"w",stdout);
+    }
     if(mtt)cin>>test;
 
     FOR(i,1,test)

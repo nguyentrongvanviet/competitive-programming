@@ -59,23 +59,10 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-
-
+int n , m; 
 void doc()
 {
-    int n = 5e3; 
-    int sum = 0 ; 
-    for(int i=1;i<=n;i++)
-    {
-        for(int j=i;j<=n;j++)
-        {
-            for(int k =i;k<=j;k++)
-            {
-                sum++ ; 
-            }
-        }
-    }    
-    cout<<sum<<el; 
+    
 }
 
 namespace sub1
@@ -91,7 +78,6 @@ namespace sub1
 signed main()
 {
     ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
-
     if(mtt)cin>>test;
 
     FOR(i,1,test)
