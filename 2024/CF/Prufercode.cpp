@@ -9,7 +9,7 @@
 #define INPUT TASK".INP" 
 #define OUTPUT TASK".OUT"
 
-bool mtt = 1 ;
+bool mtt = 0 ;
 int test = 1 ;  
 
 #include<bits/stdc++.h>
@@ -39,6 +39,11 @@ using namespace std;
 #define             UB  upper_bound 
 #define            tct  template<class T>
 #define     BIT(msk,i)  (msk>>(i)&1)
+
+ll lg(ll a){return __lg(a);}
+ll sq(ll a){return a*a;}  
+ll gcd(ll a,ll b){return __gcd(a,b);} 
+ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 ll rd(ll l , ll r ){return l+1LL*rand()*rand()*rand()%(r-l+1);}
 
 #define prt(a,n) FOR(i,1,n)cout<<a[i]<<" ";cout<<el;
@@ -54,52 +59,27 @@ const db PI = acos(-1) , EPS = 1e-9;
 const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
-int n , d , k ; 
+int  n ; 
 int a[N] ; 
-int sum[N] ;
-struct DL
-{
-    int l , val ; 
-}; 
-ve<DL>Q[N] ;
-int bit[N] ;
-void up(int idx, int val)
-{
-    for(int i=idx;i<=n;i+=i&-i)bit[i]+=val;
-}
-int get(int idx )
-{
-    int ans =0 ; 
-    for(int i=idx;i;i-=i&-i)ans+=bit[i] ;
-    return ans ;
-}
-
+int sl[N] ; 
 void doc()
 {
-    cin>> n >> d >> k ;
-    FOR(i,1,n)bit[i] =0,sum[i]=0,Q[i].clear() ; 
-    FOR(i,1,k)
+    cin>> n; 
+    FOR(i,1,n-2)
     {
-        int l ,r ;cin>> l>>r ; 
-        Q[l].pb({r,1}) ; 
-    }
-    int ma = -1 , pos_ma = 0 , mi = oo , pos_mi = 0 ; 
-    FOR(i,1,n)
+        cin>>a[i] ; 
+        sl[a[i]]++;
+    }    
+    set<int>s ;
+    FOR(i,1,n)if(sl[i]==0)s.insert(i);
+    FOR(i,1,n-2)
     {
-        for(auto [r,val] : Q[i])up(r,val) ; 
-        if(i>=d)
-        {
-            if(maxi(ma,get(n)-get(i-d)))
-            {
-                pos_ma = i-d+1 ; 
-            }
-            if(mini(mi,get(n)-get(i-d)))
-            {
-                pos_mi = i-d+1; 
-            }
-        }
+        cout<<a[i]<<" "<<*s.begin()<<endl;
+        s.erase(s.begin());
+        sl[a[i]]--;
+        if(sl[a[i]]==0)s.insert(a[i]);
     }
-    cout<<pos_ma<<" "<<pos_mi<<endl;
+    cout<<*s.begin()<<" "<<*s.rbegin()<<endl;
 }
 
 namespace sub1
@@ -114,9 +94,7 @@ namespace sub1
 
 signed main()
 {
-    ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    freopen("text.INP","r",stdin) ; 
-    freopen("text.OUT","w",stdout) ;
+    ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);srand(time(0)); 
     if(mtt)cin>>test;
 
     FOR(i,1,test)
