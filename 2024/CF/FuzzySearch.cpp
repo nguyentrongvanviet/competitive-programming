@@ -54,7 +54,7 @@ int xx[] = {0,-1,0,1} ;
 int yy[] = {-1,0,1,0} ;
 
 const db PI = acos(-1) , EPS = 1e-9;
-const ll inf = 1e18 , cs = 331 , sm = (119 << 23) + 1; 
+const ll inf = 1e18 , cs = 331 , sm = 1e9+7; 
 const int N = 2e5+5 , oo = 2e9 , LO = 17 , CH = 26 ; 
 
 tct bool mini(T& a,T b){return (a>b)?a=b,1:0;}
@@ -63,17 +63,25 @@ tct bool maxi(T& a,T b){return (a<b)?a=b,1:0;}
 void add(ll& a , ll b){a+=b;if(a>=sm)a-=sm;}
 void sub(ll& a , ll b){a-=b;if(a<0)a+=sm;}
 
-ll pw(ll a, ll n)
+int lenS , lenT , dis ;
+char S[N] , T[N] ;
+int sum_char[256][N] ; 
+ve<char> C ={'A','T','G','C'} ;
+bool check(int c, int pos)
 {
-	if(n==0) return 1;   
-	ll b = pw(a,n/2); 
-	if(n&1)return b*b%sm*a%sm;
-	return b*b%sm ;
-}
+	return sum_char[c][min(lenS,pos+dis)]-sum_char[c][max(0,pos-dis-1)];
+} 
 // fft 
 const ll mod = (119 << 23) + 1, root = 62; // = 998244353
 // For p < 2^30 there is also e.g. 5 << 25, 7 << 26, 479 << 21
 // and 483 << 21 (same root). The last two are > 10^9.
+ll pw(ll a, ll n)
+{
+	if(n==0) return 1;   
+	ll b = pw(a,n/2); 
+	if(n&1)return b*b%mod*a%mod;
+	return b*b%mod ;
+}
 void ntt(vll &a) 
 {
     int n = a.size(), L = 31 - __builtin_clz(n);
@@ -106,20 +114,57 @@ vll conv(vll a, vll b) {
     ntt(out);
     return {out.begin(), out.begin() + s};
 }
-
+int sum_ok[N] ;
 void doc()
 {
-	vll A={3} ;
-	vll B={5} ; 
-	vll C = conv(A,B) ; 
-	prv(C) ;     
+	cin>>lenS >> lenT >> dis  ; 
+	for(int i=1;i<=lenS;i++)
+	{
+		cin>>S[i] ; 
+	}
+	for(int i=1;i<=lenT;i++)
+	{
+		cin>>T[i] ; 
+	}
+	for(int i=1;i<=lenS;i++)
+	{
+		for(auto c : C)
+		{
+			sum_char[c][i] = sum_char[c][i-1]+(S[i]==c) ; 
+		}
+	}
+	for(auto c : C)
+	{
+		vll A(lenS,0) ; 
+		vll B(lenT,0) ; 
+		for(int i=1;i<=lenS;i++)
+		{
+			A[i-1] = check(c,i) ;  
+		}
+		for(int i=1;i<=lenT;i++)
+		{
+			B[i-1] = (T[i]==c) ; 
+		}
+		reverse(all(B)) ; 
+		vll C = conv(A,B) ;
+		for(int i=0;i<lenS-lenT+1;i++)
+		{
+			sum_ok[i] += C[i+lenT-1] ; 
+		}
+	}
+	int res = 0; 
+	for(int i=0;i<lenS-lenT+1;i++)
+	{
+		if(sum_ok[i]==lenT)res++ ; 
+	}
+	cout<<res<<'\n' ; 
 }
 
 namespace sub1
 {
     void xuly()
     {
-        
+ 		    	   
     }
 }
 
