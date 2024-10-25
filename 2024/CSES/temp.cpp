@@ -1,17 +1,16 @@
+#include<iostream>
 #include<fstream>
 using namespace std ;
 
-signed main()
+
+int main()
 {
-	ifstream IN ; 
-	ofstream OUT ;
-	IN.open("text.INP");
-	OUT.open("text.OUT") ; 
-	if(OUT.is_open())
+	for(int i=0;i<256;i++)
 	{
-		int A ; 
-		IN>>A ; 
-		OUT<<A+5<<endl;
+		cout<<i<<" "<<char(i)<<endl;
 	}
-	OUT.close() ;  
+	int k; cin>> k; 
+	char c ; cin>>c ; 
+	cout<<char('A'+(c+k-'A')%26)<<endl ;
+
 }
