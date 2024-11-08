@@ -1,10 +1,38 @@
 #include<bits/stdc++.h>
-using namespace std ; 
+using namespace std;
+#define ll long long
+#define db double
+#define ve vector
+#define vi vector<int>
+#define vll vector<ll>
 
-const int N = 3e5+5 , oo = 1e9+5 ; 
-const long long inf = 1e17+5 , sm = 1e9+7 ; 
-
-signed main()
+struct poly
 {
-    ios_base::sync_with_stdio(0) ; cin.tie(0) ; cout.tie(0) ;
+    vll a;
+    poly(){} 
+    poly(vll a):a(a){} 
+    void print() 
+    {
+        cout<<"Coef: " ; 
+        for(auto x : a)cout<<x<<" "; 
+        cout<<'\n' ; 
+    }
+    void normalize()
+    {
+        while(a.back()==0)a.pop_back() ;
+    }
+    int deg()
+    {
+        return a.size()-1 ; 
+    }
+    void mod_xk(int k)
+    {
+        while(deg()>=k)a.pop_back() ; 
+    }
+    
+}; 
+signed main()
+{   
+    poly p({1,2,3,4}) ; 
+    p.print() ; 
 }

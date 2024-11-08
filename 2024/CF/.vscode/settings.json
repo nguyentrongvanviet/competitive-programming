@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "random": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "valarray": "cpp",
+        "ostream": "cpp",
+        "complex": "cpp"
+    },
+    "C_Cpp.default.compilerPath": "C:\\TDM-GCC-64\\bin\\g++.exe"
+}

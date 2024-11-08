@@ -1,52 +1,15 @@
-#define TASK  "text"
 #include<bits/stdc++.h>
-const int T  = 100 ; 
-using namespace std; 
-#define ll long long 
-#define db double 
-#define el '\n'
-#define FOR(i,a,b) for(int i=(int)(a);i<=(int)(b);i++)
-#define FORD(i,a,b) for(int i=(int)(a);i>=(int)(b);i--)
-#define FORN(i,a,b) for(int i=(int)(a);i<(int)(b);i++)
-ll sq(ll a){return a*a;}   
-ll rd(ll l , ll r )
-{
-    return l+1LL*rand()*rand()%(r-l+1) ; 
-}
-void create()
-{
-    ofstream cout(TASK".INP") ; 
-    int n = 100 ; 
-    cout<<n<<el;
-    FOR(i,1,n)
-    {
-        cout<<rd(0,1)<<" " ;
-    }
-    cout<<el ;
-    FOR(i,1,n)
-    {
-        FOR(j,1,n)
-        {
-            cout<<rd(0,1)<<" " ;
-        }
-        cout<<el;
-    }
-    cout.close();
-}
+using namespace std ; 
+
+const int N = 3e5+5 , oo = 1e9+5 ; 
+const long long inf = 1e17+5 , sm = 1e9+7 ; 
 
 signed main()
-{   
-    srand(time(0)) ; 
-    FOR(i,1,T)
-    {
-        create(); 
-        system("RAT""_trau.exe");
-        system("RAT"".exe"); 
-        if(system("fc " TASK ".OUT " TASK ".ANS")!=0)
-        {   
-            cout<<"Test "<<i<<" WA"<<"\n";
-            return  0 ; 
-        }
-        cout<<"Test "<<i<<" AC"<<"\n";
-    }
+{
+    ios_base::sync_with_stdio(0) ; cin.tie(0) ; cout.tie(0) ;
+    freopen("text.INP","w",stdout) ; 
+    int n=  1e5 ; 
+    cout<<n<<endl;
+    cout<<0<<" "; 
+    for(int i=2;i<=n;i++)cout<<73644283<<" ";
 }

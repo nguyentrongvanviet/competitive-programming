@@ -151,13 +151,12 @@ namespace sub2
             update(a[i]) ; 
             MA = max(MA,pre[i]) ;  
             f[i]=get(sum[HASH],MA) ;
-            // cout<<HASH<<" ";
             sum[HASH].push_back({i,((sum[HASH].empty()?0:(sum[HASH].back().se))+f[i])%sm}) ; 
         }
         ll res = 0 ;
         // cout<<el;
         // for(int i=1;i<=n;i++)cout<<f[i]<<" ";
-        // cout<<el; 
+        // cout<<[el; 
         for(int i=1;i<=n;i++)(res+=f[i])%=sm; 
         assert(res>0) ; 
         cout<<res ;  
