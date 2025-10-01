@@ -1,0 +1,1 @@
+for(auto it = alive.begin(); it != alive.end(); )

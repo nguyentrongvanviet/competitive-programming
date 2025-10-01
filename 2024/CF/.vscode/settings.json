@@ -11,7 +11,8 @@
         "valarray": "cpp",
         "ostream": "cpp",
         "complex": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "iosfwd": "cpp"
     },
     "C_Cpp.default.compilerPath": "C:\\TDM-GCC-64\\bin\\g++.exe"
 }

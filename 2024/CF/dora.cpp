@@ -1,22 +1,7 @@
-#include <iostream>
-using namespace std;
-
-class sth{
-    public:
-    int data;
-    
-    sth& decrease_data(){
-        data--;
-        return *this;
-    }
-};
+#include<bits/stdc++.h>
+using namespace std ;  
 int main()
-{   
-    sth p;
-    p.data = 5;
-    p.decrease_data().decrease_data();
-    cout << p.data; 
-
-
-    return 0;
+{
+    int arr[]={12,13,14,15,16} ; 
+    cout<<sizeof(arr)<<" "<<sizeof(*arr)<<" "<<sizeof(arr[0])<<endl;
 }

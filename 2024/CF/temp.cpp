@@ -1,24 +1,50 @@
-#include<bits/stdc++.h>
-using namespace std ; 
-
-const int N = 3e5+5 , oo = 1e9+5 ; 
-const long long inf = 1e17+5 , sm = 1e9+7 ; 
-
-struct student 
-{
-    int tuoi, name ; 
-} ; 
-student a[N] ; 
-bool abc(student A , student B)
-{
-    if(A.tuoi==B.tuoi)return A.name<B.name ; 
-    return A.tuoi < B.tuoi ; 
-}
-signed main()
-{
-    ios_base::sync_with_stdio(0) ; cin.tie(0) ; cout.tie(0) ;
-    int n ; cin>> n ; 
-    for(int i=1;i<=n;i++)cin>>a[i].tuoi>>a[i].name ;
-    sort(a+1,a+n+1,abc) ;
-    
-}
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(!head)return head ;
+        ListNode* ans = nullptr ; 
+        ListNode* res  ; 
+        int pre = head->val; 
+        head=head->next ; 
+        bool ok = 1 ; 
+        while(head)
+        {
+			if(head->val!=pre)
+            {
+            	if(ok)
+            	{
+	                if(!ans)
+	                {
+	                    ans = new ListNode(); 
+	                    res = ans ;
+	                    ans->val = pre ;
+	                }
+	                else
+	                {
+	                    ans->next = new ListNode() ; 
+	                    ans->next->val = pre ;
+	                    ans=ans->next ;  
+	                }
+            	}
+            	ok = 1; 
+            }
+            else
+            {
+            	ok = 0 ; 
+            }
+            pre = head->val; 
+            head=head->next ; 
+        }
+        return res ; 
+    }
+};

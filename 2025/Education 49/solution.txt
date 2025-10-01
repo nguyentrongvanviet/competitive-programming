@@ -1,0 +1,36 @@
+Create d1: 
+B::Constr 
+Inter::Constr
+D::Constr 
+
+Calling:
+B::CopyConstr
+byValue
+B::Show
+byRef
+B::Show
+
+End of main
+
+D::Destr 
+Inter::Destr 
+B::Destr
+
+
+Create d1:
+B::Constr
+Inter::Constr
+D::Constr
+
+Calling
+B::CopyConstr
+byValue
+B::Show
+B::Destr
+byRef
+B::Show
+
+End of main
+D::Destr
+Inter::Destr
+B::Destr
