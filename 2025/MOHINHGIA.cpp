@@ -67,8 +67,9 @@ void doc()
     cin>> len>> n ; 
     FOR(i,1,len)
     {
-        int val ; cin>>val; 
-        pos[val] = i ; 
+        // int val ; cin>>val; 
+        // pos[val] = i ; 
+        cin>>pos[i] ; 
     }
     FOR(i,1,n)
     {
@@ -143,9 +144,9 @@ namespace sub
                 return ; 
             }
             int mid = (l+r)/2 ; 
-            up(id<<1,l,mid,pos,val); 
-            up(id<<1|1+1,mid+1,r,pos,val); 
-            st[id] = st[id<<1]+st[id<<1|1]; 
+            up(id*2,l,mid,pos,val); 
+            up(id*2+1,mid+1,r,pos,val); 
+            st[id] = st[id*2]+st[id*2+1]; 
         }
         void up(int pos ,int val)
         {
@@ -203,7 +204,7 @@ namespace sub
                 {
                     pos_list.push_back(i-len+1); 
                 }
-                hash+=chenhlech ; 
+                (hash+=chenhlech)%=sm ; 
             }
         }
         cout<<pos_list.size()<<el; 
