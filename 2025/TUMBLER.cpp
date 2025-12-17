@@ -27,7 +27,7 @@ void gofoward(int step)
         V=V*15+val[i] ;
     }
     for(int i=1;i<=14;i++)A.push_back(DL{V,step}) ; 
-    if(step==10)
+    if(step==9)
     {
         return ;  
     }    
@@ -70,13 +70,13 @@ void gofoward(int step)
         val[14] = val14; 
     }
 }
-int res = 20 ; 
+int res = 19 ; 
 void gobackward(int step)
 {
     long long V = 0 ; 
     for(int i=1;i<=14;i++)V=V*15+val[i];  
     for(int i=1;i<=14;i++)B.push_back(DL{V,step}) ; 
-    if(step==10)return ; 
+    if(step==9)return ; 
     
     {
         val[0] = val[5] ;  
@@ -123,7 +123,7 @@ void solve()
 
         gofoward(0); 
         sort(A.begin(),A.end(),cmp) ;         
-        int res = 20 ; 
+        int res = 19 ; 
         int id = 0 ; 
         for(int i=0;i<B.size();i++)
         {
@@ -137,7 +137,6 @@ void solve()
             }
         }
         cout<<res<<endl; 
-        
     }
 }
 int main()
