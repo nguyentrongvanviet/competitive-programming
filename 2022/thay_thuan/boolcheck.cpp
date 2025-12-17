@@ -15,7 +15,7 @@ using namespace std;
 #define se second  
 void IOS()
 {
-    fast 
+    fast    
     if(fopen(TASK".INP","r"))
     {
         freopen(TASK".INP","r",stdin); 
