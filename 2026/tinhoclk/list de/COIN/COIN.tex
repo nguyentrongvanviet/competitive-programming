@@ -1,0 +1,107 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{vietnam}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+
+% Cấu hình lề trang
+\geometry{
+    a4paper,
+    total={170mm,257mm},
+    left=20mm,
+    right=20mm,
+    top=20mm,
+    bottom=20mm,
+}
+
+\title{\textbf{\huge BỘ SƯU TẬP ĐỒNG XU}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- GIỚI HẠN THỜI GIAN ---
+\begin{center}
+    \vspace{-1.5cm}
+    \textbf{Thời gian giới hạn: 1.0 giây} \\
+    \textbf{Bộ nhớ giới hạn: 512 MB} \\
+    \rule{10cm}{0.4pt}
+    \vspace{0.5cm}
+\end{center}
+
+\section*{Đề bài}
+
+Bạn đang sở hữu một bộ sưu tập gồm $n$ đồng xu có giá trị nguyên dương. Các đồng xu này được xếp thành một hàng ngang và đánh số thứ tự từ $1$ đến $n$. Giá trị của đồng xu thứ $i$ là $x_i$.
+
+Để kiểm tra độ đa dạng của bộ sưu tập, bạn cần trả lời $q$ truy vấn. Mỗi truy vấn cung cấp hai số nguyên $a$ và $b$ ($1 \le a \le b \le n$). Với mỗi truy vấn, giả sử bạn chỉ được phép sử dụng các đồng xu nằm trong đoạn từ chỉ số $a$ đến chỉ số $b$ (bao gồm cả $a$ và $b$). 
+
+\textbf{Yêu cầu:} Hãy tìm tổng nguyên dương nhỏ nhất mà bạn \textbf{không thể} tạo ra được bằng cách tính tổng của một tập con bất kỳ các đồng xu trong đoạn $[a, b]$.
+
+\section*{Dữ liệu vào (Input)}
+
+\begin{itemize}
+    \item Dòng đầu tiên chứa hai số nguyên $n$ và $q$ ($1 \le n, q \le 2 \cdot 10^5$) — số lượng đồng xu và số lượng truy vấn.
+    \item Dòng thứ hai chứa $n$ số nguyên $x_1, x_2, \dots, x_n$ ($1 \le x_i \le 10^9$) — giá trị của các đồng xu.
+    \item $q$ dòng tiếp theo, mỗi dòng chứa hai số nguyên $a$ và $b$ ($1 \le a \le b \le n$) mô tả một truy vấn.
+\end{itemize}
+
+\section*{Kết quả (Output)}
+
+\begin{itemize}
+    \item Với mỗi truy vấn, in ra trên một dòng số nguyên dương nhỏ nhất không thể tạo thành.
+\end{itemize}
+
+\section*{Ví dụ}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Input} & \textbf{Output} \\
+\hline
+\begin{minipage}[t]{0.45\textwidth}
+\ttfamily
+5 3 \\
+2 9 1 2 7 \\
+2 4 \\
+4 4 \\
+1 5
+\end{minipage}
+&
+\begin{minipage}[t]{0.45\textwidth}
+\ttfamily
+4 \\
+1 \\
+6
+\end{minipage} \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{Giải thích ví dụ}
+\begin{itemize}
+    \item \textbf{Truy vấn 1 (đoạn 2..4):} Các đồng xu là $\{9, 1, 2\}$.
+    \begin{itemize}
+        \item Tổng 1: dùng $\{1\}$.
+        \item Tổng 2: dùng $\{2\}$.
+        \item Tổng 3: dùng $\{1, 2\}$.
+        \item Tổng 4: Không thể tạo được. $\rightarrow$ Đáp án: 4.
+    \end{itemize}
+    \item \textbf{Truy vấn 2 (đoạn 4..4):} Các đồng xu là $\{2\}$. Tổng nhỏ nhất không thể tạo là 1.
+    \item \textbf{Truy vấn 3 (đoạn 1..5):} Các đồng xu $\{2, 9, 1, 2, 7\}$. Có thể tạo được 1, 2, 3, 4, 5. Không tạo được 6.
+\end{itemize}
+
+\section*{Giới hạn và Subtask}
+
+Bài toán được chia làm 4 subtask:
+\begin{itemize}
+    \item \textbf{Subtask 1 (10\% số điểm):} $n, q \le 10$.
+    \item \textbf{Subtask 2 (20\% số điểm):} $n, q \le 1000$.
+    \item \textbf{Subtask 3 (30\% số điểm):} $n, q \le 2 \cdot 10^5$, nhưng giá trị $x_i \le 20$.
+    \item \textbf{Subtask 4 (40\% số điểm):} Không có ràng buộc gì thêm.
+\end{itemize}
+
+\end{document}

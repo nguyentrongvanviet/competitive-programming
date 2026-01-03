@@ -1,0 +1,119 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{vietnam}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tikz} 
+\usetikzlibrary{positioning}
+
+% Cấu hình lề trang
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ bottom=20mm,
+}
+
+\title{\textbf{\huge NGÂN SÁCH ĐỊA PHỦ}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- ADDED TIME LIMIT HERE ---
+\begin{center}
+    \vspace{-1.5cm} % Pull it closer to the title
+    \textbf{Thời gian giới hạn: 1.5 giây} \\
+    \rule{10cm}{0.4pt} % Decorative line
+    \vspace{0.5cm}
+\end{center}
+% -----------------------------
+
+\section*{Đề bài}
+
+Địa phủ là một mạng lưới hành chính gồm $N$ cơ quan được đánh số từ $1$ đến $N$. Các cơ quan này được liên kết với nhau bởi $N-1$ con đường hai chiều, đảm bảo tính liên thông giữa hai cơ quan bất kỳ (cấu trúc cây). Mỗi cơ quan $i$ hiện đang lưu giữ một số nguyên dương không âm $A_i$, đại diện cho ngân sách (tiền thuế) của cơ quan đó.
+
+Tuy nhiên, Địa phủ đang phải đối mặt với $Q$ đợt tập kích của lũ yêu quái "phá gia". Tại đợt tập kích thứ $t$ ($1 \le t \le Q$), chúng chọn ra 3 số nguyên $x_t, y_t, w_t$. Lũ yêu quái sẽ di chuyển dọc theo con đường ngắn nhất từ cơ quan $x_t$ đến cơ quan $y_t$. Tại mỗi cơ quan $u$ nằm trên đường đi này (bao gồm cả $x_t$ và $y_t$), số tiền $A_u$ sẽ bị thay đổi theo công thức modulo:
+$$ A_u = A_u \pmod{w_t} $$
+
+Việc này gây thất thoát nghiêm trọng cho ngân sách. Diêm Vương đã mời chuyên gia kế toán T.M.Lan đến để kiểm soát tình hình. Nhiệm vụ của T.M.Lan là tính toán tổng số tiền ngân sách thực tế còn lại của toàn bộ Địa phủ sau mỗi đợt phá hoại để báo cáo lại cho Diêm Vương.
+
+\textbf{Yêu cầu:} Hãy giúp T.M.Lan tính tổng số tiền của $N$ cơ quan sau mỗi lần lũ yêu quái thực hiện xong đợt tập kích.
+
+\section*{Dữ liệu vào (Input)}
+
+\begin{itemize}
+    \item Dòng đầu tiên chứa 2 số nguyên $N$ và $Q$ ($1 \le N, Q \le 2 \cdot 10^5$).
+    \item Dòng thứ hai chứa $N$ số nguyên $A_1, A_2, \dots, A_n$ ($0 \le A_i \le 2 \cdot 10^5$).
+    \item $N-1$ dòng tiếp theo, mỗi dòng chứa hai số nguyên phân biệt $u$ và $v$ ($1 \le u, v \le N$), mô tả một con đường nối trực tiếp giữa hai cơ quan $u$ và $v$.
+    \item $Q$ dòng tiếp theo, dòng thứ $t$ chứa ba số nguyên $x_t, y_t, w_t$ ($1 \le x_t, y_t \le N$; $1 \le w_t \le 2 \cdot 10^5$) mô tả đợt tập kích thứ $t$.
+\end{itemize}
+
+\section*{Kết quả (Output)}
+
+\begin{itemize}
+    \item Gồm $Q$ dòng, dòng thứ $t$ in ra một số nguyên duy nhất là tổng ngân sách thực tế của Địa phủ sau đợt tập kích thứ $t$:
+    $$ S_t = \sum_{i=1}^{N} A_i $$
+\end{itemize}
+
+\section*{Ví dụ}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Input} & \textbf{Output} \\
+\hline
+\begin{minipage}[t]{0.45\textwidth}
+\ttfamily
+5 2 \\
+10 20 30 40 50 \\
+1 2 \\
+2 3 \\
+3 4 \\
+4 5 \\
+1 3 15 \\
+4 5 45
+\end{minipage}
+&
+\begin{minipage}[t]{0.45\textwidth}
+\ttfamily
+105 \\
+60
+\end{minipage} \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{Giải thích ví dụ}
+\begin{itemize}
+    \item Ban đầu $A = [10, 20, 30, 40, 50]$. Tổng = 150.
+    \item \textbf{Đợt 1:} $x=1, y=3, w=15$. Đường đi: $1-2-3$.
+    \begin{itemize}
+        \item $A_1 = 10 \pmod{15} = 10$
+        \item $A_2 = 20 \pmod{15} = 5$
+        \item $A_3 = 30 \pmod{15} = 0$
+    \end{itemize}
+    Mảng $A$ mới: $[10, 5, 0, 40, 50]$. Tổng = $10 + 5 + 0 + 40 + 50 = 105$.
+    \item \textbf{Đợt 2:} $x=4, y=5, w=45$. Đường đi: $4-5$.
+    \begin{itemize}
+        \item $A_4 = 40 \pmod{45} = 40$
+        \item $A_5 = 50 \pmod{45} = 5$
+    \end{itemize}
+    Mảng $A$ mới: $[10, 5, 0, 40, 5]$. Tổng = $10 + 5 + 0 + 40 + 5 = 60$.
+\end{itemize}
+
+\section*{Giới hạn và Subtask}
+
+Bài toán được chia làm 3 subtask:
+\begin{itemize}
+    \item \textbf{Subtask 1 (20\% số điểm):} $1 \le N, Q \le 500$.
+    \item \textbf{Subtask 2 (30\% số điểm):} Mỗi đỉnh có bậc không quá 2.
+    \item \textbf{Subtask 3 (50\% số điểm):} Không có ràng buộc gì thêm.
+\end{itemize}
+\end{document}

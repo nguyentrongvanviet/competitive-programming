@@ -1,0 +1,107 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{vietnam}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tikz} % Để vẽ hình minh họa đơn giản nếu cần
+
+% Cấu hình lề trang chuẩn đề thi HSG
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ bottom=20mm,
+}
+
+\title{\textbf{\huge FLAPPY BIRD: THỬ THÁCH ĐƯỜNG THẲNG}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- GIỚI HẠN THỜI GIAN ---
+\begin{center}
+    \vspace{-1.5cm}
+    \textbf{Thời gian giới hạn: 2.0 giây} \\
+    \rule{10cm}{0.4pt}
+    \vspace{0.5cm}
+\end{center}
+
+\section*{Đề bài}
+
+Sau nhiều năm bay nhảy mệt mỏi lên xuống để tránh các ống nước, chú chim Flappy Bird quyết định tìm kiếm một phong cách bay mới: **"Bay Lượn Tự Do"**. Trong chế độ này, chú chim sẽ không vỗ cánh liên tục nữa mà sẽ giữ nguyên tư thế để lướt đi theo một \textbf{quỹ đạo là đường thẳng tắp}.
+
+Bản đồ của trò chơi bao gồm $N$ cột ống nước được đặt liên tiếp nhau tại các hoành độ $x = 1, 2, \dots, N$. Tại mỗi cột $i$, có một khe hở an toàn để bay qua. Khe hở này nằm ở độ cao từ $L_i$ đến $R_i$ (nghĩa là độ cao bay $y$ tại cột $i$ phải thỏa mãn $L_i \le y \le R_i$).
+
+Để hoàn thành màn chơi, Flappy Bird cần chọn một điểm xuất phát và một góc bay (độ dốc) sao cho quỹ đạo bay là một đường thẳng $y = a \cdot x + b$ đi qua lọt khe hở của tất cả $N$ cột ống nước.
+
+Do cấu trúc của thế giới 8-bit, tại mỗi cột ống nước, độ cao của chim bắt buộc phải là một **số nguyên**.
+
+\textbf{Yêu cầu:} Hãy đếm xem có bao nhiêu quỹ đạo đường thẳng hợp lệ (tương ứng với bao nhiêu cách chọn độ cao và độ dốc) để Flappy Bird có thể vượt qua tất cả các cột ống nước mà không bị va chạm?
+
+\section*{Dữ liệu vào (Input)}
+
+\begin{itemize}
+    \item Dòng đầu tiên chứa một số nguyên $N$ ($2 \le N \le 2 \cdot 10^5$) là số lượng cột ống nước.
+    \item $N$ dòng tiếp theo, mỗi dòng chứa hai số nguyên $L_i$ và $R_i$ ($1 \le L_i \le R_i \le 10^9$), mô tả độ cao thấp nhất và cao nhất của khe hở tại cột thứ $i$.
+\end{itemize}
+
+\section*{Kết quả (Output)}
+
+\begin{itemize}
+    \item In ra một số nguyên duy nhất là số lượng quỹ đạo đường thẳng hợp lệ tìm được.
+\end{itemize}
+
+\section*{Ví dụ}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Input} & \textbf{Output} \\
+\hline
+\begin{minipage}[t]{0.45\textwidth}
+\ttfamily
+3 \\
+1 3 \\
+2 3 \\
+1 5
+\end{minipage}
+&
+\begin{minipage}[t]{0.45\textwidth}
+\ttfamily
+6
+\vspace{1cm} % Hack chiều cao
+\end{minipage} \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{Giải thích ví dụ}
+Có 3 cột ống nước. Khe hở lần lượt là $[1,3], [2,3], [1,5]$.
+Có 6 quỹ đạo bay thẳng hợp lệ đi qua các độ cao nguyên:
+\begin{itemize}
+    \item Bay ngang tại độ cao 2: $(1,2) \to (2,2) \to (3,2)$
+    \item Bay ngang tại độ cao 3: $(1,3) \to (2,3) \to (3,3)$
+    \item Bay dốc lên 1 đơn vị: $(1,1) \to (2,2) \to (3,3)$
+    \item Bay dốc lên 1 đơn vị (cao hơn): $(1,2) \to (2,3) \to (3,4)$
+    \item Bay dốc lên 2 đơn vị: $(1,1) \to (2,3) \to (3,5)$
+    \item Bay dốc xuống 1 đơn vị: $(1,3) \to (2,2) \to (3,1)$
+\end{itemize}
+
+\section*{Giới hạn và Subtask}
+
+Bài toán được chia làm 3 subtask:
+\begin{itemize}
+    \item \textbf{Subtask 1 (20\% số điểm):} $N \le 100$ và độ cao $L_i, R_i \le 100$.
+    \item \textbf{Subtask 2 (30\% số điểm):} $L_i,R_i \le 10^5$.
+    \item \textbf{Subtask 3 (50\% số điểm):} Không có ràng buộc gì thêm ($N \le 2 \cdot 10^5$, $L_i, R_i \le 10^9$).
+\end{itemize}
+
+\end{document}
